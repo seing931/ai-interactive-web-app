@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI ConceptHub - Top 20 AI Concepts for Developers</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <!-- React & Babel for Single-File Web App -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+        .code-font {
+            font-family: 'Fira Code', monospace;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.2s ease-in-out;
+        }
+        .glass-card:hover {
+            background: rgba(30, 41, 59, 0.8);
+            border-color: rgba(99, 102, 241, 0.4);
+            transform: translateY(-2px);
+        }
+        /* 3D Flip Card */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+
+        // 20 AI Concepts Database
+        const CONCEPTS_DATA = [
+            {
+                id: 1,
+                number: "01",
+                title: "Machine Learning",
+                category: "Fundamentals",
+                icon: "fa-brain",
+                tagline: "Core algorithms, statistics, and model training techniques",
+                summary: "Machine Learning (ML) is a branch of artificial intelligence where algorithms improve automatically through experience and data rather than explicit programming.",
+                keyTakeaways: [
+                    "Supervised, Unsupervised, & Reinforcement Learning modalities",
+                    "Requires training pipelines: Data preprocessing, feature engineering, model fitting",
+                    "Overfitting vs. Underfitting trade-off management"
+                ],
+                codeSnippet: "# Scikit-Learn Model Training Example\nfrom sklearn.ensemble import RandomForestClassifier\n\nmodel = RandomForestClassifier(n_estimators=100)\nmodel.fit(X_train, y_train)\npredictions = model.predict(X_test)",
+                interactiveDemo: "ml_playground"
+            },
+            {
+                id: 2,
+                number: "02",
+                title: "Deep Learning",
+                category: "Architectures",
+                icon: "fa-network-wired",
+                tagline: "Hierarchical neural networks learning complex representations automatically",
+                summary: "A subset of ML based on artificial neural networks with multiple layers (deep architectures) capable of learning intricate high-level abstractions.",
+                keyTakeaways: [
+                    "Eliminates manual feature engineering for complex spatial/temporal data",
+                    "Requires significant compute (GPUs/TPUs) and high-volume training data",
+                    "Forms the backbone of modern LLMs, Vision models, and Speech systems"
+                ],
+                codeSnippet: "# PyTorch Deep Network Layer\nimport torch.nn as nn\n\nclass DeepNet(nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.layers = nn.Sequential(\n            nn.Linear(784, 256),\n            nn.ReLU(),\n            nn.Linear(256, 10)\n        )",
+                interactiveDemo: "layer_sim"
+            },
+            {
+                id: 3,
+                number: "03",
+                title: "Neural Networks",
+                category: "Architectures",
+                icon: "fa-circle-nodes",
+                tagline: "Layered architectures efficiently modeling non-linear relationships accurately",
+                summary: "Computational models inspired by biological human brains. Composed of interconnected nodes (neurons) structured into input, hidden, and output layers.",
+                keyTakeaways: [
+                    "Forward Propagation maps input features to predicted outputs",
+                    "Activation Functions (ReLU, Sigmoid, Softmax) introduce non-linearity",
+                    "Backpropagation computes gradients using calculus to adjust neuron weights"
+                ],
+                codeSnippet: "# Sigmoid Activation Function\nimport numpy as np\n\ndef sigmoid(z):\n    return 1 / (1 + np.exp(-z))",
+                interactiveDemo: "activation_demo"
+            },
+            {
+                id: 4,
+                number: "04",
+                title: "Natural Language Processing (NLP)",
+                category: "Domains",
+                icon: "fa-language",
+                tagline: "Techniques to process, analyze, and understand natural language text",
+                summary: "Field focused on enabling computers to understand, interpret, analyze, and synthesize human language in a meaningful and contextual way.",
+                keyTakeaways: [
+                    "Pipeline stages: Tokenization, Lemmatization, POS Tagging, Parsing",
+                    "Evolution: Bag-of-Words → Word2Vec → Recurrent Networks → Transformers",
+                    "Powers Machine Translation, Sentiment Analysis, and Summarization"
+                ],
+                codeSnippet: "# NLTK Tokenization Example\nimport nltk\ntokens = nltk.word_tokenize('Developers leverage AI tools daily.')",
+                interactiveDemo: "tokenizer_demo"
+            },
+            {
+                id: 5,
+                number: "05",
+                title: "Computer Vision",
+                category: "Domains",
+                icon: "fa-eye",
+                tagline: "Algorithms interpreting and analyzing visual data effectively",
+                summary: "Field enabling machines to derive meaningful information from visual inputs like digital images, video frames, and 3D sensor streams.",
+                keyTakeaways: [
+                    "Core Tasks: Object Detection, Image Segmentation, Facial Recognition",
+                    "Driven by Convolutional Neural Networks (CNNs) & Vision Transformers (ViT)",
+                    "Powers Autonomous Vehicles, Medical Imaging Diagnostics, and Robotics"
+                ],
+                codeSnippet: "# OpenCV Basic Processing\nimport cv2\nimage = cv2.imread('input.jpg')\ngray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)",
+                interactiveDemo: "vision_demo"
+            },
+            {
+                id: 6,
+                number: "06",
+                title: "Reinforcement Learning",
+                category: "Fundamentals",
+                icon: "fa-gamepad",
+                tagline: "Agent, State, Environment, Action loop rewarding optimal decisions",
+                summary: "Machine learning paradigm where an autonomous Agent learns optimal behavior policies by taking actions in an Environment to maximize cumulative Rewards.",
+                keyTakeaways: [
+                    "Feedback loop: State (S) → Action (A) → Reward (R) → New State (S')",
+                    "Balancing Exploration (trying new paths) vs. Exploitation (using known best paths)",
+                    "Critical for RLHF (Reinforcement Learning from Human Feedback) in LLM alignment"
+                ],
+                codeSnippet: "# Q-Learning Update Equation\nQ[state, action] += alpha * (reward + gamma * max(Q[next_state, :]) - Q[state, action])",
+                interactiveDemo: "rl_sim"
+            },
+            {
+                id: 7,
+                number: "07",
+                title: "Generative Models",
+                category: "Generative AI",
+                icon: "fa-wand-magic-sparkles",
+                tagline: "Creating new data samples using learned probability distributions",
+                summary: "AI models trained to estimate probability distributions in order to generate realistic original content such as synthetic images, audio, video, or synthetic data.",
+                keyTakeaways: [
+                    "Architectures: VAEs, GANs (Generative Adversarial Networks), Diffusion Models",
+                    "Diffusion models progressively denoise random Gaussian noise into crisp outputs",
+                    "Powers Midjourney, Stable Diffusion, and ElevenLabs voice generation"
+                ],
+                codeSnippet: "# Latent Noise Sampling for Generative Models\nimport torch\nlatent_vector = torch.randn(batch_size, latent_dim)",
+                interactiveDemo: "gen_sim"
+            },
+            {
+                id: 8,
+                number: "08",
+                title: "Large Language Models (LLMs)",
+                category: "Generative AI",
+                icon: "fa-comments",
+                tagline: "Generates human-like text using massive pre-training dataset scale",
+                summary: "Deep learning models with tens or hundreds of billions of parameters trained on vast internet text corpora to generate, reason, and answer questions.",
+                keyTakeaways: [
+                    "Autoregressive generation: Predicts the next most likely token sequentially",
+                    "In-context learning capabilities without modifying underlying parameters",
+                    "Examples: OpenAI GPT-4, Anthropic Claude 3.5, Google Gemini 1.5, Meta Llama 3"
+                ],
+                codeSnippet: "// API Call to LLM Provider\nconst response = await fetch('https://api.openai.com/v1/chat/completions', {\n  method: 'POST',\n  body: JSON.stringify({ model: 'gpt-4o', messages: [{role: 'user', content: 'Hello'}] })\n});",
+                interactiveDemo: "llm_demo"
+            },
+            {
+                id: 9,
+                number: "09",
+                title: "Transformers",
+                category: "Architectures",
+                icon: "fa-bolt",
+                tagline: "Self-attention-based architecture powering modern AI models",
+                summary: "Introduced in the seminal paper 'Attention Is All You Need' (2017), replacing recurrent structures with parallelized Self-Attention mechanisms.",
+                keyTakeaways: [
+                    "Self-Attention computes pairwise contextual relationships between all tokens simultaneously",
+                    "Positional Encodings preserve word sequence order without recurrent loops",
+                    "Enables massive hardware acceleration across GPU clusters"
+                ],
+                codeSnippet: "# Multi-Head Attention Call\nimport torch.nn as nn\nmultihead_attn = nn.MultiheadAttention(embed_dim=512, num_heads=8)",
+                interactiveDemo: "attention_demo"
+            },
+            {
+                id: 10,
+                number: "10",
+                title: "Feature Engineering",
+                category: "Engineering",
+                icon: "fa-sliders",
+                tagline: "Designing informative features significantly improving model performance",
+                summary: "The art and science of transforming raw datasets into representative domain-specific features that maximize machine learning algorithm predictive efficiency.",
+                keyTakeaways: [
+                    "Techniques: One-hot encoding, Normalization/Scaling, Polynomial features",
+                    "Handling missing values, outlier detection, and dimensionality reduction (PCA)",
+                    "Remains vital for tabular data, classical ML, and XGBoost models"
+                ],
+                codeSnippet: "# One-Hot Encoding pandas dataframe\nimport pandas as pd\ndf_encoded = pd.get_dummies(df, columns=['category_column'])",
+                interactiveDemo: "feature_sim"
+            },
+            {
+                id: 11,
+                number: "11",
+                title: "Supervised Learning",
+                category: "Fundamentals",
+                icon: "fa-book-open-reader",
+                tagline: "Learns predictive mappings from labeled training pairs",
+                summary: "Primary machine learning methodology where models are trained using dataset samples containing both input feature vectors (X) and ground-truth target labels (Y).",
+                keyTakeaways: [
+                    "Two main task types: Classification (discrete categories) and Regression (continuous values)",
+                    "Loss functions (MSE, Cross-Entropy) quantify prediction discrepancy",
+                    "Evaluation via metrics like Accuracy, Precision, Recall, and ROC-AUC"
+                ],
+                codeSnippet: "# Linear Regression Example\nfrom sklearn.linear_model import LinearRegression\nreg = LinearRegression().fit(X, y)",
+                interactiveDemo: "supervised_demo"
+            },
+            {
+                id: 12,
+                number: "12",
+                title: "Bayesian Learning",
+                category: "Fundamentals",
+                icon: "fa-chart-line",
+                tagline: "Incorporates uncertainty using probabilistic model updating",
+                summary: "Statistical approach to machine learning that applies Bayes' Theorem to update probability distributions as new evidence or observations are gathered.",
+                keyTakeaways: [
+                    "Formula: Posterior = (Likelihood * Prior) / Evidence",
+                    "Explicitly quantifies confidence & epistemic uncertainty in predictions",
+                    "Useful in medical diagnostics, financial risk, and active learning"
+                ],
+                codeSnippet: "# Naive Bayes Classifier\nfrom sklearn.naive_bayes import GaussianNB\ngnb = GaussianNB().fit(X_train, y_train)",
+                interactiveDemo: "bayes_demo"
+            },
+            {
+                id: 13,
+                number: "13",
+                title: "Prompt Engineering",
+                category: "Generative AI",
+                icon: "fa-terminal",
+                tagline: "Crafting effective inputs to guide generative model outputs",
+                summary: "The practice of structuring natural language instructions, context, constraints, and system personas to reliably steer generative model behavior.",
+                keyTakeaways: [
+                    "Techniques: Few-Shot Prompting, Chain-of-Thought (CoT), System Role Definition",
+                    "Mitigates hallucinations and enforces structured output JSON formats",
+                    "Essential skill for modern AI application software developers"
+                ],
+                codeSnippet: `System: You are an expert code reviewer.
+Context:
+1. Return response strictly in JSON format.
+2. Analyze complexity O(N).
+User: Review this Python function...`,
+                interactiveDemo: "prompt_sandbox"
+            },
+            {
+                id: 14,
+                number: "14",
+                title: "AI Agents",
+                category: "Autonomous AI",
+                icon: "fa-robot",
+                tagline: "Autonomous systems that perceive, decide, plan, and act",
+                summary: "Advanced AI software entities that utilize LLMs as central reasoning engines to plan tasks, execute code, query tools, and iteratively solve complex workflows.",
+                keyTakeaways: [
+                    "ReAct Pattern: Reason → Action → Observation loop",
+                    "Tool Integration: Web browsing, SQL querying, API execution, Code execution",
+                    "Multi-Agent Orchestration: CrewAI, AutoGen, and LangGraph frameworks"
+                ],
+                codeSnippet: "# Conceptual Agent Tool Call\nif agent.needs_tool():\n    result = execute_python_code(agent.generated_script)\n    agent.update_memory(result)",
+                interactiveDemo: "agent_sim"
+            },
+            {
+                id: 15,
+                number: "15",
+                title: "Fine Tuning Models",
+                category: "Engineering",
+                icon: "fa-gears",
+                tagline: "Customizes pre-trained models for specialized domain tasks",
+                summary: "Process of continuing the training of an existing pre-trained foundational model on a smaller, domain-specific dataset to adapt its knowledge or style.",
+                keyTakeaways: [
+                    "PEFT (Parameter-Efficient Fine-Tuning) and LoRA (Low-Rank Adaptation)",
+                    "Drastically lowers compute requirements by updating <1% of weights",
+                    "Tailors tone, specialized nomenclature, and strict API response schemas"
+                ],
+                codeSnippet: "# Hugging Face PEFT/LoRA Setup\nfrom peft import LoraConfig, get_peft_model\nconfig = LoraConfig(r=8, lora_alpha=32, target_modules=['q_proj', 'v_proj'])\nmodel = get_peft_model(base_model, config)",
+                interactiveDemo: "finetune_demo"
+            },
+            {
+                id: 16,
+                number: "16",
+                title: "Multimodal Models",
+                category: "Generative AI",
+                icon: "fa-cubes",
+                tagline: "Processes and generates content seamlessly across multiple data types",
+                summary: "AI architectures designed to process, reason over, and synthesize information from diverse media modalities including text, images, audio, and video.",
+                keyTakeaways: [
+                    "Unified joint embedding space mapping words to image pixels or audio waves",
+                    "Enables Visual Question Answering (VQA), voice-to-voice conversation, document OCR",
+                    "Examples: GPT-4o, Gemini 1.5 Pro, Claude 3.5 Sonnet"
+                ],
+                codeSnippet: "// Multimodal API Request Payload\nconst payload = {\n  model: 'gpt-4o',\n  messages: [{\n    role: 'user',\n    content: [\n      { type: 'text', text: 'Analyze this architecture diagram:' },\n      { type: 'image_url', image_url: { url: 'https://example.com/diagram.png' } }\n    ]\n  }]\n};",
+                interactiveDemo: "multimodal_sim"
+            },
+            {
+                id: 17,
+                number: "17",
+                title: "Embeddings",
+                category: "Engineering",
+                icon: "fa-project-diagram",
+                tagline: "Transforms input content into machine-readable numerical dense vectors",
+                summary: "High-dimensional continuous vector representations of data (text, images, audio) where semantic similarity corresponds to geometric proximity.",
+                keyTakeaways: [
+                    "Captures subtle semantic nuance (e.g. 'King' - 'Man' + 'Woman' ≈ 'Queen')",
+                    "Converts raw unstructured text into 768 to 3072-dimensional floating-point arrays",
+                    "Foundation of Semantic Search, Recommendation Systems, and RAG"
+                ],
+                codeSnippet: "# OpenAI Embedding Request\nimport openai\nres = openai.Embedding.create(input='Vector Database', model='text-embedding-3-small')\nvector = res['data'][0]['embedding'] # [0.012, -0.043, ...]",
+                interactiveDemo: "embedding_demo"
+            },
+            {
+                id: 18,
+                number: "18",
+                title: "Vector Search",
+                category: "Engineering",
+                icon: "fa-magnifying-glass-location",
+                tagline: "Finds similar items using dense vector distance math",
+                summary: "Searching technique that queries databases based on conceptual semantic similarity rather than exact keyword matches using vector distance calculations.",
+                keyTakeaways: [
+                    "Distance Metrics: Cosine Similarity, Euclidean Distance (L2), Dot Product",
+                    "ANN (Approximate Nearest Neighbors) algorithms: HNSW, IVF, Flat indexing",
+                    "Vector DB Engines: Pinecone, Qdrant, Milvus, Weaviate, pgvector"
+                ],
+                codeSnippet: "# Cosine Similarity Math\nimport numpy as np\ndef cosine_similarity(a, b):\n    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))",
+                interactiveDemo: "vector_calc"
+            },
+            {
+                id: 19,
+                number: "19",
+                title: "Model Evaluation",
+                category: "Engineering",
+                icon: "fa-clipboard-check",
+                tagline: "Assessing predictive performance using validation techniques",
+                summary: "Methodologies and metrics used to systematically measure, benchmark, and audit the performance, safety, bias, and generalizability of AI models.",
+                keyTakeaways: [
+                    "Metrics: Accuracy, Precision, Recall, F1-Score, MAE, ROUGE, BLEU",
+                    "LLM Evaluations (LLM-as-a-Judge): Faithfulness, Hallucination rate, Answer Relevance",
+                    "Cross-Validation & Holdout validation set partitioning"
+                ],
+                codeSnippet: "# Classification Report\nfrom sklearn.metrics import classification_report\nprint(classification_report(y_true, y_pred))",
+                interactiveDemo: "eval_sim"
+            },
+            {
+                id: 20,
+                number: "20",
+                title: "AI Infrastructure",
+                category: "Engineering",
+                icon: "fa-server",
+                tagline: "Deploying scalable systems and hardware to support AI operations",
+                summary: "The hardware stack, cloud clusters, inference engines, orchestration platforms, and MLOps tools required to train, serve, and monitor AI workloads at scale.",
+                keyTakeaways: [
+                    "Hardware: NVIDIA H100/B200 GPUs, Tensor Core acceleration, NVLink networks",
+                    "Inference Engines: vLLM, TensorRT-LLM, Ollama, Triton Inference Server",
+                    "LLM Orchestration & Monitoring: LangChain, LlamaIndex, Arize, LangSmith"
+                ],
+                codeSnippet: "# vLLM High-Throughput Engine Launch\npython -m vllm.entrypoints.openai.api_server \\\n  --model mistralai/Mistral-7B-Instruct-v0.2 \\\n  --port 8000",
+                interactiveDemo: "infra_sim"
+            }
+        ];
+
+        function App() {
+            const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard', 'slide', 'flashcard', 'quiz', 'demo'
+            const [activeSlideIndex, setActiveSlideIndex] = useState(0);
+            const [selectedCategory, setSelectedCategory] = useState('All');
+            const [searchQuery, setSearchQuery] = useState('');
+            const [bookmarkedIds, setBookmarkedIds] = useState([1, 8, 9, 13, 18]);
+            const [completedIds, setCompletedIds] = useState([1, 2, 3]);
+
+            // Interactive Playground States
+            const [vectorVecA, setVectorVecA] = useState([0.8, 0.2, 0.5]);
+            const [vectorVecB, setVectorVecB] = useState([0.7, 0.3, 0.4]);
+            const [promptText, setPromptText] = useState("Summarize this text in 3 bullet points");
+            const [promptPersona, setPromptPersona] = useState("Senior Architect");
+
+            // Flashcard State
+            const [flashcardIndex, setFlashcardIndex] = useState(0);
+            const [isFlipped, setIsFlipped] = useState(false);
+
+            // Quiz State
+            const [quizQuestionIndex, setQuizQuestionIndex] = useState(0);
+            const [quizScore, setQuizScore] = useState(0);
+            const [selectedQuizAnswer, setSelectedQuizAnswer] = useState(null);
+            const [quizSubmitted, setQuizSubmitted] = useState(false);
+
+            const QUIZ_QUESTIONS = [
+                {
+                    q: "Which architecture introduced the Self-Attention mechanism in 2017?",
+                    options: ["Recurrent Neural Networks (RNN)", "Transformers", "Convolutional Neural Networks (CNN)", "Support Vector Machines"],
+                    correct: 1,
+                    explanation: "Transformers introduced the self-attention mechanism in the 'Attention Is All You Need' paper."
+                },
+                {
+                    q: "What metric is commonly used in Vector Search to calculate semantic closeness between normalized vectors?",
+                    options: ["Hamming Distance", "Cosine Similarity", "Manhattan Distance", "Gini Impurity"],
+                    correct: 1,
+                    explanation: "Cosine Similarity measures the cosine of the angle between two dense embedding vectors."
+                },
+                {
+                    q: "What technique modifies a pre-trained LLM's weights using low-rank matrices to save GPU memory?",
+                    options: ["LoRA (Low-Rank Adaptation)", "Grid Search", "Bagging", "K-Means Clustering"],
+                    correct: 0,
+                    explanation: "LoRA is a Parameter-Efficient Fine-Tuning (PEFT) method that freezes base weights and trains adapter matrices."
+                },
+                {
+                    q: "In Reinforcement Learning, what describes the central entity taking actions within an Environment?",
+                    options: ["Hyperparameter", "Agent", "Tensor", "Loss Function"],
+                    correct: 1,
+                    explanation: "The Agent interacts with the Environment, taking actions to maximize cumulative reward."
+                },
+                {
+                    q: "What transforms unstructured data (like text or images) into continuous numerical floating-point vectors?",
+                    options: ["One-Hot Encoding", "Embeddings", "Quantization", "Gradient Descent"],
+                    correct: 1,
+                    explanation: "Embeddings convert semantic meaning into dense continuous vector spaces."
+                }
+            ];
+
+            // Categories
+            const categories = ['All', 'Fundamentals', 'Architectures', 'Generative AI', 'Engineering', 'Domains', 'Autonomous AI'];
+
+            // Filtered Concepts
+            const filteredConcepts = useMemo(() => {
+                return CONCEPTS_DATA.filter(concept => {
+                    const matchesCat = selectedCategory === 'All' || concept.category === selectedCategory;
+                    const matchesSearch = concept.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                          concept.tagline.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                          concept.summary.toLowerCase().includes(searchQuery.toLowerCase());
+                    return matchesCat && matchesSearch;
+                });
+            }, [selectedCategory, searchQuery]);
+
+            const toggleBookmark = (id, e) => {
+                if (e) e.stopPropagation();
+                setBookmarkedIds(prev => 
+                    prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+                );
+            };
+
+            const toggleCompleted = (id, e) => {
+                if (e) e.stopPropagation();
+                setCompletedIds(prev => 
+                    prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+                );
+            };
+
+            // Calculate Cosine Similarity
+            const cosineSimResult = useMemo(() => {
+                let dot = 0, normA = 0, normB = 0;
+                for(let i = 0; i < vectorVecA.length; i++) {
+                    dot += vectorVecA[i] * vectorVecB[i];
+                    normA += vectorVecA[i] ** 2;
+                    normB += vectorVecB[i] ** 2;
+                }
+                if (normA === 0 || normB === 0) return 0;
+                return (dot / (Math.sqrt(normA) * Math.sqrt(normB))).toFixed(4);
+            }, [vectorVecA, vectorVecB]);
+
+            const handleNextSlide = () => {
+                if (activeSlideIndex < CONCEPTS_DATA.length - 1) {
+                    setActiveSlideIndex(prev => prev + 1);
+                }
+            };
+
+            const handlePrevSlide = () => {
+                if (activeSlideIndex > 0) {
+                    setActiveSlideIndex(prev => prev - 1);
+                }
+            };
+
+            // Keyboard navigation for Slide View
+            useEffect(() => {
+                const handleKeyDown = (e) => {
+                    if (currentView === 'slide') {
+                        if (e.key === 'ArrowRight' || e.key === 'Space') {
+                            handleNextSlide();
+                        } else if (e.key === 'ArrowLeft') {
+                            handlePrevSlide();
+                        }
+                    }
+                };
+                window.addEventListener('keydown', handleKeyDown);
+                return () => window.removeEventListener('keydown', handleKeyDown);
+            }, [currentView, activeSlideIndex]);
+
+            return (
+                <div className="flex flex-col min-h-screen bg-slate-950 text-slate-100">
+                    {/* Top Navigation Bar */}
+                    <header className="sticky top-0 z-50 glass-panel border-b border-slate-800 px-4 md:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4">
+                        <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setCurrentView('dashboard')}>
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                                <i className="fa-solid fa-brain text-white text-lg"></i>
+                            </div>
+                            <div>
+                                <h1 className="font-bold text-lg leading-tight tracking-wide flex items-center gap-2">
+                                    AI ConceptHub
+                                    <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-medium">Developer Edition</span>
+                                </h1>
+                                <p className="text-xs text-slate-400">Master the top 20 core AI concepts</p>
+                            </div>
+                        </div>
+
+                        {/* View Switcher Tabs */}
+                        <nav className="flex items-center space-x-1 bg-slate-900/80 p-1 rounded-xl border border-slate-800">
+                            <button 
+                                onClick={() => setCurrentView('dashboard')}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 ${currentView === 'dashboard' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}`}
+                            >
+                                <i className="fa-solid fa-grip"></i> Dashboard
+                            </button>
+                            <button 
+                                onClick={() => setCurrentView('slide')}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 ${currentView === 'slide' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}`}
+                            >
+                                <i className="fa-solid fa-file-powerpoint"></i> Interactive Slides
+                            </button>
+                            <button 
+                                onClick={() => setCurrentView('demo')}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 ${currentView === 'demo' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}`}
+                            >
+                                <i className="fa-solid fa-flask"></i> Playgrounds
+                            </button>
+                            <button 
+                                onClick={() => setCurrentView('flashcard')}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 ${currentView === 'flashcard' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}`}
+                            >
+                                <i className="fa-solid fa-cards"></i> Flashcards
+                            </button>
+                            <button 
+                                onClick={() => setCurrentView('quiz')}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 ${currentView === 'quiz' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}`}
+                            >
+                                <i className="fa-solid fa-graduation-cap"></i> Quiz
+                            </button>
+                        </nav>
+
+                        {/* Progress Stats */}
+                        <div className="hidden lg:flex items-center space-x-4">
+                            <div className="text-right">
+                                <div className="text-xs text-slate-400">Mastery Progress</div>
+                                <div className="text-sm font-bold text-indigo-400">{completedIds.length} / 20 Completed</div>
+                            </div>
+                            <div className="w-24 bg-slate-800 rounded-full h-2.5 overflow-hidden border border-slate-700">
+                                <div className="bg-gradient-to-r from-indigo-500 to-purple-500 h-2.5 rounded-full" style={{ width: `${(completedIds.length / 20) * 100}%` }}></div>
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* Main Content Area */}
+                    <main className="flex-1 p-4 md:p-8 max-w-7xl w-full mx-auto">
+                        
+                        {/* VIEW 1: DASHBOARD VIEW */}
+                        {currentView === 'dashboard' && (
+                            <div className="space-y-6">
+                                {/* Search & Category Filters Bar */}
+                                <div className="flex flex-col md:flex-row gap-4 items-center justify-between glass-panel p-4 rounded-2xl">
+                                    <div className="relative w-full md:w-80">
+                                        <i className="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-sm"></i>
+                                        <input 
+                                            type="text" 
+                                            placeholder="Search AI concepts..." 
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            className="w-full bg-slate-900 border border-slate-700 text-slate-100 text-sm rounded-xl pl-10 pr-4 py-2 focus:outline-none focus:border-indigo-500 transition-colors"
+                                        />
+                                    </div>
+
+                                    {/* Category Pills */}
+                                    <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-none">
+                                        {categories.map(cat => (
+                                            <button
+                                                key={cat}
+                                                onClick={() => setSelectedCategory(cat)}
+                                                className={`px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap transition-all ${selectedCategory === cat ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200'}`}
+                                            >
+                                                {cat}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Concept Grid */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                    {filteredConcepts.map((item) => {
+                                        const isBookmarked = bookmarkedIds.includes(item.id);
+                                        const isDone = completedIds.includes(item.id);
+
+                                        return (
+                                            <div 
+                                                key={item.id}
+                                                onClick={() => {
+                                                    setActiveSlideIndex(item.id - 1);
+                                                    setCurrentView('slide');
+                                                }}
+                                                className="glass-card p-5 rounded-2xl flex flex-col justify-between cursor-pointer group relative overflow-hidden"
+                                            >
+                                                {/* Category Accent Line */}
+                                                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+
+                                                <div>
+                                                    <div className="flex items-center justify-between mb-3">
+                                                        <span className="text-xs font-mono font-bold px-2 py-1 bg-slate-800/80 rounded-lg text-indigo-400 border border-slate-700">
+                                                            #{item.number}
+                                                        </span>
+                                                        <div className="flex items-center space-x-2">
+                                                            <button 
+                                                                onClick={(e) => toggleCompleted(item.id, e)}
+                                                                title={isDone ? "Mark as Incomplete" : "Mark as Completed"}
+                                                                className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${isDone ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-slate-800 text-slate-500 hover:text-slate-300'}`}
+                                                            >
+                                                                <i className="fa-solid fa-check text-xs"></i>
+                                                            </button>
+                                                            <button 
+                                                                onClick={(e) => toggleBookmark(item.id, e)}
+                                                                title="Bookmark Concept"
+                                                                className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${isBookmarked ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-slate-800 text-slate-500 hover:text-slate-300'}`}
+                                                            >
+                                                                <i className={`fa-${isBookmarked ? 'solid' : 'regular'} fa-bookmark text-xs`}></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 mb-3 group-hover:scale-110 transition-transform">
+                                                        <i className={`fa-solid ${item.icon} text-lg`}></i>
+                                                    </div>
+
+                                                    <h3 className="font-bold text-slate-100 text-base group-hover:text-indigo-300 transition-colors mb-1">
+                                                        {item.title}
+                                                    </h3>
+                                                    <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">
+                                                        {item.tagline}
+                                                    </p>
+                                                </div>
+
+                                                <div className="mt-4 pt-3 border-t border-slate-800/60 flex items-center justify-between text-xs text-slate-500">
+                                                    <span className="px-2 py-0.5 rounded bg-slate-900 border border-slate-800">{item.category}</span>
+                                                    <span className="text-indigo-400 font-medium group-hover:translate-x-1 transition-transform flex items-center gap-1">
+                                                        Learn <i className="fa-solid fa-arrow-right text-[10px]"></i>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* VIEW 2: INTERACTIVE SLIDE VIEW */}
+                        {currentView === 'slide' && (
+                            <div className="glass-panel rounded-3xl p-6 md:p-10 max-w-5xl mx-auto shadow-2xl relative overflow-hidden">
+                                {/* Slide Header Info */}
+                                <div className="flex items-center justify-between border-b border-slate-800 pb-5 mb-6">
+                                    <div className="flex items-center space-x-3">
+                                        <span className="text-sm font-mono px-3 py-1 bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-full font-bold">
+                                            Concept {CONCEPTS_DATA[activeSlideIndex].number} of 20
+                                        </span>
+                                        <span className="text-xs px-2.5 py-1 bg-slate-800 text-slate-400 rounded-lg border border-slate-700">
+                                            {CONCEPTS_DATA[activeSlideIndex].category}
+                                        </span>
+                                    </div>
+
+                                    <div className="flex items-center space-x-2">
+                                        <button 
+                                            onClick={() => toggleBookmark(CONCEPTS_DATA[activeSlideIndex].id)}
+                                            className="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-medium text-slate-300 hover:text-white flex items-center gap-2"
+                                        >
+                                            <i className={`fa-${bookmarkedIds.includes(CONCEPTS_DATA[activeSlideIndex].id) ? 'solid text-amber-400' : 'regular'} fa-bookmark`}></i>
+                                            {bookmarkedIds.includes(CONCEPTS_DATA[activeSlideIndex].id) ? 'Bookmarked' : 'Bookmark'}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Slide Main Content Body */}
+                                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                                    <div className="lg:col-span-7 space-y-6">
+                                        <div className="flex items-center space-x-4">
+                                            <div className="w-14 h-14 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-2xl shadow-inner">
+                                                <i className={`fa-solid ${CONCEPTS_DATA[activeSlideIndex].icon}`}></i>
+                                            </div>
+                                            <div>
+                                                <h2 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
+                                                    {CONCEPTS_DATA[activeSlideIndex].title}
+                                                </h2>
+                                                <p className="text-sm text-indigo-300 font-medium mt-0.5">
+                                                    {CONCEPTS_DATA[activeSlideIndex].tagline}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <p className="text-slate-300 leading-relaxed text-sm md:text-base bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+                                            {CONCEPTS_DATA[activeSlideIndex].summary}
+                                        </p>
+
+                                        {/* Key Takeaways Checklist */}
+                                        <div className="space-y-3">
+                                            <h4 className="text-xs uppercase font-bold tracking-wider text-slate-400 flex items-center gap-2">
+                                                <i className="fa-solid fa-list-check text-indigo-400"></i> Core Architectural Takeaways
+                                            </h4>
+                                            <ul className="space-y-2">
+                                                {CONCEPTS_DATA[activeSlideIndex].keyTakeaways.map((point, idx) => (
+                                                    <li key={idx} className="flex items-start space-x-3 text-xs md:text-sm text-slate-300 bg-slate-900/30 p-2.5 rounded-lg border border-slate-800/50">
+                                                        <i className="fa-solid fa-circle-check text-indigo-400 mt-0.5 text-xs"></i>
+                                                        <span>{point}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                    {/* Code Example & Practical Implementation */}
+                                    <div className="lg:col-span-5 bg-slate-900 rounded-2xl border border-slate-800 p-4 shadow-xl space-y-3">
+                                        <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                                            <span className="text-xs font-mono text-slate-400 flex items-center gap-1.5">
+                                                <i className="fa-solid fa-code text-indigo-400"></i> Developer Pattern
+                                            </span>
+                                            <button 
+                                                onClick={() => {
+                                                    navigator.clipboard.writeText(CONCEPTS_DATA[activeSlideIndex].codeSnippet);
+                                                }}
+                                                className="text-[11px] text-indigo-400 hover:text-indigo-300"
+                                            >
+                                                <i className="fa-regular fa-copy"></i> Copy
+                                            </button>
+                                        </div>
+                                        <pre className="code-font text-xs text-indigo-200 overflow-x-auto p-3 bg-slate-950 rounded-xl border border-slate-800/80 leading-relaxed">
+                                            {CONCEPTS_DATA[activeSlideIndex].codeSnippet}
+                                        </pre>
+
+                                        <div className="p-3 rounded-xl bg-indigo-950/30 border border-indigo-800/30 text-xs text-indigo-300 flex items-center gap-2">
+                                            <i className="fa-solid fa-lightbulb text-amber-400 text-sm"></i>
+                                            <span>Use controls below or keyboard arrow keys to navigate slides.</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Slide Bottom Navigation Toolbar */}
+                                <div className="mt-8 pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+                                    <button 
+                                        onClick={handlePrevSlide}
+                                        disabled={activeSlideIndex === 0}
+                                        className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 text-xs font-semibold disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+                                    >
+                                        <i className="fa-solid fa-chevron-left"></i> Previous Slide
+                                    </button>
+
+                                    {/* Slide Jump Dropdown */}
+                                    <div className="flex items-center space-x-2">
+                                        <select 
+                                            value={activeSlideIndex}
+                                            onChange={(e) => setActiveSlideIndex(Number(e.target.value))}
+                                            className="bg-slate-900 text-slate-200 border border-slate-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-indigo-500 cursor-pointer"
+                                        >
+                                            {CONCEPTS_DATA.map((item, idx) => (
+                                                <option key={item.id} value={idx}>
+                                                    #{item.number} {item.title}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <button 
+                                        onClick={handleNextSlide}
+                                        disabled={activeSlideIndex === CONCEPTS_DATA.length - 1}
+                                        className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/30"
+                                    >
+                                        Next Slide <i className="fa-solid fa-chevron-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* VIEW 3: INTERACTIVE PLAYGROUNDS VIEW */}
+                        {currentView === 'demo' && (
+                            <div className="space-y-6 max-w-4xl mx-auto">
+                                <div className="text-center space-y-2 mb-8">
+                                    <h2 className="text-2xl font-bold text-white">Interactive AI Concept Playgrounds</h2>
+                                    <p className="text-sm text-slate-400">Test concepts mathematically and practically through real-time interactive parameter tweaking.</p>
+                                </div>
+
+                                {/* Playground 1: Vector Search & Cosine Similarity Calculator */}
+                                <div className="glass-panel p-6 rounded-2xl space-y-4">
+                                    <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                                        <h3 className="font-bold text-slate-200 flex items-center gap-2">
+                                            <i className="fa-solid fa-magnifying-glass-location text-indigo-400"></i> Vector Search Cosine Similarity Calculator (#18)
+                                        </h3>
+                                        <span className="text-xs px-2.5 py-0.5 bg-indigo-500/20 text-indigo-300 rounded-full font-mono">Math Simulator</span>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-3 bg-slate-900 p-4 rounded-xl border border-slate-800">
+                                            <label className="text-xs font-semibold text-slate-300 block">Vector A (Query Vector)</label>
+                                            {vectorVecA.map((val, idx) => (
+                                                <div key={idx} className="flex items-center space-x-2">
+                                                    <span className="text-xs font-mono text-slate-500">Dim {idx+1}:</span>
+                                                    <input 
+                                                        type="range" min="-1" max="1" step="0.1"
+                                                        value={val}
+                                                        onChange={(e) => {
+                                                            const newA = [...vectorVecA];
+                                                            newA[idx] = parseFloat(e.target.value);
+                                                            setVectorVecA(newA);
+                                                        }}
+                                                        className="w-full accent-indigo-500 cursor-pointer"
+                                                    />
+                                                    <span className="text-xs font-mono text-indigo-400 w-8">{val}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        <div className="space-y-3 bg-slate-900 p-4 rounded-xl border border-slate-800">
+                                            <label className="text-xs font-semibold text-slate-300 block">Vector B (Database Vector)</label>
+                                            {vectorVecB.map((val, idx) => (
+                                                <div key={idx} className="flex items-center space-x-2">
+                                                    <span className="text-xs font-mono text-slate-500">Dim {idx+1}:</span>
+                                                    <input 
+                                                        type="range" min="-1" max="1" step="0.1"
+                                                        value={val}
+                                                        onChange={(e) => {
+                                                            const newB = [...vectorVecB];
+                                                            newB[idx] = parseFloat(e.target.value);
+                                                            setVectorVecB(newB);
+                                                        }}
+                                                        className="w-full accent-purple-500 cursor-pointer"
+                                                    />
+                                                    <span className="text-xs font-mono text-purple-400 w-8">{val}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="p-4 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+                                        <div>
+                                            <div className="text-xs text-slate-400">Calculated Cosine Similarity</div>
+                                            <div className="text-2xl font-bold font-mono text-emerald-400">{cosineSimResult}</div>
+                                        </div>
+                                        <div className="text-xs text-right text-slate-400 max-w-xs">
+                                            A score closer to <span className="text-emerald-400 font-bold">1.0</span> indicates high semantic similarity.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Playground 2: Prompt Engineering Structure Tester */}
+                                <div className="glass-panel p-6 rounded-2xl space-y-4">
+                                    <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                                        <h3 className="font-bold text-slate-200 flex items-center gap-2">
+                                            <i className="fa-solid fa-terminal text-indigo-400"></i> Prompt Engineering Structure Builder (#13)
+                                        </h3>
+                                        <span className="text-xs px-2.5 py-0.5 bg-purple-500/20 text-purple-300 rounded-full font-mono">LLM Tool</span>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <label className="text-xs text-slate-400 font-medium">Assign Persona Role</label>
+                                            <select 
+                                                value={promptPersona}
+                                                onChange={(e) => setPromptPersona(e.target.value)}
+                                                className="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
+                                            >
+                                                <option value="Senior AI System Architect">Senior AI System Architect</option>
+                                                <option value="Full-Stack Engineer">Full-Stack Engineer</option>
+                                                <option value="Cybersecurity Specialist">Cybersecurity Specialist</option>
+                                            </select>
+
+                                            <label className="text-xs text-slate-400 font-medium block pt-2">Task Instruction</label>
+                                            <textarea 
+                                                value={promptText}
+                                                onChange={(e) => setPromptText(e.target.value)}
+                                                rows="3"
+                                                className="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
+                                            ></textarea>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <label className="text-xs text-slate-400 font-medium">Generated Structured System Prompt Payload</label>
+                                            <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 code-font text-xs text-indigo-300 h-36 overflow-y-auto">
+                                                {`{\n  "role": "system",\n  "persona": "${promptPersona}",\n  "instruction": "${promptText}",\n  "format": "JSON",\n  "temperature": 0.2\n}`}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* VIEW 4: FLASHCARD STUDY MODE */}
+                        {currentView === 'flashcard' && (
+                            <div className="max-w-xl mx-auto space-y-6 text-center">
+                                <div className="space-y-1">
+                                    <h2 className="text-2xl font-bold text-white">AI Concept Flashcards</h2>
+                                    <p className="text-xs text-slate-400">Click card to flip between tagline definition and deep architecture details.</p>
+                                </div>
+
+                                {/* Flashcard Container */}
+                                <div 
+                                    onClick={() => setIsFlipped(!isFlipped)}
+                                    className="w-full h-80 perspective-1000 cursor-pointer"
+                                >
+                                    <div className={`relative w-full h-full duration-500 transform-style-3d ${isFlipped ? 'rotate-y-180' : ''}`}>
+                                        {/* Front Face */}
+                                        <div className="absolute inset-0 w-full h-full glass-panel rounded-3xl p-8 flex flex-col justify-between items-center text-center backface-hidden shadow-2xl border border-indigo-500/30">
+                                            <span className="text-xs font-mono font-bold px-3 py-1 bg-indigo-500/20 text-indigo-300 rounded-full">
+                                                Card {flashcardIndex + 1} of 20
+                                            </span>
+
+                                            <div className="space-y-3">
+                                                <div className="w-16 h-16 rounded-2xl bg-indigo-600/20 text-indigo-400 text-3xl flex items-center justify-center mx-auto border border-indigo-500/30">
+                                                    <i className={`fa-solid ${CONCEPTS_DATA[flashcardIndex].icon}`}></i>
+                                                </div>
+                                                <h3 className="text-2xl font-bold text-white">{CONCEPTS_DATA[flashcardIndex].title}</h3>
+                                                <p className="text-xs text-indigo-300">{CONCEPTS_DATA[flashcardIndex].tagline}</p>
+                                            </div>
+
+                                            <div className="text-xs text-slate-500 flex items-center gap-1">
+                                                <i className="fa-solid fa-rotate text-xs"></i> Click to flip
+                                            </div>
+                                        </div>
+
+                                        {/* Back Face */}
+                                        <div className="absolute inset-0 w-full h-full bg-slate-900 rounded-3xl p-8 flex flex-col justify-between items-center text-center backface-hidden rotate-y-180 shadow-2xl border border-purple-500/30">
+                                            <span className="text-xs font-mono text-purple-400 uppercase font-bold tracking-wider">
+                                                Core Summary & Key Insights
+                                            </span>
+
+                                            <p className="text-xs md:text-sm text-slate-300 leading-relaxed my-auto">
+                                                {CONCEPTS_DATA[flashcardIndex].summary}
+                                            </p>
+
+                                            <div className="text-xs text-slate-500 flex items-center gap-1">
+                                                <i className="fa-solid fa-rotate text-xs"></i> Click to flip back
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Flashcard Navigation Controls */}
+                                <div className="flex items-center justify-between gap-4 pt-2">
+                                    <button 
+                                        onClick={() => {
+                                            setIsFlipped(false);
+                                            setFlashcardIndex(prev => Math.max(0, prev - 1));
+                                        }}
+                                        disabled={flashcardIndex === 0}
+                                        className="px-5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-semibold disabled:opacity-40"
+                                    >
+                                        <i className="fa-solid fa-arrow-left mr-1"></i> Prev
+                                    </button>
+                                    <span className="text-xs text-slate-400 font-mono">
+                                        {flashcardIndex + 1} / 20
+                                    </span>
+                                    <button 
+                                        onClick={() => {
+                                            setIsFlipped(false);
+                                            setFlashcardIndex(prev => Math.min(CONCEPTS_DATA.length - 1, prev + 1));
+                                        }}
+                                        disabled={flashcardIndex === CONCEPTS_DATA.length - 1}
+                                        className="px-5 py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-semibold disabled:opacity-40"
+                                    >
+                                        Next <i className="fa-solid fa-arrow-right ml-1"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* VIEW 5: QUIZ VIEW */}
+                        {currentView === 'quiz' && (
+                            <div className="max-w-2xl mx-auto glass-panel p-8 rounded-3xl space-y-6">
+                                <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+                                    <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                                        <i className="fa-solid fa-graduation-cap text-indigo-400"></i> AI Knowledge Evaluator
+                                    </h2>
+                                    <span className="text-xs font-mono text-slate-400">
+                                        Question {quizQuestionIndex + 1} of {QUIZ_QUESTIONS.length}
+                                    </span>
+                                </div>
+
+                                {!quizSubmitted ? (
+                                    <div className="space-y-6">
+                                        <h3 className="text-base font-semibold text-slate-100">
+                                            {QUIZ_QUESTIONS[quizQuestionIndex].q}
+                                        </h3>
+
+                                        <div className="space-y-3">
+                                            {QUIZ_QUESTIONS[quizQuestionIndex].options.map((opt, idx) => (
+                                                <button 
+                                                    key={idx}
+                                                    onClick={() => setSelectedQuizAnswer(idx)}
+                                                    className={`w-full text-left p-3.5 rounded-xl text-xs font-medium border transition-all ${selectedQuizAnswer === idx ? 'bg-indigo-600/20 border-indigo-500 text-indigo-200' : 'bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700'}`}
+                                                >
+                                                    <span className="font-mono text-slate-500 mr-2">{String.fromCharCode(65 + idx)}.</span> {opt}
+                                                </button>
+                                            ))}
+                                        </div>
+
+                                        <button 
+                                            disabled={selectedQuizAnswer === null}
+                                            onClick={() => {
+                                                if (selectedQuizAnswer === QUIZ_QUESTIONS[quizQuestionIndex].correct) {
+                                                    setQuizScore(prev => prev + 1);
+                                                }
+                                                if (quizQuestionIndex < QUIZ_QUESTIONS.length - 1) {
+                                                    setQuizQuestionIndex(prev => prev + 1);
+                                                    setSelectedQuizAnswer(null);
+                                                } else {
+                                                    setQuizSubmitted(true);
+                                                }
+                                            }}
+                                            className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold disabled:opacity-40 transition-all shadow-lg shadow-indigo-600/30"
+                                        >
+                                            {quizQuestionIndex < QUIZ_QUESTIONS.length - 1 ? 'Submit Answer & Continue' : 'Finish Quiz'}
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-8 space-y-4">
+                                        <div className="w-16 h-16 bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 rounded-full flex items-center justify-center text-2xl mx-auto">
+                                            <i className="fa-solid fa-trophy"></i>
+                                        </div>
+                                        <h3 className="text-2xl font-extrabold text-white">Quiz Completed!</h3>
+                                        <p className="text-sm text-slate-300">
+                                            You scored <span className="font-bold text-emerald-400 text-lg">{quizScore}</span> out of <span className="font-bold text-white">{QUIZ_QUESTIONS.length}</span>
+                                        </p>
+
+                                        <button 
+                                            onClick={() => {
+                                                setQuizQuestionIndex(0);
+                                                setQuizScore(0);
+                                                setSelectedQuizAnswer(null);
+                                                setQuizSubmitted(false);
+                                            }}
+                                            className="px-6 py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-semibold"
+                                        >
+                                            Retake Quiz
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </main>
+
+                    {/* Footer */}
+                    <footer className="mt-auto border-t border-slate-800/80 p-4 text-center text-xs text-slate-500 glass-panel">
+                        AI ConceptHub Application &bull; Built for modern software engineers & developers.
+                    </footer>
+                </div>
+            );
+        }
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>

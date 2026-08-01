@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top 20 AI Concepts Every Developer Should Know</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome CDN for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    },
+                    colors: {
+                        navy: {
+                            950: '#070B19',
+                            900: '#0C1327',
+                            800: '#141E38',
+                            700: '#1E2B4D',
+                            600: '#2A3B66',
+                        },
+                        brand: {
+                            blue: '#4F46E5',
+                            lightBlue: '#818CF8',
+                            accent: '#6366F1',
+                            glow: '#A5B4FC',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0C1327;
+            color: #F3F4F6;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Radial background glow to mirror slide background */
+        .slide-bg-gradient {
+            background: radial-gradient(circle at 85% 15%, rgba(99, 102, 241, 0.15) 0%, rgba(12, 19, 39, 1) 70%);
+        }
+
+        /* Card custom glow and glassmorphism */
+        .glass-card {
+            background: rgba(20, 30, 56, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(129, 140, 248, 0.3);
+            box-shadow: 0 12px 35px -5px rgba(99, 102, 241, 0.15);
+        }
+
+        .glass-pill {
+            background: rgba(129, 140, 248, 0.12);
+            border: 1px solid rgba(129, 140, 248, 0.25);
+        }
+
+        /* Slide Transitions */
+        .slide-enter {
+            opacity: 0;
+            transform: translateY(16px) scale(0.98);
+        }
+
+        .slide-active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .slide-exit {
+            opacity: 0;
+            transform: translateY(-16px) scale(0.98);
+            transition: all 0.3s cubic-bezier(0.7, 0, 0.84, 0);
+        }
+
+        /* Custom Scrollbar for sidebars/modals */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(12, 19, 39, 0.8);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(129, 140, 248, 0.3);
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(129, 140, 248, 0.6);
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col slide-bg-gradient select-none">
+
+    <header class="w-full bg-navy-950/80 backdrop-blur-md border-b border-white/10 px-4 py-3 sticky top-0 z-40 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <button id="homeBtn" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium text-brand-glow bg-brand-accent/20 hover:bg-brand-accent/30 border border-brand-accent/40 transition">
+                <i class="fa-solid fa-layer-group"></i>
+                <span class="hidden sm:inline">Overview Grid</span>
+            </button>
+            <div class="h-4 w-px bg-white/20 hidden sm:block"></div>
+            <span class="text-xs md:text-sm font-semibold tracking-wide text-gray-300 truncate max-w-[200px] sm:max-w-xs md:max-w-md">
+                Top 20 AI Concepts Guide
+            </span>
+        </div>
+
+        <!-- Center Controls: Counter & Title -->
+        <div class="flex items-center gap-2 bg-navy-900/90 border border-white/10 rounded-full px-4 py-1 text-xs sm:text-sm font-mono">
+            <span id="currentSlideNum" class="text-brand-glow font-bold">0</span>
+            <span class="text-gray-500">/</span>
+            <span id="totalSlidesNum" class="text-gray-400">22</span>
+        </div>
+
+        <!-- Right Action Controls -->
+        <div class="flex items-center gap-2">
+            <!-- Search Trigger -->
+            <button id="searchToggleBtn" title="Search Concepts (Ctrl+K)" class="p-2 rounded-lg text-gray-300 hover:text-white hover:bg-white/10 transition text-sm">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+            
+            <!-- Presentation Mode Switcher -->
+            <button id="layoutToggleBtn" title="Toggle Slide / Scroll View" class="p-2 rounded-lg text-gray-300 hover:text-white hover:bg-white/10 transition text-sm">
+                <i id="layoutIcon" class="fa-solid fa-expand"></i>
+            </button>
+
+            <!-- Fullscreen Switcher -->
+            <button id="fullscreenBtn" title="Full Screen (F)" class="p-2 rounded-lg text-gray-300 hover:text-white hover:bg-white/10 transition text-sm hidden md:inline-flex">
+                <i class="fa-solid fa-expand-wide"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-1 relative flex flex-col justify-center items-center p-4 md:p-8 max-w-7xl mx-auto w-full min-h-0 overflow-y-auto">
+        
+        <!-- Interactive Progress Bar -->
+        <div class="w-full max-w-5xl mb-4 bg-navy-900/80 rounded-full h-1.5 border border-white/5 overflow-hidden">
+            <div id="progressBar" class="bg-gradient-to-r from-brand-accent to-brand-lightBlue h-full transition-all duration-300 w-0"></div>
+        </div>
+
+        <!-- Slide Content Wrapper -->
+        <div id="slideViewport" class="w-full max-w-5xl my-auto flex items-center justify-center min-h-[500px]">
+            <!-- Slide render destination -->
+            <div id="activeSlideContainer" class="w-full slide-active"></div>
+        </div>
+
+    </main>
+
+    <footer class="w-full bg-navy-950/90 border-t border-white/10 px-4 py-3 sticky bottom-0 z-40 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-2">
+            <button id="prevSlideBtn" class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-white/10 hover:bg-white/20 text-white disabled:opacity-30 disabled:cursor-not-allowed transition">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span class="hidden sm:inline">Previous</span>
+            </button>
+            <button id="nextSlideBtn" class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-brand-accent hover:bg-brand-accent/80 text-white shadow-lg shadow-brand-accent/20 disabled:opacity-30 disabled:cursor-not-allowed transition">
+                <span class="hidden sm:inline">Next</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+
+        <!-- Quick Jump Select Dropdown -->
+        <div class="flex-1 max-w-xs mx-2">
+            <select id="slideSelect" class="w-full bg-navy-900 border border-white/15 text-xs sm:text-sm rounded-xl px-3 py-2 text-gray-200 focus:outline-none focus:border-brand-accent cursor-pointer truncate">
+                <!-- Populated dynamically via JS -->
+            </select>
+        </div>
+
+        <!-- Auto Play & Audio Controls -->
+        <div class="flex items-center gap-2">
+            <button id="autoplayBtn" title="Autoplay Presentation" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs sm:text-sm text-gray-300 flex items-center gap-1.5 transition">
+                <i id="autoplayIcon" class="fa-solid fa-play text-emerald-400"></i>
+                <span class="hidden md:inline">Autoplay</span>
+            </button>
+        </div>
+    </footer>
+
+    <div id="gridModal" class="fixed inset-0 bg-navy-950/95 backdrop-blur-xl z-50 flex flex-col p-4 md:p-8 hidden opacity-0 transition-opacity duration-300">
+        <div class="flex items-center justify-between mb-6 max-w-7xl mx-auto w-full">
+            <div>
+                <h2 class="text-xl md:text-2xl font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-border-all text-brand-lightBlue"></i>
+                    All 20 AI Concepts Roadmap
+                </h2>
+                <p class="text-xs md:text-sm text-gray-400">Click any card to jump directly to its detailed breakdown.</p>
+            </div>
+            <button id="closeGridBtn" class="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Grid Container -->
+        <div id="gridContainer" class="max-w-7xl mx-auto w-full flex-1 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-1">
+            <!-- Dynamic Grid Items -->
+        </div>
+    </div>
+
+    <div id="searchModal" class="fixed inset-0 bg-navy-950/80 backdrop-blur-md z-50 flex items-start justify-center pt-20 p-4 hidden">
+        <div class="bg-navy-900 border border-white/20 rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col">
+            <div class="p-4 border-b border-white/10 flex items-center gap-3">
+                <i class="fa-solid fa-magnifying-glass text-brand-lightBlue"></i>
+                <input type="text" id="searchInput" placeholder="Search concepts, keywords, terms (e.g., 'Attention', 'RAG', 'Loss')..." class="bg-transparent border-none text-white focus:outline-none w-full text-sm md:text-base placeholder-gray-500">
+                <button id="closeSearchBtn" class="text-gray-400 hover:text-white text-sm">Esc</button>
+            </div>
+            <div id="searchResults" class="max-h-96 overflow-y-auto p-2 divide-y divide-white/5">
+                <!-- Search Items -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* 
+         * COMPLETE SLIDE DECK CONTENT (100% Matching original images & attachment)
+         */
+        const slideData = [
+            // Slide 0: Title Cover
+            {
+                type: 'cover',
+                badge: 'Developer Reference Architecture Guide',
+                title: 'Top 20 AI Concepts Every Developer Should Know',
+                subtitle: 'A comprehensive architectural guide to modern artificial intelligence, machine learning principles, and generative LLM technologies.',
+                codeSymbol: '</>'
+            },
+            // Slide 1: Roadmap Overview Grid Slide
+            {
+                type: 'roadmap',
+                title: 'Top 20 AI Concepts Roadmap Overview',
+                subtitle: 'Key foundational components structuring modern AI development'
+            },
+            // Concept 1
+            {
+                number: 1,
+                title: 'Machine Learning Foundations',
+                badge: 'Core Algorithms & Statistics',
+                icon: 'fa-brain',
+                bullets: [
+                    { title: 'Core Algorithms & Statistics', text: 'Mathematical methods that enable computer systems to learn patterns directly from structured or unstructured data.' },
+                    { title: 'Model Training Techniques', text: 'Involves optimizing objective loss functions using iterative optimization algorithms like Gradient Descent.' },
+                    { title: 'Generalization Goal', text: 'Focuses on learning underlying relationships rather than memorizing data, ensuring high performance on unseen test data.' }
+                ]
+            },
+            // Concept 2
+            {
+                number: 2,
+                title: 'Deep Learning Architecture',
+                badge: 'Neural Representation',
+                icon: 'fa-network-wired',
+                bullets: [
+                    { title: 'Hierarchical Representations', text: 'Deep Learning utilizes deep neural networks with multiple stacked hidden layers to extract multi-level abstractions automatically from raw inputs.' },
+                    { title: 'Automatic Feature Extraction', text: 'Eliminates hand-crafted manual feature engineering by learning low-level edges, mid-level textures, and high-level semantic shapes end-to-end.' }
+                ]
+            },
+            // Concept 3
+            {
+                number: 3,
+                title: 'Neural Networks',
+                badge: 'Layered Abstraction',
+                icon: 'fa-diagram-project',
+                bullets: [
+                    { title: 'Layered Architectures', text: 'Composed of input layers, multiple hidden layers, and output layers containing interconnected artificial neurons (nodes).' },
+                    { title: 'Non-Linear Modeling', text: 'Employs activation functions (e.g., ReLU, GELU, Sigmoid) to model complex non-linear mathematical relationships accurately.' }
+                ]
+            },
+            // Concept 4
+            {
+                number: 4,
+                title: 'Natural Language Processing',
+                badge: 'Text AI',
+                icon: 'fa-font',
+                bullets: [
+                    { title: 'Text Parsing', text: 'Techniques such as tokenization, lemmatization, and syntax tree parsing to transform raw unstructured text into structured tokens.' },
+                    { title: 'Semantic Understanding', text: 'Extracting intent, sentiment, entity recognition (NER), and contextual meaning from human language inputs.' },
+                    { title: 'Language Generation', text: 'Translating, summarizing, and synthesizing natural text tailored to domain-specific contextual requirements.' }
+                ]
+            },
+            // Concept 5
+            {
+                number: 5,
+                title: 'Computer Vision',
+                badge: 'Visual Data',
+                icon: 'fa-eye',
+                bullets: [
+                    { title: 'Visual Interpretation', text: 'Algorithms capable of processing, inspecting, and analyzing 2D images and 3D video streams.' },
+                    { title: 'Core Tasks', text: 'Includes image classification, bounding-box object detection, semantic segmentation, and optical character recognition (OCR).' },
+                    { title: 'Modern Backbone', text: 'Powered historically by Convolutional Neural Networks (CNNs) and currently by Vision Transformers (ViT).' }
+                ]
+            },
+            // Concept 6
+            {
+                number: 6,
+                title: 'Reinforcement Learning',
+                badge: 'Decision Making',
+                icon: 'fa-gamepad',
+                bullets: [
+                    { title: 'Agent-Environment Loop', text: 'An autonomous Agent perceives a State, performs an Action, and receives numerical feedback (Reward/Penalty) from the Environment.' },
+                    { title: 'Policy Optimization', text: 'Learns optimal decision policies to maximize cumulative long-term rewards (e.g., Q-Learning, PPO, RLHF for aligning LLMs).' }
+                ]
+            },
+            // Concept 7
+            {
+                number: 7,
+                title: 'Generative Models',
+                badge: 'Creation',
+                icon: 'fa-wand-magic-sparkles',
+                bullets: [
+                    { title: 'Learning Probability Distributions', text: 'Models the underlying probability distribution of training data to sample and generate brand-new, realistic data artifacts.' },
+                    { title: 'Key Architectures', text: 'Generative Adversarial Networks (GANs), Variational Autoencoders (VAEs), and Latent Diffusion Models.' },
+                    { title: 'Applications', text: 'High-resolution image synthesis, audio cloning, synthetic data generation, and 3D mesh creation.' }
+                ]
+            },
+            // Concept 8
+            {
+                number: 8,
+                title: 'Large Language Models (LLM)',
+                badge: 'GenAI',
+                icon: 'fa-comments',
+                bullets: [
+                    { title: 'Massive Pre-training', text: 'Trained on billions/trillions of textual tokens using self-supervised objective tasks (e.g., Next-Token Prediction) to encode vast world knowledge.' },
+                    { title: 'Emergent Capabilities', text: 'Exhibits human-like reasoning, in-context learning, code synthesis, and multi-step problem solving across general domains.' }
+                ]
+            },
+            // Concept 9
+            {
+                number: 9,
+                title: 'Transformers',
+                badge: 'Core Architecture',
+                icon: 'fa-bolt',
+                bullets: [
+                    { title: 'Self-Attention', text: 'Allows models to dynamically weigh the importance and relationships between tokens regardless of distance in sequence.' },
+                    { title: 'Parallel Computing', text: 'Replaces sequential RNNs, enabling massive hardware parallelization across modern GPU/TPU clusters.' },
+                    { title: 'Foundation of AI', text: 'Powers virtually all contemporary breakthrough models including GPT-4, Claude, Gemini, Llama, and ViT.' }
+                ]
+            },
+            // Concept 10
+            {
+                number: 10,
+                title: 'Feature Engineering',
+                badge: 'Data Prep',
+                icon: 'fa-sliders',
+                bullets: [
+                    { title: 'Information Extraction', text: 'Selecting, transforming, and combining raw data attributes into informative features that accentuate domain signals for tabular ML models.' },
+                    { title: 'Performance Impact', text: 'Significantly reduces model complexity, prevents overfitting, and maximizes predictive performance across traditional machine learning pipelines.' }
+                ]
+            },
+            // Concept 11
+            {
+                number: 11,
+                title: 'Supervised & Unsupervised Learning',
+                badge: 'Paradigms',
+                icon: 'fa-diagram-successor',
+                bullets: [
+                    { title: 'Supervised Learning', text: 'Learns mapping functions from labeled input-output pairs (e.g., Regression, Classification) to predict labels on unseen targets.' },
+                    { title: 'Unsupervised Learning', text: 'Discovers hidden patterns, clusters, and latent representations from unlabeled data (e.g., K-Means, PCA, Autoencoders).' }
+                ]
+            },
+            // Concept 12
+            {
+                number: 12,
+                title: 'Bayesian Learning',
+                badge: 'Probabilistic AI',
+                icon: 'fa-chart-pie',
+                bullets: [
+                    { title: 'Prior & Posterior Updating', text: 'Incorporates prior domain belief probabilities and dynamically updates them with observed evidence using Bayes\' Theorem.' },
+                    { title: 'Uncertainty Estimation', text: 'Quantifies predictive risk and confidence bounds accurately, essential for safety-critical applications like medical diagnosis and finance.' }
+                ]
+            },
+            // Concept 13
+            {
+                number: 13,
+                title: 'Prompt Engineering',
+                badge: 'LLM Control',
+                icon: 'fa-terminal',
+                bullets: [
+                    { title: 'Input Optimization', text: 'The practice of designing structured instructions, system roles, and contextual constraints to guide generative model outputs.' },
+                    { title: 'Advanced Prompt Strategies', text: 'Employs techniques like Few-Shot Prompting, Chain-of-Thought (CoT), Tree-of-Thoughts, and ReAct frameworks.' },
+                    { title: 'Deterministic Tuning', text: 'Adjusting decoding hyperparameters (e.g., Temperature, Top-P, System Prompts) to optimize consistency.' }
+                ]
+            },
+            // Concept 14
+            {
+                number: 14,
+                title: 'AI Agents',
+                badge: 'Autonomous Systems',
+                icon: 'fa-robot',
+                bullets: [
+                    { title: 'Autonomous Systems', text: 'Goal-driven software entities that perceive their surroundings, make decisions, and act autonomously.' },
+                    { title: 'Tool Augmentation', text: 'Integrates external APIs, code execution, search engines, and database lookup tools.' },
+                    { title: 'Memory & Planning', text: 'Maintains short-term and long-term memory buffer states for multi-step task execution.' }
+                ]
+            },
+            // Concept 15
+            {
+                number: 15,
+                title: 'Fine-Tuning Models',
+                badge: 'Customization',
+                icon: 'fa-gears',
+                bullets: [
+                    { title: 'Domain Adaptation', text: 'Adapts general pre-trained models to specialized domain tasks (e.g., medical, legal, corporate knowledge) using supervised datasets.' },
+                    { title: 'Parameter Efficient Tuning (PEFT)', text: 'Uses efficient techniques like LoRA (Low-Rank Adaptation) and QLoRA to fine-tune a small fraction (~1%) of model weights with minimal VRAM overhead.' }
+                ]
+            },
+            // Concept 16
+            {
+                number: 16,
+                title: 'Multimodal Models',
+                badge: 'Multi-Input',
+                icon: 'fa-cubes',
+                bullets: [
+                    { title: 'Vision & Language', text: 'Jointly ingests images, documents, and diagrams alongside natural language queries for visual reasoning.' },
+                    { title: 'Audio & Speech', text: 'Direct native processing of speech streams for ultra-low latency real-time voice conversations.' },
+                    { title: 'Unified Embedding Space', text: 'Aligns disparate data types into shared vector space representations (e.g., CLIP, Gemini, GPT-4o).' }
+                ]
+            },
+            // Concept 17
+            {
+                number: 17,
+                title: 'Embeddings',
+                badge: 'Representation',
+                icon: 'fa-bezier-curve',
+                bullets: [
+                    { title: 'Dense Vector Conversion', text: 'Transforms complex text, audio, images, or graph nodes into fixed-size real-valued vectors.' },
+                    { title: 'Semantic Proximity', text: 'Captures contextual meaning such that semantically similar concepts end up closer together in multi-dimensional vector space.' },
+                    { title: 'Core Requirement', text: 'Serves as the foundational mathematical representation for semantic search, recommendation systems, and RAG architectures.' }
+                ]
+            },
+            // Concept 18
+            {
+                number: 18,
+                title: 'Vector Search',
+                badge: 'Semantic Retrieval',
+                icon: 'fa-magnifying-glass-location',
+                bullets: [
+                    { title: 'Similarity Metrics', text: 'Finds relevant content based on semantic distance (Cosine Similarity, Euclidean Distance, Dot Product) rather than exact keyword matches.' },
+                    { title: 'Vector Databases & RAG', text: 'Uses ANN (Approximate Nearest Neighbors) indexing (e.g., HNSW) to power Retrieval-Augmented Generation (RAG) pipelines at scale.' }
+                ]
+            },
+            // Concept 19
+            {
+                number: 19,
+                title: 'Model Evaluation',
+                badge: 'Validation',
+                icon: 'fa-square-check',
+                bullets: [
+                    { title: 'Traditional ML Metrics', text: 'Measures quantitative metrics like Precision, Recall, F1-Score, ROC-AUC, and Mean Squared Error (MSE) across test validation sets.' },
+                    { title: 'LLM & GenAI Benchmarks', text: 'Evaluates generative models using LLM-as-a-Judge frameworks, human evaluation, and standardized benchmarks (MMLU, GSM8K, HumanEval).' }
+                ]
+            },
+            // Concept 20
+            {
+                number: 20,
+                title: 'AI Infrastructure',
+                badge: 'Operations & MLOps',
+                icon: 'fa-server',
+                bullets: [
+                    { title: 'Hardware Clusters', text: 'Distributed high-performance GPU/TPU nodes interconnected via high-bandwidth InfiniBand networking.' },
+                    { title: 'Serving & Inference', text: 'Optimized engines (vLLM, TensorRT-LLM, Ollama) maximizing KV-cache efficiency and throughput.' },
+                    { title: 'MLOps & Monitoring', text: 'End-to-end continuous deployment pipelines, metric logging, model registries, and drift detection.' }
+                ]
+            },
+            // Slide 21: Questions & Outro
+            {
+                type: 'outro',
+                title: 'Questions & Discussion',
+                subtitle: 'You now possess a foundational architectural grasp of the top 20 AI concepts.',
+                footer: 'Modern Artificial Intelligence Reference Deck for Developers'
+            }
+        ];
+
+        // Concept Titles list for index
+        const conceptTitlesList = [
+            "Machine Learning", "Deep Learning", "Neural Networks", "NLP", "Computer Vision",
+            "Reinforcement Learning", "Generative Models", "LLM", "Transformers", "Feature Engineering",
+            "Supervised / Unsupervised", "Bayesian Learning", "Prompt Engineering", "AI Agents", "Fine-Tuning Models",
+            "Multimodal Models", "Embeddings", "Vector Search", "Model Evaluation", "AI Infrastructure"
+        ];
+
+        let currentSlideIndex = 0;
+        let autoplayInterval = null;
+        let isAutoplay = false;
+
+        // Elements
+        const activeSlideContainer = document.getElementById('activeSlideContainer');
+        const currentSlideNumEl = document.getElementById('currentSlideNum');
+        const totalSlidesNumEl = document.getElementById('totalSlidesNum');
+        const progressBar = document.getElementById('progressBar');
+        const prevBtn = document.getElementById('prevSlideBtn');
+        const nextBtn = document.getElementById('nextSlideBtn');
+        const slideSelect = document.getElementById('slideSelect');
+        const gridModal = document.getElementById('gridModal');
+        const gridContainer = document.getElementById('gridContainer');
+        const searchModal = document.getElementById('searchModal');
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.getElementById('searchResults');
+
+        // Initialize Total Count
+        totalSlidesNumEl.textContent = slideData.length - 1;
+
+        function renderSlide(index) {
+            const slide = slideData[index];
+            currentSlideNumEl.textContent = index;
+            progressBar.style.width = `${(index / (slideData.length - 1)) * 100}%`;
+
+            // Update prev/next button states
+            prevBtn.disabled = index === 0;
+            nextBtn.disabled = index === slideData.length - 1;
+            slideSelect.value = index;
+
+            let html = '';
+
+            if (slide.type === 'cover') {
+                // Cover Slide Layout 100% matched to Attachment
+                html = `
+                    <div class="glass-card rounded-3xl p-8 md:p-14 text-center max-w-4xl mx-auto flex flex-col items-center justify-center min-h-[460px] border border-white/10 relative overflow-hidden">
+                        <div class="absolute -top-24 -right-24 w-72 h-72 bg-brand-accent/20 rounded-full blur-3xl pointer-events-none"></div>
+                        <div class="absolute -bottom-24 -left-24 w-72 h-72 bg-brand-lightBlue/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                        <div class="inline-flex items-center gap-2 px-5 py-2 rounded-full glass-pill text-brand-glow text-sm font-semibold mb-8">
+                            <span>${slide.badge}</span>
+                        </div>
+
+                        <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight mb-6 leading-tight">
+                            ${slide.title}
+                        </h1>
+
+                        <p class="text-gray-300 text-sm sm:text-lg max-w-2xl font-normal leading-relaxed mb-10">
+                            ${slide.subtitle}
+                        </p>
+
+                        <div class="w-16 h-16 rounded-2xl bg-brand-accent/20 border border-brand-accent/40 flex items-center justify-center text-brand-glow text-2xl font-mono shadow-inner">
+                            &lt;/&gt;
+                        </div>
+                    </div>
+                `;
+            } else if (slide.type === 'roadmap') {
+                // Roadmap grid slide matching slide #2 of deck
+                html = `
+                    <div class="glass-card rounded-3xl p-6 md:p-10 w-full max-w-5xl mx-auto border border-white/10">
+                        <div class="text-center mb-8">
+                            <h2 class="text-2xl sm:text-4xl font-extrabold text-white mb-2">${slide.title}</h2>
+                            <p class="text-gray-400 text-xs sm:text-sm">${slide.subtitle}</p>
+                        </div>
+
+                        <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-2.5 sm:gap-3">
+                            ${conceptTitlesList.map((concept, i) => `
+                                <button onclick="goToSlide(${i + 2})" class="glass-card p-3 rounded-xl border border-white/10 hover:border-brand-accent/60 hover:bg-brand-accent/20 transition text-left flex flex-col justify-between h-20 group">
+                                    <span class="text-[10px] font-mono font-bold text-brand-glow group-hover:text-white">#${i + 1}</span>
+                                    <span class="text-xs font-semibold text-gray-200 group-hover:text-white line-clamp-2 leading-snug">${concept}</span>
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } else if (slide.type === 'outro') {
+                // Questions & Outro slide
+                html = `
+                    <div class="glass-card rounded-3xl p-8 md:p-16 text-center max-w-3xl mx-auto flex flex-col items-center justify-center min-h-[420px] border border-white/10">
+                        <div class="w-20 h-20 rounded-full bg-brand-accent/20 border border-brand-accent/40 flex items-center justify-center text-brand-glow text-3xl mb-8 shadow-lg shadow-brand-accent/20 animate-pulse">
+                            <i class="fa-regular fa-comments"></i>
+                        </div>
+
+                        <h2 class="text-3xl sm:text-5xl font-extrabold text-white mb-4">
+                            ${slide.title}
+                        </h2>
+
+                        <p class="text-gray-300 text-base sm:text-xl font-medium max-w-xl mb-8">
+                            ${slide.subtitle}
+                        </p>
+
+                        <div class="text-xs sm:text-sm font-mono text-brand-glow px-4 py-2 rounded-full glass-pill">
+                            ${slide.footer}
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Concept Slides (1 through 20)
+                html = `
+                    <div class="glass-card rounded-3xl p-6 sm:p-10 w-full max-w-4xl mx-auto border border-white/10 relative overflow-hidden">
+                        <!-- Top Header Row -->
+                        <div class="flex items-center justify-between gap-4 mb-8 pb-4 border-b border-white/10">
+                            <div class="flex items-center gap-3">
+                                <span class="w-10 h-10 rounded-xl bg-brand-accent/20 border border-brand-accent/40 text-brand-glow font-mono font-bold text-lg flex items-center justify-center">
+                                    ${slide.number}
+                                </span>
+                                <div>
+                                    <h2 class="text-xl sm:text-3xl font-extrabold text-white tracking-tight">
+                                        ${slide.title}
+                                    </h2>
+                                </div>
+                            </div>
+
+                            <span class="px-3.5 py-1.5 rounded-full text-xs font-semibold glass-pill text-brand-glow shrink-0">
+                                ${slide.badge}
+                            </span>
+                        </div>
+
+                        <!-- Content Cards / Bullets -->
+                        <div class="space-y-4">
+                            ${slide.bullets.map((bullet, idx) => `
+                                <div class="p-4 sm:p-5 rounded-2xl bg-navy-900/60 border border-white/5 hover:border-brand-accent/30 transition flex items-start gap-4">
+                                    <div class="w-2 h-2 rounded-full bg-brand-lightBlue mt-2.5 shrink-0"></div>
+                                    <div class="flex-1">
+                                        <h3 class="text-sm sm:text-base font-bold text-white mb-1">
+                                            ${bullet.title}
+                                        </h3>
+                                        <p class="text-xs sm:text-sm text-gray-300 leading-relaxed">
+                                            ${bullet.text}
+                                        </p>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Animate transition
+            activeSlideContainer.className = 'w-full slide-exit';
+            setTimeout(() => {
+                activeSlideContainer.innerHTML = html;
+                activeSlideContainer.className = 'w-full slide-active';
+            }, 150);
+        }
+
+        function initNavigationOptions() {
+            // Populate select dropdown
+            slideSelect.innerHTML = slideData.map((slide, idx) => {
+                let label = '';
+                if (slide.type === 'cover') label = '0. Reference Architecture Guide';
+                else if (slide.type === 'roadmap') label = 'Roadmap Overview';
+                else if (slide.type === 'outro') label = 'End: Questions & Discussion';
+                else label = `${slide.number}. ${slide.title}`;
+                return `<option value="${idx}">${label}</option>`;
+            }).join('');
+
+            // Populate Grid Modal Cards
+            gridContainer.innerHTML = slideData.map((slide, idx) => {
+                if (slide.type === 'cover') {
+                    return `
+                        <div onclick="goToSlide(${idx}); closeGrid();" class="glass-card p-4 rounded-2xl border border-brand-accent/40 cursor-pointer hover:scale-[1.02] transition">
+                            <span class="text-[10px] font-mono uppercase text-brand-glow tracking-wider font-bold">Cover Slide</span>
+                            <h3 class="text-sm font-extrabold text-white mt-1">Reference Architecture Guide</h3>
+                        </div>
+                    `;
+                } else if (slide.type === 'roadmap') {
+                    return `
+                        <div onclick="goToSlide(${idx}); closeGrid();" class="glass-card p-4 rounded-2xl border border-white/20 cursor-pointer hover:scale-[1.02] transition">
+                            <span class="text-[10px] font-mono uppercase text-gray-400 tracking-wider font-bold">Roadmap</span>
+                            <h3 class="text-sm font-extrabold text-white mt-1">Overview Grid Index</h3>
+                        </div>
+                    `;
+                } else if (slide.type === 'outro') {
+                    return `
+                        <div onclick="goToSlide(${idx}); closeGrid();" class="glass-card p-4 rounded-2xl border border-white/10 cursor-pointer hover:scale-[1.02] transition">
+                            <span class="text-[10px] font-mono uppercase text-gray-400 tracking-wider font-bold">Outro</span>
+                            <h3 class="text-sm font-extrabold text-white mt-1">Questions & Discussion</h3>
+                        </div>
+                    `;
+                }
+                return `
+                    <div onclick="goToSlide(${idx}); closeGrid();" class="glass-card p-4 rounded-2xl border border-white/10 cursor-pointer hover:border-brand-accent/60 transition group hover:scale-[1.02]">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-mono font-bold text-brand-glow">#${slide.number}</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded-full glass-pill text-gray-300">${slide.badge}</span>
+                        </div>
+                        <h3 class="text-sm font-bold text-white group-hover:text-brand-glow transition">${slide.title}</h3>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function goToSlide(index) {
+            if (index >= 0 && index < slideData.length) {
+                currentSlideIndex = index;
+                renderSlide(currentSlideIndex);
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlideIndex < slideData.length - 1) {
+                goToSlide(currentSlideIndex + 1);
+            } else if (isAutoplay) {
+                toggleAutoplay(); // Stop at end
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlideIndex > 0) {
+                goToSlide(currentSlideIndex - 1);
+            }
+        }
+
+        function toggleAutoplay() {
+            isAutoplay = !isAutoplay;
+            const icon = document.getElementById('autoplayIcon');
+            const btn = document.getElementById('autoplayBtn');
+
+            if (isAutoplay) {
+                icon.className = 'fa-solid fa-pause text-amber-400';
+                autoplayInterval = setInterval(nextSlide, 5000);
+            } else {
+                icon.className = 'fa-solid fa-play text-emerald-400';
+                clearInterval(autoplayInterval);
+            }
+        }
+
+        function openGrid() {
+            gridModal.classList.remove('hidden');
+            setTimeout(() => gridModal.classList.remove('opacity-0'), 10);
+        }
+
+        function closeGrid() {
+            gridModal.classList.add('opacity-0');
+            setTimeout(() => gridModal.classList.add('hidden'), 300);
+        }
+
+        function openSearch() {
+            searchModal.classList.remove('hidden');
+            searchInput.focus();
+            performSearch();
+        }
+
+        function closeSearch() {
+            searchModal.classList.add('hidden');
+        }
+
+        function performSearch() {
+            const query = searchInput.value.toLowerCase().trim();
+            if (!query) {
+                searchResults.innerHTML = '<p class="text-xs text-gray-500 p-4 text-center">Type a keyword above to filter slides.</p>';
+                return;
+            }
+
+            const matches = [];
+            slideData.forEach((slide, idx) => {
+                if (slide.type === 'cover' || slide.type === 'outro' || slide.type === 'roadmap') return;
+                
+                let matchCount = 0;
+                if (slide.title.toLowerCase().includes(query)) matchCount += 3;
+                if (slide.badge.toLowerCase().includes(query)) matchCount += 2;
+                
+                slide.bullets.forEach(b => {
+                    if (b.title.toLowerCase().includes(query)) matchCount += 2;
+                    if (b.text.toLowerCase().includes(query)) matchCount += 1;
+                });
+
+                if (matchCount > 0) {
+                    matches.push({ slide, idx, score: matchCount });
+                }
+            });
+
+            if (matches.length === 0) {
+                searchResults.innerHTML = '<p class="text-xs text-gray-400 p-4 text-center">No matching concepts found.</p>';
+                return;
+            }
+
+            searchResults.innerHTML = matches.map(m => `
+                <div onclick="goToSlide(${m.idx}); closeSearch();" class="p-3 hover:bg-white/5 rounded-xl cursor-pointer transition flex items-center justify-between">
+                    <div>
+                        <div class="text-xs font-bold text-brand-glow">#${m.slide.number} ${m.slide.title}</div>
+                        <div class="text-[11px] text-gray-400">${m.slide.badge}</div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-xs text-gray-500"></i>
+                </div>
+            `).join('');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initNavigationOptions();
+            renderSlide(currentSlideIndex);
+
+            // Button Event Listeners
+            prevBtn.addEventListener('click', prevSlide);
+            nextBtn.addEventListener('click', nextSlide);
+            document.getElementById('homeBtn').addEventListener('click', openGrid);
+            document.getElementById('closeGridBtn').addEventListener('click', closeGrid);
+            document.getElementById('autoplayBtn').addEventListener('click', toggleAutoplay);
+            document.getElementById('searchToggleBtn').addEventListener('click', openSearch);
+            document.getElementById('closeSearchBtn').addEventListener('click', closeSearch);
+
+            slideSelect.addEventListener('change', (e) => {
+                goToSlide(parseInt(e.target.value));
+            });
+
+            searchInput.addEventListener('input', performSearch);
+
+            // Fullscreen Toggle
+            document.getElementById('fullscreenBtn').addEventListener('click', () => {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(() => {});
+                } else {
+                    document.exitFullscreen().catch(() => {});
+                }
+            });
+
+            // Keyboard Navigation Shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.target.tagName === 'INPUT') return;
+
+                if (e.key === 'ArrowRight' || e.key === 'Space') {
+                    e.preventDefault();
+                    nextSlide();
+                } else if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    prevSlide();
+                } else if (e.key === 'Escape') {
+                    closeGrid();
+                    closeSearch();
+                } else if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                    e.preventDefault();
+                    openSearch();
+                }
+            });
+
+            // Touch Swipe Gestures
+            let touchStartX = 0;
+            let touchEndX = 0;
+
+            document.body.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+
+            document.body.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, { passive: true });
+
+            function handleSwipe() {
+                const diff = touchStartX - touchEndX;
+                if (Math.abs(diff) > 50) {
+                    if (diff > 0) nextSlide(); // Swipe left
+                    else prevSlide(); // Swipe right
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Types of APIs & Their Use Cases - Interactive Guide</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              open: '#f59e0b',     // Amber yellow
+              internal: '#10b981', // Emerald green
+              partner: '#8b5cf6',  // Purple
+              darkBg: '#0f172a',   // Slate 900
+              cardBg: '#1e293b',   // Slate 800
+              border: '#334155',   // Slate 700
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #0b0f19;
+      color: #f1f5f9;
+      font-family: 'Inter', sans-serif;
+    }
+    
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+
+    /* Mindmap Connection Lines */
+    .tree-line-v {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #334155;
+      z-index: 0;
+    }
+    .tree-card {
+      transition: all 0.25s ease-in-out;
+    }
+    .tree-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Pulse active node */
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.8; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.03); }
+    }
+    .active-glow {
+      animation: pulseGlow 2s infinite;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-950 text-slate-100 antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- Top Navigation Bar -->
+  <header class="sticky top-0 z-50 border-b border-slate-800 bg-slate-900/90 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('mindmap')">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-amber-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
+          <i class="fa-solid fa-network-wired text-xl"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
+            Types of APIs & Use Cases
+          </h1>
+          <p class="text-xs text-slate-400 hidden sm:block">Interactive Architecture Visualizer & Simulator</p>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="flex items-center space-x-1 sm:space-x-2">
+        <button id="tab-mindmap" onclick="switchTab('mindmap')" class="px-3 py-2 rounded-lg text-sm font-medium transition-colors bg-indigo-600 text-white shadow-md shadow-indigo-600/30 flex items-center space-x-2">
+          <i class="fa-solid fa-[#diagram-project] fa-diagram-project"></i>
+          <span class="hidden sm:inline">Mind Map</span>
+        </button>
+        <button id="tab-playground" onclick="switchTab('playground')" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-colors flex items-center space-x-2">
+          <i class="fa-solid fa-terminal"></i>
+          <span class="hidden sm:inline">API Playground</span>
+        </button>
+        <button id="tab-matrix" onclick="switchTab('matrix')" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-colors flex items-center space-x-2">
+          <i class="fa-solid fa-table-columns"></i>
+          <span class="hidden sm:inline">Comparison Matrix</span>
+        </button>
+        <button id="tab-quiz" onclick="switchTab('quiz')" class="px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-colors flex items-center space-x-2">
+          <i class="fa-solid fa-graduation-cap"></i>
+          <span class="hidden sm:inline">Quiz</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content Wrapper -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6">
+
+    <!-- Global Search & Stats Header -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="w-full md:w-1/2 relative">
+        <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+        <input 
+          type="text" 
+          id="global-search" 
+          oninput="handleSearch(this.value)"
+          placeholder="Search API types, protocols, or use cases (e.g., Weather, SOAP, Auth, OAuth, Hotel)..." 
+          class="w-full bg-slate-950 border border-slate-700/70 rounded-xl pl-11 pr-4 py-2.5 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+        />
+        <div id="search-results-dropdown" class="absolute left-0 right-0 top-full mt-2 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl z-50 max-h-80 overflow-y-auto hidden">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Quick Legend Badges -->
+      <div class="flex items-center flex-wrap gap-2 text-xs font-semibold">
+        <span class="px-3 py-1.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-amber-400"></span> Open API
+        </span>
+        <span class="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Internal API
+        </span>
+        <span class="px-3 py-1.5 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/30 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-purple-400"></span> Partner API
+        </span>
+      </div>
+    </div>
+
+    <!-- VIEW 1: Mindmap Explorer -->
+    <section id="view-mindmap" class="space-y-6">
+      <!-- Section Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div>
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-sitemap text-indigo-400"></i> API Taxonomy & Use Cases Mindmap
+          </h2>
+          <p class="text-xs text-slate-400">Click on any API architecture or use case to view detailed protocol specs & live playground demo.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="expandAllNodes()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-lg border border-slate-700 transition">
+            <i class="fa-solid fa-expand text-slate-400 mr-1"></i> Expand All
+          </button>
+          <button onclick="collapseAllNodes()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-lg border border-slate-700 transition">
+            <i class="fa-solid fa-compress text-slate-400 mr-1"></i> Collapse All
+          </button>
+        </div>
+      </div>
+
+      <!-- Root Mindmap Grid Container -->
+      <div id="mindmap-tree-container" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Rendered by JS based on API Data -->
+      </div>
+    </section>
+
+    <!-- VIEW 2: Interactive API Playground -->
+    <section id="view-playground" class="hidden space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-flask text-emerald-400"></i> Interactive API Tester & Sandbox
+          </h2>
+          <p class="text-xs text-slate-400">Select an API endpoint, configure parameters, and simulate real-time request/response cycles.</p>
+        </div>
+        <div class="w-full sm:w-64">
+          <select id="playground-selector" onchange="loadPlaygroundUseCase(this.value)" class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-xl px-3 py-2 focus:outline-none focus:border-indigo-500">
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+      </div>
+
+      <!-- Main Tester Interface -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Request Panel -->
+        <div class="lg:col-span-6 bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4 shadow-xl">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+              <i class="fa-solid fa-paper-plane text-indigo-400"></i> Request Configuration
+            </span>
+            <span id="active-category-badge" class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-800 text-slate-300">
+              Open API
+            </span>
+          </div>
+
+          <!-- HTTP Method & Endpoint bar -->
+          <div class="flex items-center gap-2">
+            <span id="req-method-badge" class="px-3 py-2 rounded-lg bg-emerald-500/20 text-emerald-400 font-mono font-bold text-xs border border-emerald-500/30">
+              GET
+            </span>
+            <input id="req-endpoint-input" type="text" readonly class="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 font-mono text-xs text-slate-300 focus:outline-none cursor-not-allowed">
+            <button onclick="executeApiRequest()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs rounded-lg shadow-lg shadow-indigo-600/30 transition flex items-center gap-2">
+              <i class="fa-solid fa-play"></i> Send
+            </button>
+          </div>
+
+          <!-- Tabs for Request Payload / Headers / Snippet -->
+          <div class="flex border-b border-slate-800 space-x-4 text-xs font-medium">
+            <button id="req-tab-params" onclick="switchReqSubTab('params')" class="pb-2 border-b-2 border-indigo-500 text-indigo-400">Headers & Params</button>
+            <button id="req-tab-body" onclick="switchReqSubTab('body')" class="pb-2 text-slate-400 hover:text-slate-200">Request Body</button>
+            <button id="req-tab-code" onclick="switchReqSubTab('code')" class="pb-2 text-slate-400 hover:text-slate-200">Code Snippet</button>
+          </div>
+
+          <!-- Subtab 1: Headers & Params -->
+          <div id="req-panel-params" class="space-y-3">
+            <div class="space-y-2">
+              <label class="text-xs text-slate-400">Request Headers</label>
+              <div class="bg-slate-950 border border-slate-800 rounded-lg p-3 font-mono text-xs text-slate-300 space-y-1">
+                <div><span class="text-slate-500">Accept:</span> <span class="text-amber-400" id="header-accept">application/json</span></div>
+                <div><span class="text-slate-500">Content-Type:</span> <span class="text-amber-400" id="header-content-type">application/json</span></div>
+                <div><span class="text-slate-500">Authorization:</span> <span class="text-indigo-400" id="header-auth">Bearer token_demo_xyz123</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Subtab 2: Request Body -->
+          <div id="req-panel-body" class="hidden space-y-2">
+            <label class="text-xs text-slate-400">Payload</label>
+            <textarea id="req-body-textarea" rows="6" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 font-mono text-xs text-emerald-400 focus:outline-none focus:border-indigo-500"></textarea>
+          </div>
+
+          <!-- Subtab 3: Code Snippet -->
+          <div id="req-panel-code" class="hidden space-y-2">
+            <div class="flex items-center justify-between">
+              <div class="flex gap-2">
+                <button onclick="setLanguage('js')" id="lang-btn-js" class="px-2 py-1 rounded bg-indigo-600 text-white text-[11px]">JavaScript</button>
+                <button onclick="setLanguage('python')" id="lang-btn-python" class="px-2 py-1 rounded bg-slate-800 text-slate-400 text-[11px]">Python</button>
+                <button onclick="setLanguage('curl')" id="lang-btn-curl" class="px-2 py-1 rounded bg-slate-800 text-slate-400 text-[11px]">cURL</button>
+              </div>
+              <button onclick="copyCodeSnippet()" class="text-xs text-slate-400 hover:text-white flex items-center gap-1">
+                <i class="fa-regular fa-copy"></i> Copy
+              </button>
+            </div>
+            <pre class="bg-slate-950 border border-slate-800 rounded-lg p-3 font-mono text-xs text-slate-300 overflow-x-auto"><code id="code-snippet-display"></code></pre>
+          </div>
+        </div>
+
+        <!-- Response Panel -->
+        <div class="lg:col-span-6 bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4 shadow-xl">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+              <i class="fa-solid fa-server text-emerald-400"></i> Simulated Response
+            </span>
+            <div class="flex items-center gap-3 text-xs font-mono">
+              <span id="res-status-badge" class="px-2.5 py-0.5 rounded-full font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                200 OK
+              </span>
+              <span id="res-time-badge" class="text-slate-400">
+                <i class="fa-solid fa-clock text-slate-500 mr-1"></i> 42 ms
+              </span>
+            </div>
+          </div>
+
+          <!-- Response Display Body -->
+          <div class="relative min-h-[260px] bg-slate-950 border border-slate-800 rounded-lg p-4 font-mono text-xs overflow-auto flex-1">
+            <button onclick="copyResponseText()" class="absolute top-3 right-3 text-slate-500 hover:text-slate-200 transition">
+              <i class="fa-regular fa-copy text-sm"></i>
+            </button>
+            <div id="response-loading-spinner" class="hidden absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center gap-3">
+              <i class="fa-solid fa-circle-notch fa-spin text-2xl text-indigo-500"></i>
+              <span class="text-xs text-slate-400 font-sans">Connecting to remote API endpoint...</span>
+            </div>
+            <pre class="text-emerald-400"><code id="response-body-display">Click "Send" to trigger mock API request...</code></pre>
+          </div>
+
+          <!-- Key Takeaways & Architecture Notes -->
+          <div class="p-3 rounded-xl bg-slate-950/50 border border-slate-800/80 text-xs space-y-1">
+            <div class="font-semibold text-slate-300 flex items-center gap-1.5">
+              <i class="fa-solid fa-lightbulb text-amber-400"></i> Architecture & Security Note:
+            </div>
+            <p id="usecase-architecture-desc" class="text-slate-400 leading-relaxed">
+              REST APIs rely on stateless client-server HTTP requests returning structured JSON representations.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 3: Protocol Comparison Matrix -->
+    <section id="view-matrix" class="hidden space-y-6">
+      <div>
+        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-table-list text-purple-400"></i> API Types & Architectural Comparison Matrix
+        </h2>
+        <p class="text-xs text-slate-400">Detailed side-by-side evaluation of REST, SOAP, GraphQL, gRPC, and category scopes.</p>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-slate-300">
+            <thead class="bg-slate-950 text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-800">
+              <tr>
+                <th class="px-6 py-4">API Architecture / Type</th>
+                <th class="px-6 py-4">Data Format</th>
+                <th class="px-6 py-4">Protocol & Transport</th>
+                <th class="px-6 py-4">Security Standards</th>
+                <th class="px-6 py-4">Performance & Bandwidth</th>
+                <th class="px-6 py-4">Primary Use Cases</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800 text-xs">
+              <!-- REST -->
+              <tr class="hover:bg-slate-800/50 transition-colors">
+                <td class="px-6 py-4 font-bold text-amber-400 flex items-center gap-2">
+                  <i class="fa-solid fa-globe text-amber-500"></i> REST API
+                </td>
+                <td class="px-6 py-4 font-mono text-slate-200">JSON, XML, HTML, Text</td>
+                <td class="px-6 py-4">HTTP / HTTPS (GET, POST, PUT, DELETE)</td>
+                <td class="px-6 py-4">OAuth 2.0, API Keys, JWT, TLS</td>
+                <td class="px-6 py-4">Moderate overhead, standard payload caching</td>
+                <td class="px-6 py-4 text-slate-400">Weather data, Web & Mobile apps, Login systems</td>
+              </tr>
+              <!-- SOAP -->
+              <tr class="hover:bg-slate-800/50 transition-colors">
+                <td class="px-6 py-4 font-bold text-blue-400 flex items-center gap-2">
+                  <i class="fa-solid fa-shield-halved text-blue-500"></i> SOAP API
+                </td>
+                <td class="px-6 py-4 font-mono text-slate-200">Strict XML Envelopes</td>
+                <td class="px-6 py-4">HTTP, SMTP, TCP, JMS</td>
+                <td class="px-6 py-4">WS-Security, ACID Compliance, SAML</td>
+                <td class="px-6 py-4">High XML verbosity & parsing overhead</td>
+                <td class="px-6 py-4 text-slate-400">Banking, Insurance, Government systems</td>
+              </tr>
+              <!-- GraphQL -->
+              <tr class="hover:bg-slate-800/50 transition-colors">
+                <td class="px-6 py-4 font-bold text-pink-400 flex items-center gap-2">
+                  <i class="fa-solid fa-diagram-nested text-pink-500"></i> GraphQL API
+                </td>
+                <td class="px-6 py-4 font-mono text-slate-200">JSON (Client schema queries)</td>
+                <td class="px-6 py-4">HTTP POST / WebSockets</td>
+                <td class="px-6 py-4">Token auth, Query depth limiting</td>
+                <td class="px-6 py-4">High efficiency (Prevents over/under-fetching)</td>
+                <td class="px-6 py-4 text-slate-400">Facebook feeds, GitHub Stats, Complex dashboards</td>
+              </tr>
+              <!-- Internal / gRPC -->
+              <tr class="hover:bg-slate-800/50 transition-colors">
+                <td class="px-6 py-4 font-bold text-emerald-400 flex items-center gap-2">
+                  <i class="fa-solid fa-lock text-emerald-500"></i> Internal (Backend to Backend)
+                </td>
+                <td class="px-6 py-4 font-mono text-slate-200">Protobuf / Binary / JSON</td>
+                <td class="px-6 py-4">HTTP/2, gRPC, Private VPC</td>
+                <td class="px-6 py-4">mTLS, Network Isolation, IAM</td>
+                <td class="px-6 py-4">Ultra-fast low latency, multiplexed binary streams</td>
+                <td class="px-6 py-4 text-slate-400">Payment sync, Microservice comms, DB updates</td>
+              </tr>
+              <!-- Partner API -->
+              <tr class="hover:bg-slate-800/50 transition-colors">
+                <td class="px-6 py-4 font-bold text-purple-400 flex items-center gap-2">
+                  <i class="fa-solid fa-handshake text-purple-500"></i> Partner API
+                </td>
+                <td class="px-6 py-4 font-mono text-slate-200">JSON / XML / Webhooks</td>
+                <td class="px-6 py-4">HTTPS, B2B Gateways</td>
+                <td class="px-6 py-4">OAuth2 Client Credentials, IP Whitelisting, SLA</td>
+                <td class="px-6 py-4">Rate-limited, quota monitored</td>
+                <td class="px-6 py-4 text-slate-400">Hotel booking, Airline reservation, Healthcare FHIR</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 4: Interactive Quiz -->
+    <section id="view-quiz" class="hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-award text-amber-400"></i> API Architecture Knowledge Assessment
+          </h2>
+          <p class="text-xs text-slate-400">Test your mastery of API classifications, protocols, and architectural trade-offs.</p>
+        </div>
+        <button onclick="resetQuiz()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-lg border border-slate-700 transition">
+          <i class="fa-solid fa-rotate-right mr-1"></i> Restart Quiz
+        </button>
+      </div>
+
+      <!-- Quiz Card -->
+      <div id="quiz-card-container" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl max-w-3xl mx-auto space-y-6">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+  </main>
+
+  <!-- Node Inspector Modal -->
+  <div id="node-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 shadow-2xl relative space-y-4 max-h-[90vh] overflow-y-auto">
+      <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="flex items-center gap-3">
+        <div id="modal-icon-bg" class="w-12 h-12 rounded-xl flex items-center justify-center text-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+          <i id="modal-icon" class="fa-solid fa-cube"></i>
+        </div>
+        <div>
+          <span id="modal-category-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30">
+            Open API
+          </span>
+          <h3 id="modal-title" class="text-lg font-bold text-white mt-0.5">REST API</h3>
+        </div>
+      </div>
+
+      <p id="modal-description" class="text-sm text-slate-300 leading-relaxed border-b border-slate-800 pb-4">
+        Details description goes here...
+      </p>
+
+      <div class="space-y-3">
+        <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Associated Use Cases</h4>
+        <div id="modal-usecases-list" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <div class="pt-4 border-t border-slate-800 flex justify-end">
+        <button id="modal-launch-btn" onclick="" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs rounded-xl shadow-lg shadow-indigo-600/30 transition flex items-center gap-2">
+          <i class="fa-solid fa-flask"></i> Open in Playground
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* Complete API Taxonomy Dataset matching the uploaded infographic diagram */
+    const API_TAXONOMY = [
+      {
+        id: 'open-api',
+        title: 'Open API',
+        color: 'amber',
+        borderClass: 'border-amber-500/30',
+        bgClass: 'bg-amber-500/10',
+        textClass: 'text-amber-400',
+        badgeBg: 'bg-amber-500/20',
+        icon: 'fa-globe',
+        description: 'Publicly accessible APIs available to external developers and third parties with minimal restrictions, driving developer adoption and ecosystem integrations.',
+        subcategories: [
+          {
+            id: 'rest-api',
+            name: 'REST API',
+            icon: 'fa-network-wired',
+            protocol: 'HTTP / JSON',
+            description: 'Representational State Transfer protocol leveraging HTTP methods (GET, POST, PUT, DELETE) and standardized JSON resource representation.',
+            useCases: [
+              {
+                id: 'weather-data',
+                name: 'Weather Data',
+                icon: 'fa-cloud-sun',
+                method: 'GET',
+                endpoint: '/v1/weather?city=London&units=metric',
+                reqHeaders: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+                reqBody: '{}',
+                resStatus: '200 OK',
+                resTime: '38 ms',
+                resData: JSON.stringify({
+                  city: "London",
+                  country: "UK",
+                  temperature: 19.5,
+                  humidity: 62,
+                  condition: "Partly Cloudy",
+                  wind_speed: "14 km/h"
+                }, null, 2),
+                codeJS: `fetch("https://api.weatherprovider.com/v1/weather?city=London")\n  .then(res => res.json())\n  .then(data => console.log(data));`,
+                codePy: `import requests\nres = requests.get("https://api.weatherprovider.com/v1/weather?city=London")\nprint(res.json())`,
+                codeCurl: `curl -X GET "https://api.weatherprovider.com/v1/weather?city=London" -H "Accept: application/json"`,
+                archNote: 'Public REST endpoints serve structured JSON data to mobile apps, web interfaces, and third-party dashboards.'
+              },
+              {
+                id: 'login-system',
+                name: 'Login System',
+                icon: 'fa-right-to-bracket',
+                method: 'POST',
+                endpoint: '/v1/auth/login',
+                reqHeaders: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+                reqBody: JSON.stringify({ username: "developer@example.com", password: "••••••••" }, null, 2),
+                resStatus: '200 OK',
+                resTime: '64 ms',
+                resData: JSON.stringify({
+                  token_type: "Bearer",
+                  access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                  expires_in: 3600,
+                  user: { id: "usr_881", name: "Jane Developer", role: "admin" }
+                }, null, 2),
+                codeJS: `fetch("/v1/auth/login", {\n  method: "POST",\n  headers: { "Content-Type": "application/json" },\n  body: JSON.stringify({ username, password })\n});`,
+                codePy: `import requests\nres = requests.post("https://api.example.com/v1/auth/login", json={"username": u, "password": p})\nprint(res.json())`,
+                codeCurl: `curl -X POST "https://api.example.com/v1/auth/login" -H "Content-Type: application/json" -d '{"username":"dev@example.com","password":"..."}'`,
+                archNote: 'Public OAuth/Auth endpoints process credential verification and issue stateless JWT tokens.'
+              },
+              {
+                id: 'product-fetch',
+                name: 'Product Fetch',
+                icon: 'fa-boxes-stacked',
+                method: 'GET',
+                endpoint: '/v1/products?category=electronics&limit=2',
+                reqHeaders: { 'Accept': 'application/json' },
+                reqBody: '{}',
+                resStatus: '200 OK',
+                resTime: '45 ms',
+                resData: JSON.stringify([
+                  { id: "prod_01", name: "Wireless Noise-Canceling Headphones", price: 199.99, stock: 42 },
+                  { id: "prod_02", name: "Ergonomic Mechanical Keyboard", price: 149.50, stock: 18 }
+                ], null, 2),
+                codeJS: `const res = await fetch("https://store.api.com/v1/products");\nconst products = await res.json();`,
+                codePy: `import requests\nproducts = requests.get("https://store.api.com/v1/products").json()`,
+                codeCurl: `curl -X GET "https://store.api.com/v1/products"`,
+                archNote: 'E-commerce product catalogs exposed for public browsing and affiliate applications.'
+              }
+            ]
+          },
+          {
+            id: 'soap-api',
+            name: 'SOAP API',
+            icon: 'fa-shield-halved',
+            protocol: 'XML / WSDL',
+            description: 'Simple Object Access Protocol with strict XML envelopes, formal WSDL contracts, and enterprise WS-Security features.',
+            useCases: [
+              {
+                id: 'bank-transfer',
+                name: 'Bank Transfer',
+                icon: 'fa-building-columns',
+                method: 'POST',
+                endpoint: '/FinancialService.svc/Transfer',
+                reqHeaders: { 'Content-Type': 'text/xml;charset=UTF-8', 'SOAPAction': 'TransferFund' },
+                reqBody: `<?xml version="1.0"?>\n<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">\n  <soapenv:Body>\n    <TransferFund>\n      <FromAccount>10098231</FromAccount>\n      <ToAccount>88231021</ToAccount>\n      <Amount>500.00</Amount>\n    </TransferFund>\n  </soapenv:Body>\n</soapenv:Envelope>`,
+                resStatus: '200 OK',
+                resTime: '110 ms',
+                resData: `<?xml version="1.0"?>\n<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">\n  <soapenv:Body>\n    <TransferResponse>\n      <Status>SUCCESS</Status>\n      <TransactionRef>TXN-908123712</TransactionRef>\n      <Timestamp>2026-08-03T17:30:00Z</Timestamp>\n    </TransferResponse>\n  </soapenv:Body>\n</soapenv:Envelope>`,
+                codeJS: `// SOAP Transfer Request\nconst xmlBody = \`<soapenv:Envelope...>...</soapenv:Envelope>\`;\nfetch('/FinancialService.svc', { method: 'POST', headers: {'Content-Type':'text/xml'}, body: xmlBody });`,
+                codePy: `import requests\nheaders = {'Content-Type': 'text/xml'}\nxml_body = """<soapenv:Envelope>...</soapenv:Envelope>"""\nres = requests.post("https://bank.com/FinancialService.svc", data=xml_body, headers=headers)`,
+                codeCurl: `curl -X POST "https://bank.com/FinancialService.svc" -H "Content-Type: text/xml" -d @transfer_req.xml`,
+                archNote: 'Banking networks require SOAP for strict XML validation, compliance, and ACID transaction guarantees.'
+              },
+              {
+                id: 'insurance-claim',
+                name: 'Insurance Claim',
+                icon: 'fa-file-medical',
+                method: 'POST',
+                endpoint: '/InsuranceClaims.asmx',
+                reqHeaders: { 'Content-Type': 'text/xml' },
+                reqBody: `<ClaimSubmissionRequest>\n  <PolicyNumber>POL-99281</PolicyNumber>\n  <ClaimAmount>1250.00</ClaimAmount>\n</ClaimSubmissionRequest>`,
+                resStatus: '200 OK',
+                resTime: '145 ms',
+                resData: `<ClaimSubmissionResponse>\n  <ClaimID>CLM-88210</ClaimID>\n  <ApprovalStatus>PROCESSING</ApprovalStatus>\n</ClaimSubmissionResponse>`,
+                codeJS: `// Insurance Claim XML Web Service Call`,
+                codePy: `import requests\n# Submit XML Claim`,
+                codeCurl: `curl -X POST "https://insurance.com/Claims.asmx" -d @claim.xml`,
+                archNote: 'Enterprise healthcare and insurance claims processed through formal legacy XML web services.'
+              },
+              {
+                id: 'govt-records',
+                name: 'Govt Records',
+                icon: 'fa-id-card',
+                method: 'POST',
+                endpoint: '/GovRegistryService.svc',
+                reqHeaders: { 'Content-Type': 'text/xml' },
+                reqBody: `<GovVerifyIDRequest>\n  <NationalID>S-901283-A</NationalID>\n</GovVerifyIDRequest>`,
+                resStatus: '200 OK',
+                resTime: '180 ms',
+                resData: `<GovVerifyIDResponse>\n  <IsValid>true</IsValid>\n  <VerificationHash>A90F8123B771</VerificationHash>\n</GovVerifyIDResponse>`,
+                codeJS: `// National ID Verification Service`,
+                codePy: `# Government registry XML verification`,
+                codeCurl: `curl -X POST "https://gov.portal/Verify" -d @id.xml`,
+                archNote: 'Government inter-departmental verification using audited SOAP web services.'
+              }
+            ]
+          },
+          {
+            id: 'graphql-api',
+            name: 'GraphQL API',
+            icon: 'fa-diagram-nested',
+            protocol: 'HTTP POST / Query Lang',
+            description: 'Declarative query language enabling clients to request exact fields needed in a single roundtrip.',
+            useCases: [
+              {
+                id: 'facebook-feed',
+                name: 'Facebook Feed',
+                icon: 'fa-facebook',
+                method: 'POST',
+                endpoint: '/graphql',
+                reqHeaders: { 'Content-Type': 'application/json' },
+                reqBody: JSON.stringify({
+                  query: `query GetUserFeed {\n  me {\n    name\n    posts(first: 2) {\n      id\n      content\n      likesCount\n    }\n  }\n}`
+                }, null, 2),
+                resStatus: '200 OK',
+                resTime: '52 ms',
+                resData: JSON.stringify({
+                  data: {
+                    me: {
+                      name: "Alex Morgan",
+                      posts: [
+                        { id: "post_101", content: "Excited to launch our new API visualizer!", likesCount: 142 },
+                        { id: "post_102", content: "GraphQL reduces network payload drastically.", likesCount: 89 }
+                      ]
+                    }
+                  }
+                }, null, 2),
+                codeJS: `const query = \`query { me { name posts { content } } }\`;\nfetch("/graphql", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ query }) });`,
+                codePy: `import requests\nq = "{ me { name posts { content } } }"\nres = requests.post("https://fb.com/graphql", json={"query": q})`,
+                codeCurl: `curl -X POST "https://fb.com/graphql" -H "Content-Type: application/json" -d '{"query":"{ me { name } }"}'`,
+                archNote: 'Social graphs utilize GraphQL to fetch nested users, posts, and comments without over-fetching.'
+              },
+              {
+                id: 'github-stats',
+                name: 'GitHub Stats',
+                icon: 'fa-github',
+                method: 'POST',
+                endpoint: 'https://api.github.com/graphql',
+                reqHeaders: { 'Authorization': 'Bearer ghp_xxx', 'Content-Type': 'application/json' },
+                reqBody: JSON.stringify({
+                  query: `query {\n  user(login: "octocat") {\n    name\n    repositories(first: 1) {\n      nodes { name stargazerCount }\n    }\n  }\n}`
+                }, null, 2),
+                resStatus: '200 OK',
+                resTime: '58 ms',
+                resData: JSON.stringify({
+                  data: {
+                    user: {
+                      name: "The Octocat",
+                      repositories: {
+                        nodes: [{ name: "Hello-World", stargazerCount: 3240 }]
+                      }
+                    }
+                  }
+                }, null, 2),
+                codeJS: `// GitHub GraphQL v4 query example`,
+                codePy: `# Query developer statistics`,
+                codeCurl: `curl -X POST "https://api.github.com/graphql" -H "Authorization: Bearer TOKEN" -d '{"query":"..."}'`,
+                archNote: 'Developers query developer profiles, star counts, and repository metrics flexibly.'
+              },
+              {
+                id: 'custom-queries',
+                name: 'Custom Queries',
+                icon: 'fa-sliders',
+                method: 'POST',
+                endpoint: '/graphql',
+                reqHeaders: { 'Content-Type': 'application/json' },
+                reqBody: JSON.stringify({
+                  query: `query CustomFilter($tag: String) {\n  searchArticles(tag: $tag) {\n    title\n    author { name }\n  }\n}`,
+                  variables: { tag: "webdev" }
+                }, null, 2),
+                resStatus: '200 OK',
+                resTime: '30 ms',
+                resData: JSON.stringify({
+                  data: {
+                    searchArticles: [
+                      { title: "Understanding API Types", author: { name: "Sarah Tech" } }
+                    ]
+                  }
+                }, null, 2),
+                codeJS: `// Dynamic GraphQL variable queries`,
+                codePy: `# Dynamic variable bindings in Python`,
+                codeCurl: `curl -X POST "/graphql" -d '{"query":"...", "variables":{}}'`,
+                archNote: 'Dynamic field selection eliminates multiple cascade HTTP API requests.'
+              }
+            ]
+          }
+        ]
+      },
+
+      {
+        id: 'internal-api',
+        title: 'Internal API',
+        color: 'emerald',
+        borderClass: 'border-emerald-500/30',
+        bgClass: 'bg-emerald-500/10',
+        textClass: 'text-emerald-400',
+        badgeBg: 'bg-emerald-500/20',
+        icon: 'fa-lock',
+        description: 'Private APIs isolated behind internal firewalls and service meshes, connecting microservices, frontends, and internal databases securely.',
+        subcategories: [
+          {
+            id: 'backend-to-backend',
+            name: 'Backend to Backend',
+            icon: 'fa-server',
+            protocol: 'gRPC / HTTP2 / Protobuf',
+            description: 'Ultra-fast inter-service microservice communication in private VPC clouds.',
+            useCases: [
+              {
+                id: 'payment-sync',
+                name: 'Payment Sync',
+                icon: 'fa-rotate',
+                method: 'POST',
+                endpoint: 'payment-svc.internal:8080/SyncTransaction',
+                reqHeaders: { 'X-Internal-Service': 'order-service', 'Content-Type': 'application/json' },
+                reqBody: JSON.stringify({ order_id: "ORD-99812", amount: 49.99, status: "PAID" }, null, 2),
+                resStatus: '200 OK',
+                resTime: '12 ms',
+                resData: JSON.stringify({ sync_status: "SUCCESS", ledger_ref: "LEDGER-88210" }, null, 2),
+                codeJS: `// Internal microservice axios call\nawait axios.post('http://payment-svc.internal/Sync', payload);`,
+                codePy: `# Internal RPC client\nclient.SyncTransaction(payload)`,
+                codeCurl: `curl -X POST "http://payment-svc.internal/SyncTransaction" -d '{"order_id":"..."}'`,
+                archNote: 'Microservice-to-microservice high-speed ledger synchronization.'
+              },
+              {
+                id: 'token-verify',
+                name: 'Token Verify',
+                icon: 'fa-shield-check',
+                method: 'POST',
+                endpoint: 'auth-svc.internal/v1/verify',
+                reqHeaders: { 'Content-Type': 'application/json' },
+                reqBody: JSON.stringify({ token: "eyJhbGciOiJIUzI1Ni..." }, null, 2),
+                resStatus: '200 OK',
+                resTime: '8 ms',
+                resData: JSON.stringify({ valid: true, user_id: "usr_901", scope: ["read", "write"] }, null, 2),
+                codeJS: `// Internal API gateway token validation`,
+                codePy: `# Internal auth validation`,
+                codeCurl: `curl -X POST "http://auth-svc.internal/v1/verify"`,
+                archNote: 'API Gateways validating request auth claims before forwarding downstream.'
+              },
+              {
+                id: 'stock-update',
+                name: 'Stock Update',
+                icon: 'fa-chart-line',
+                method: 'PATCH',
+                endpoint: 'inventory-svc.internal/items/SKU-992/decrement',
+                reqHeaders: { 'Content-Type': 'application/json' },
+                reqBody: JSON.stringify({ count: 1 }, null, 2),
+                resStatus: '200 OK',
+                resTime: '14 ms',
+                resData: JSON.stringify({ sku: "SKU-992", remaining_stock: 47 }, null, 2),
+                codeJS: `// Atomic stock quantity update`,
+                codePy: `# Inventory decrease RPC`,
+                codeCurl: `curl -X PATCH "http://inventory-svc.internal/items/SKU-992"`,
+                archNote: 'Real-time inventory decrement during checkout sequence.'
+              }
+            ]
+          },
+          {
+            id: 'frontend-to-backend',
+            name: 'Frontend to Backend',
+            icon: 'fa-desktop',
+            protocol: 'BFF / REST / WebSockets',
+            description: 'Backend-For-Frontend APIs servicing web and native mobile application user interfaces.',
+            useCases: [
+              {
+                id: 'login-request',
+                name: 'Login Request',
+                icon: 'fa-user-check',
+                method: 'POST',
+                endpoint: '/api/internal/session',
+                reqHeaders: { 'Content-Type': 'application/json' },
+                reqBody: JSON.stringify({ email: "user@domain.com", auth_code: "991823" }, null, 2),
+                resStatus: '200 OK',
+                resTime: '28 ms',
+                resData: JSON.stringify({ authenticated: true, session_expiry: "2026-08-04T00:00:00Z" }, null, 2),
+                codeJS: `// Frontend login form submission`,
+                codePy: `# Test login endpoint`,
+                codeCurl: `curl -X POST "/api/internal/session" -d '{"email":"..."}'`,
+                archNote: 'Web application sending login credentials to obtain HttpOnly cookie session.'
+              },
+              {
+                id: 'profile-fetch',
+                name: 'Profile Fetch',
+                icon: 'fa-user-gear',
+                method: 'GET',
+                endpoint: '/api/internal/me/profile',
+                reqHeaders: { 'Accept': 'application/json' },
+                reqBody: '{}',
+                resStatus: '200 OK',
+                resTime: '22 ms',
+                resData: JSON.stringify({ id: "usr_901", name: "David Kim", dark_mode: true, email: "david@app.com" }, null, 2),
+                codeJS: `// React profile fetch hook`,
+                codePy: `# Fetch user settings`,
+                codeCurl: `curl -X GET "/api/internal/me/profile"`,
+                archNote: 'Frontend loading user profile preferences into dashboard views.'
+              },
+              {
+                id: 'live-search',
+                name: 'Live Search',
+                icon: 'fa-magnifying-glass',
+                method: 'GET',
+                endpoint: '/api/internal/search/autocomplete?q=react',
+                reqHeaders: { 'Accept': 'application/json' },
+                reqBody: '{}',
+                resStatus: '200 OK',
+                resTime: '15 ms',
+                resData: JSON.stringify({ results: ["React JS Guide", "React Native Architecture", "React Redux State"] }, null, 2),
+                codeJS: `// Debounced autocomplete search input`,
+                codePy: `# Autocomplete search API`,
+                codeCurl: `curl -X GET "/api/internal/search/autocomplete?q=react"`,
+                archNote: 'Debounced fast autocomplete search responses rendered as user types.'
+              }
+            ]
+          },
+          {
+            id: 'service-to-database',
+            name: 'Service to Database',
+            icon: 'fa-database',
+            protocol: 'SQL Driver / ORM / Mongo Protocol',
+            description: 'Data layer abstractions, ORMs, and database connection pools.',
+            useCases: [
+              {
+                id: 'user-insert',
+                name: 'User Insert',
+                icon: 'fa-user-plus',
+                method: 'SQL / ORM',
+                endpoint: 'db.users.insertOne()',
+                reqHeaders: { 'Database': 'PostgreSQL / MongoDB' },
+                reqBody: JSON.stringify({ name: "Alice Smith", email: "alice@db.com", created_at: "2026-08-03" }, null, 2),
+                resStatus: '200 OK',
+                resTime: '6 ms',
+                resData: JSON.stringify({ inserted_id: "usr_db_9981", affected_rows: 1 }, null, 2),
+                codeJS: `const newUser = await prisma.user.create({ data: { name, email } });`,
+                codePy: `user = User.create(name=name, email=email)`,
+                codeCurl: `# Database direct execution via driver`,
+                archNote: 'Persisting new records into relational or document database tables.'
+              },
+              {
+                id: 'profile-update',
+                name: 'Profile Update',
+                icon: 'fa-pen-to-square',
+                method: 'SQL / ORM',
+                endpoint: 'db.users.updateWhere()',
+                reqHeaders: { 'Database': 'PostgreSQL' },
+                reqBody: JSON.stringify({ bio: "Full Stack Engineer & API Architect" }, null, 2),
+                resStatus: '200 OK',
+                resTime: '5 ms',
+                resData: JSON.stringify({ updated: true, rows_modified: 1 }, null, 2),
+                codeJS: `await prisma.user.update({ where: { id }, data: { bio } });`,
+                codePy: `User.filter(id=user_id).update(bio=new_bio)`,
+                codeCurl: `# Database update operation`,
+                archNote: 'Updating user profile attributes in database persistence store.'
+              },
+              {
+                id: 'report-query',
+                name: 'Report Query',
+                icon: 'fa-chart-pie',
+                method: 'SQL Aggregate',
+                endpoint: 'db.analytics.aggregate()',
+                reqHeaders: { 'Database': 'ClickHouse / Snowflake' },
+                reqBody: `SELECT DATE(created_at), COUNT(*) FROM orders GROUP BY 1;`,
+                resStatus: '200 OK',
+                resTime: '35 ms',
+                resData: JSON.stringify([
+                  { date: "2026-08-01", count: 1420 },
+                  { date: "2026-08-02", count: 1890 },
+                  { date: "2026-08-03", count: 2100 }
+                ], null, 2),
+                codeJS: `const stats = await db.query('SELECT DATE(created_at)...');`,
+                codePy: `stats = db.execute("SELECT ...")`,
+                codeCurl: `# Analytical query execution`,
+                archNote: 'Read-heavy analytical aggregate SQL queries powering admin reports.'
+              }
+            ]
+          }
+        ]
+      },
+
+      {
+        id: 'partner-api',
+        title: 'Partner API',
+        color: 'purple',
+        borderClass: 'border-purple-500/30',
+        bgClass: 'bg-purple-500/10',
+        textClass: 'text-purple-400',
+        badgeBg: 'bg-purple-500/20',
+        icon: 'fa-handshake',
+        description: 'B2B integrations shared with authorized strategic business partners with strict SLA contracts, API keys, and custom permissions.',
+        subcategories: [
+          {
+            id: 'b2b-integration',
+            name: 'B2B Integration',
+            icon: 'fa-briefcase',
+            protocol: 'REST / OAuth2 Client Credentials',
+            description: 'Enterprise Business-to-Business software integrations.',
+            useCases: [
+              {
+                id: 'hotel-booking',
+                name: 'Hotel Booking',
+                icon: 'fa-hotel',
+                method: 'POST',
+                endpoint: '/partner/v2/reservations',
+                reqHeaders: { 'Authorization': 'Bearer partner_expedia_token', 'Content-Type': 'application/json' },
+                reqBody: JSON.stringify({ hotel_id: "HTL-8812", room_type: "SUITE", checkin: "2026-09-01", nights: 3 }, null, 2),
+                resStatus: '200 OK',
+                resTime: '92 ms',
+                resData: JSON.stringify({ reservation_id: "RES-99012", status: "CONFIRMED", total_usd: 450.00 }, null, 2),
+                codeJS: `// Travel aggregator hotel booking call`,
+                codePy: `# Hotel reservation B2B API call`,
+                codeCurl: `curl -X POST "https://partner.hotelchain.com/v2/reservations" -H "Authorization: Bearer KEY"`,
+                archNote: 'Travel portals (e.g. Expedia, Booking.com) making automated B2B bookings.'
+              },
+              {
+                id: 'airline-data',
+                name: 'Airline Data',
+                icon: 'fa-plane-departure',
+                method: 'GET',
+                endpoint: '/partner/v1/flights/availability?origin=JFK&dest=LHR',
+                reqHeaders: { 'Accept': 'application/json' },
+                reqBody: '{}',
+                resStatus: '200 OK',
+                resTime: '88 ms',
+                resData: JSON.stringify({ flight_no: "BA-178", seats_available: 12, price: 680.00 }, null, 2),
+                codeJS: `// Flight status lookup API`,
+                codePy: `# Fetch airline availability`,
+                codeCurl: `curl -X GET "https://api.airline.com/v1/flights"`,
+                archNote: 'Global Distribution Systems (GDS) fetching live flight availability.'
+              },
+              {
+                id: 'payment-gateway',
+                name: 'Payment Gateway',
+                icon: 'fa-credit-card',
+                method: 'POST',
+                endpoint: '/v1/charges',
+                reqHeaders: { 'Authorization': 'Bearer sk_live_992301...', 'Content-Type': 'application/json' },
+                reqBody: JSON.stringify({ amount: 2500, currency: "usd", source: "tok_visa" }, null, 2),
+                resStatus: '200 OK',
+                resTime: '130 ms',
+                resData: JSON.stringify({ id: "ch_3M019", paid: true, status: "succeeded" }, null, 2),
+                codeJS: `// Stripe charge API integration`,
+                codePy: `import stripe\nstripe.Charge.create(amount=2500, currency="usd", source="tok_visa")`,
+                codeCurl: `curl -X POST "https://api.stripe.com/v1/charges" -u sk_live_xxx:`,
+                archNote: 'Third-party payment gateways (Stripe/PayPal) processing merchant checkouts.'
+              }
+            ]
+          },
+          {
+            id: 'affiliate-integration',
+            name: 'Affiliate Integration',
+            icon: 'fa-bullhorn',
+            protocol: 'REST / Webhooks / Tracking Pixels',
+            description: 'Tracking partner referrals, customized affiliate URLs, and commission payouts.',
+            useCases: [
+              {
+                id: 'product-links',
+                name: 'Product Links',
+                icon: 'fa-link',
+                method: 'POST',
+                endpoint: '/affiliate/v1/links/generate',
+                reqHeaders: { 'Content-Type': 'application/json' },
+                reqBody: JSON.stringify({ partner_id: "AFF_7712", product_id: "PROD_9901" }, null, 2),
+                resStatus: '200 OK',
+                resTime: '32 ms',
+                resData: JSON.stringify({ short_url: "https://shop.link/x81a", tracking_id: "TRK_99120" }, null, 2),
+                codeJS: `// Affiliate link generator API`,
+                codePy: `# Generate tracked affiliate link`,
+                codeCurl: `curl -X POST "/affiliate/v1/links/generate"`,
+                archNote: 'Influencers and publisher platforms generating trackable deep links.'
+              },
+              {
+                id: 'commission-tracking',
+                name: 'Commission Tracking',
+                icon: 'fa-coins',
+                method: 'GET',
+                endpoint: '/affiliate/v1/earnings?period=this_month',
+                reqHeaders: { 'Accept': 'application/json' },
+                reqBody: '{}',
+                resStatus: '200 OK',
+                resTime: '40 ms',
+                resData: JSON.stringify({ total_conversions: 142, total_payout_usd: 710.00 }, null, 2),
+                codeJS: `// Affiliate earnings dashboard fetch`,
+                codePy: `# Fetch commission earnings`,
+                codeCurl: `curl -X GET "/affiliate/v1/earnings"`,
+                archNote: 'Affiliates querying monthly referral revenue and conversion metrics.'
+              },
+              {
+                id: 'click-analytics',
+                name: 'Click Analytics',
+                icon: 'fa-chart-column',
+                method: 'GET',
+                endpoint: '/affiliate/v1/analytics/clicks?range=7d',
+                reqHeaders: { 'Accept': 'application/json' },
+                reqBody: '{}',
+                resStatus: '200 OK',
+                resTime: '36 ms',
+                resData: JSON.stringify({ clicks: 12400, unique_visitors: 8900, ctr: "4.2%" }, null, 2),
+                codeJS: `// Referral click telemetry API`,
+                codePy: `# Fetch click analytics`,
+                codeCurl: `curl -X GET "/affiliate/v1/analytics/clicks"`,
+                archNote: 'Real-time referral telemetry tracking click-through rates.'
+              }
+            ]
+          },
+          {
+            id: 'data-sharing-api',
+            name: 'Data Sharing API',
+            icon: 'fa-share-nodes',
+            protocol: 'REST / Open Banking / FHIR / mTLS',
+            description: 'Secure, regulatory-compliant data exchange between verified healthcare, financial, and logistics institutions.',
+            useCases: [
+              {
+                id: 'health-records',
+                name: 'Health Records',
+                icon: 'fa-notes-medical',
+                method: 'GET',
+                endpoint: '/fhir/v4/Patient/10293/MedicalHistory',
+                reqHeaders: { 'Authorization': 'Bearer fhir_health_token', 'Accept': 'application/fhir+json' },
+                reqBody: '{}',
+                resStatus: '200 OK',
+                resTime: '78 ms',
+                resData: JSON.stringify({
+                  resourceType: "PatientHistory",
+                  patient: "John Doe",
+                  allergies: ["Penicillin"],
+                  immunizations: ["Covid-19 Booster 2025"]
+                }, null, 2),
+                codeJS: `// HL7 FHIR standard medical record request`,
+                codePy: `# FHIR health record query`,
+                codeCurl: `curl -X GET "https://health.portal/fhir/v4/Patient/10293"`,
+                archNote: 'HIPAA-compliant health record sharing across hospitals, labs, and diagnostic providers.'
+              },
+              {
+                id: 'finance-data',
+                name: 'Finance Data',
+                icon: 'fa-chart-line-up',
+                method: 'GET',
+                endpoint: '/open-banking/v3/accounts/9012/transactions',
+                reqHeaders: { 'Authorization': 'Bearer openbank_tok_991' },
+                reqBody: '{}',
+                resStatus: '200 OK',
+                resTime: '82 ms',
+                resData: JSON.stringify({
+                  account_id: "ACC-9012",
+                  balance_usd: 14250.00,
+                  recent_txns: [{ desc: "Organic Grocery", amount: -84.20 }]
+                }, null, 2),
+                codeJS: `// Open Banking API transaction sync`,
+                codePy: `# Financial ledger sync API`,
+                codeCurl: `curl -X GET "https://openbank.com/v3/accounts"`,
+                archNote: 'Open Banking standards (Plaid, Yodlee) providing financial account aggregator sync.'
+              },
+              {
+                id: 'logistics-tracking',
+                name: 'Logistics Tracking',
+                icon: 'fa-truck-fast',
+                method: 'GET',
+                endpoint: '/partner/logistics/v1/shipment/TRK-90021',
+                reqHeaders: { 'Accept': 'application/json' },
+                reqBody: '{}',
+                resStatus: '200 OK',
+                resTime: '48 ms',
+                resData: JSON.stringify({
+                  tracking_id: "TRK-90021",
+                  status: "In Transit",
+                  hub: "Chicago Distribution Hub",
+                  eta: "2026-08-05"
+                }, null, 2),
+                codeJS: `// Logistics shipment tracking call`,
+                codePy: `# Package location tracking`,
+                codeCurl: `curl -X GET "https://logistics.partner.com/v1/shipment/TRK-90021"`,
+                archNote: 'Supply chain tracking between courier partners (FedEx, DHL, UPS) and e-commerce merchants.'
+              }
+            ]
+          }
+        ]
+      }
+    ];
+
+    const QUIZ_QUESTIONS = [
+      {
+        question: "Which API architecture is ideal when a frontend application needs to request custom nested data structures in a single request without over-fetching?",
+        options: [
+          { text: "SOAP API with XML envelopes", correct: false },
+          { text: "GraphQL API", correct: true },
+          { text: "Standard REST API GET request", correct: false },
+          { text: "gRPC Binary Stream", correct: false }
+        ],
+        explanation: "GraphQL allows clients to define exact query schemas, requesting only required fields and fetching nested graph data in a single network roundtrip."
+      },
+      {
+        question: "Which protocol is typically chosen for high-security enterprise banking transactions requiring strict ACID compliance, SAML, and WS-Security?",
+        options: [
+          { text: "SOAP API", correct: true },
+          { text: "REST API", correct: false },
+          { text: "Open API", correct: false },
+          { text: "GraphQL API", correct: false }
+        ],
+        explanation: "SOAP utilizes formal XML schemas (WSDL) and WS-Security standards, making it the enterprise benchmark for banking, government, and financial operations."
+      },
+      {
+        question: "What primary characteristic defines an 'Internal API'?",
+        options: [
+          { text: "It is accessible to any public internet user without authentication.", correct: false },
+          { text: "It is strictly hidden behind private networks and firewalls for inter-service communication.", correct: true },
+          { text: "It requires affiliate commission tracking tokens.", correct: false },
+          { text: "It only accepts XML payloads.", correct: false }
+        ],
+        explanation: "Internal APIs operate inside an organization's private VPC network, powering microservices, database interfaces, and backend-for-frontend systems."
+      },
+      {
+        question: "An airline reservation portal provides Expedia with access to query real-time flight seats via OAuth2 credentials under a business contract. What type of API is this?",
+        options: [
+          { text: "Open API", correct: false },
+          { text: "Internal API", correct: false },
+          { text: "Partner API", correct: true },
+          { text: "Database Service API", correct: false }
+        ],
+        explanation: "Partner APIs are shared specifically with authorized strategic business partners with strict SLAs and authentication controls."
+      }
+    ];
+
+    /* Application State Variables */
+    let currentTab = 'mindmap';
+    let currentPlaygroundUseCase = null;
+    let selectedCodeLang = 'js';
+    let currentQuizIndex = 0;
+    let quizScore = 0;
+
+    function renderMindmap() {
+      const container = document.getElementById('mindmap-tree-container');
+      container.innerHTML = '';
+
+      API_TAXONOMY.forEach(cat => {
+        const catCol = document.createElement('div');
+        catCol.className = 'flex flex-col gap-4';
+
+        // Main Category Header Card
+        const headerCard = document.createElement('div');
+        headerCard.className = `bg-slate-900 border ${cat.borderClass} rounded-2xl p-5 shadow-lg relative overflow-hidden transition-all hover:border-slate-600`;
+        headerCard.innerHTML = `
+          <div class="flex items-center justify-between mb-2">
+            <span class="px-3 py-1 rounded-full text-xs font-bold ${cat.badgeBg} ${cat.textClass} border ${cat.borderClass} uppercase tracking-wider flex items-center gap-1.5">
+              <i class="fa-solid ${cat.icon}"></i> ${cat.title}
+            </span>
+            <span class="text-xs text-slate-500 font-mono">${cat.subcategories.length} Protocols</span>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">${cat.description}</p>
+        `;
+        catCol.appendChild(headerCard);
+
+        // Subcategories & Use Cases
+        cat.subcategories.forEach(sub => {
+          const subCard = document.createElement('div');
+          subCard.className = `bg-slate-900/90 border border-slate-800 rounded-xl p-4 shadow-md space-y-3 tree-card`;
+          
+          let useCasesHtml = sub.useCases.map(uc => `
+            <button onclick="selectUseCaseFromMindmap('${cat.id}', '${sub.id}', '${uc.id}')" 
+              class="w-full text-left p-2.5 rounded-lg bg-slate-950/70 hover:bg-slate-800 border border-slate-800/80 hover:border-indigo-500/50 transition flex items-center justify-between group">
+              <div class="flex items-center gap-2.5">
+                <div class="w-7 h-7 rounded-md bg-slate-900 border border-slate-700 flex items-center justify-center text-xs text-slate-300 group-hover:text-indigo-400 group-hover:border-indigo-500/50">
+                  <i class="fa-solid ${uc.icon}"></i>
+                </div>
+                <span class="text-xs font-medium text-slate-200 group-hover:text-white">${uc.name}</span>
+              </div>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-900 text-slate-400 border border-slate-800 group-hover:border-indigo-500/30">
+                ${uc.method}
+              </span>
+            </button>
+          `).join('');
+
+          subCard.innerHTML = `
+            <div class="flex items-center justify-between border-b border-slate-800/80 pb-2.5">
+              <div class="flex items-center gap-2">
+                <i class="fa-solid ${sub.icon} ${cat.textClass} text-sm"></i>
+                <h4 class="text-sm font-bold text-slate-100">${sub.name}</h4>
+              </div>
+              <span class="text-[10px] font-mono text-slate-400 px-2 py-0.5 rounded bg-slate-950 border border-slate-800">
+                ${sub.protocol}
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-400">${sub.description}</p>
+            <div class="space-y-2 pt-1">
+              ${useCasesHtml}
+            </div>
+          `;
+
+          catCol.appendChild(subCard);
+        });
+
+        container.appendChild(catCol);
+      });
+    }
+
+    function populatePlaygroundSelector() {
+      const selector = document.getElementById('playground-selector');
+      selector.innerHTML = '';
+
+      API_TAXONOMY.forEach(cat => {
+        const optgroup = document.createElement('optgroup');
+        optgroup.label = cat.title;
+
+        cat.subcategories.forEach(sub => {
+          sub.useCases.forEach(uc => {
+            const opt = document.createElement('option');
+            opt.value = `${cat.id}::${sub.id}::${uc.id}`;
+            opt.textContent = `[${cat.title}] ${sub.name} ➔ ${uc.name}`;
+            optgroup.appendChild(opt);
+          });
+        });
+
+        selector.appendChild(optgroup);
+      });
+    }
+
+    function switchTab(tab) {
+      currentTab = tab;
+      const tabs = ['mindmap', 'playground', 'matrix', 'quiz'];
+      
+      tabs.forEach(t => {
+        const viewEl = document.getElementById(`view-${t}`);
+        const btnEl = document.getElementById(`tab-${t}`);
+        
+        if (t === tab) {
+          viewEl.classList.remove('hidden');
+          btnEl.className = "px-3 py-2 rounded-lg text-sm font-medium transition-colors bg-indigo-600 text-white shadow-md shadow-indigo-600/30 flex items-center space-x-2";
+        } else {
+          viewEl.classList.add('hidden');
+          btnEl.className = "px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-colors flex items-center space-x-2";
+        }
+      });
+
+      if (tab === 'playground' && !currentPlaygroundUseCase) {
+        // Load default first use case
+        const firstVal = document.getElementById('playground-selector').value;
+        loadPlaygroundUseCase(firstVal);
+      }
+    }
+
+    function selectUseCaseFromMindmap(catId, subId, ucId) {
+      const val = `${catId}::${subId}::${ucId}`;
+      document.getElementById('playground-selector').value = val;
+      loadPlaygroundUseCase(val);
+      switchTab('playground');
+    }
+
+    function loadPlaygroundUseCase(compositeKey) {
+      const [catId, subId, ucId] = compositeKey.split('::');
+      
+      const category = API_TAXONOMY.find(c => c.id === catId);
+      const subcategory = category.subcategories.find(s => s.id === subId);
+      const usecase = subcategory.useCases.find(u => u.id === ucId);
+
+      currentPlaygroundUseCase = { category, subcategory, usecase };
+
+      // Update UI elements
+      document.getElementById('active-category-badge').textContent = category.title;
+      document.getElementById('active-category-badge').className = `px-2.5 py-0.5 rounded-full text-xs font-medium border ${category.badgeBg} ${category.textClass} ${category.borderClass}`;
+      
+      document.getElementById('req-method-badge').textContent = usecase.method;
+      document.getElementById('req-endpoint-input').value = usecase.endpoint;
+      
+      document.getElementById('req-body-textarea').value = usecase.reqBody;
+      document.getElementById('response-body-display').textContent = 'Click "Send" to trigger mock API request...';
+      document.getElementById('res-status-badge').textContent = 'READY';
+      document.getElementById('res-time-badge').textContent = '-- ms';
+
+      document.getElementById('usecase-architecture-desc').textContent = usecase.archNote;
+
+      updateCodeSnippetDisplay();
+    }
+
+    function executeApiRequest() {
+      if (!currentPlaygroundUseCase) return;
+      
+      const spinner = document.getElementById('response-loading-spinner');
+      spinner.classList.remove('hidden');
+
+      setTimeout(() => {
+        spinner.classList.add('hidden');
+        document.getElementById('response-body-display').textContent = currentPlaygroundUseCase.usecase.resData;
+        document.getElementById('res-status-badge').textContent = currentPlaygroundUseCase.usecase.resStatus;
+        document.getElementById('res-time-badge').innerHTML = `<i class="fa-solid fa-clock text-slate-500 mr-1"></i> ${currentPlaygroundUseCase.usecase.resTime}`;
+      }, 450);
+    }
+
+    function setLanguage(lang) {
+      selectedCodeLang = lang;
+      ['js', 'python', 'curl'].forEach(l => {
+        const btn = document.getElementById(`lang-btn-${l}`);
+        if (l === lang) {
+          btn.className = "px-2 py-1 rounded bg-indigo-600 text-white text-[11px]";
+        } else {
+          btn.className = "px-2 py-1 rounded bg-slate-800 text-slate-400 text-[11px]";
+        }
+      });
+      updateCodeSnippetDisplay();
+    }
+
+    function updateCodeSnippetDisplay() {
+      if (!currentPlaygroundUseCase) return;
+      const uc = currentPlaygroundUseCase.usecase;
+      const codeEl = document.getElementById('code-snippet-display');
+
+      if (selectedCodeLang === 'js') codeEl.textContent = uc.codeJS;
+      else if (selectedCodeLang === 'python') codeEl.textContent = uc.codePy;
+      else if (selectedCodeLang === 'curl') codeEl.textContent = uc.codeCurl;
+    }
+
+    function switchReqSubTab(tab) {
+      ['params', 'body', 'code'].forEach(t => {
+        const btn = document.getElementById(`req-tab-${t}`);
+        const panel = document.getElementById(`req-panel-${t}`);
+        if (t === tab) {
+          btn.className = "pb-2 border-b-2 border-indigo-500 text-indigo-400";
+          panel.classList.remove('hidden');
+        } else {
+          btn.className = "pb-2 text-slate-400 hover:text-slate-200";
+          panel.classList.add('hidden');
+        }
+      });
+    }
+
+    function copyCodeSnippet() {
+      const code = document.getElementById('code-snippet-display').textContent;
+      copyToClipboard(code);
+    }
+
+    function copyResponseText() {
+      const text = document.getElementById('response-body-display').textContent;
+      copyToClipboard(text);
+    }
+
+    function copyToClipboard(text) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+
+      // Toast feedback
+      const toast = document.createElement('div');
+      toast.className = 'fixed bottom-5 right-5 bg-indigo-600 text-white px-4 py-2 rounded-xl text-xs shadow-2xl z-50 flex items-center gap-2';
+      toast.innerHTML = `<i class="fa-solid fa-check"></i> Copied to clipboard!`;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 2000);
+    }
+
+    function handleSearch(query) {
+      const dropdown = document.getElementById('search-results-dropdown');
+      if (!query.trim()) {
+        dropdown.classList.add('hidden');
+        return;
+      }
+
+      const q = query.toLowerCase();
+      let matches = [];
+
+      API_TAXONOMY.forEach(cat => {
+        cat.subcategories.forEach(sub => {
+          sub.useCases.forEach(uc => {
+            if (
+              uc.name.toLowerCase().includes(q) ||
+              sub.name.toLowerCase().includes(q) ||
+              cat.title.toLowerCase().includes(q) ||
+              sub.protocol.toLowerCase().includes(q)
+            ) {
+              matches.push({ cat, sub, uc });
+            }
+          });
+        });
+      });
+
+      if (matches.length === 0) {
+        dropdown.innerHTML = `<div class="p-3 text-xs text-slate-400 text-center">No matching API types or use cases found.</div>`;
+      } else {
+        dropdown.innerHTML = matches.map(m => `
+          <div onclick="selectUseCaseFromMindmap('${m.cat.id}', '${m.sub.id}', '${m.uc.id}')" 
+            class="p-3 hover:bg-slate-800 border-b border-slate-800/80 cursor-pointer flex items-center justify-between transition">
+            <div>
+              <div class="text-xs font-bold text-white flex items-center gap-2">
+                <i class="fa-solid ${m.uc.icon} text-indigo-400"></i> ${m.uc.name}
+              </div>
+              <div class="text-[11px] text-slate-400">${m.cat.title} ➔ ${m.sub.name} (${m.sub.protocol})</div>
+            </div>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-950 text-emerald-400 border border-slate-800">
+              ${m.uc.method}
+            </span>
+          </div>
+        `).join('');
+      }
+
+      dropdown.classList.remove('hidden');
+    }
+
+    // Hide search dropdown on click outside
+    document.addEventListener('click', (e) => {
+      const dropdown = document.getElementById('search-results-dropdown');
+      const input = document.getElementById('global-search');
+      if (!dropdown.contains(e.target) && e.target !== input) {
+        dropdown.classList.add('hidden');
+      }
+    });
+
+    function renderQuiz() {
+      const card = document.getElementById('quiz-card-container');
+      
+      if (currentQuizIndex >= QUIZ_QUESTIONS.length) {
+        // Quiz Complete
+        card.innerHTML = `
+          <div class="text-center space-y-4 py-8">
+            <div class="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-2xl mx-auto">
+              <i class="fa-solid fa-trophy"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white">Quiz Completed!</h3>
+            <p class="text-sm text-slate-300">You scored <span class="font-bold text-emerald-400">${quizScore}</span> out of <span class="font-bold text-white">${QUIZ_QUESTIONS.length}</span></p>
+            <button onclick="resetQuiz()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-indigo-600/30 transition">
+              Try Again
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      const q = QUIZ_QUESTIONS[currentQuizIndex];
+      card.innerHTML = `
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+            Question ${currentQuizIndex + 1} of ${QUIZ_QUESTIONS.length}
+          </span>
+          <span class="text-xs font-mono text-emerald-400">Score: ${quizScore}</span>
+        </div>
+
+        <h3 class="text-base font-semibold text-white leading-relaxed">${q.question}</h3>
+
+        <div class="space-y-2.5">
+          ${q.options.map((opt, i) => `
+            <button onclick="answerQuiz(${i})" class="w-full text-left p-3.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-indigo-500 text-slate-200 text-xs font-medium transition flex items-center justify-between group">
+              <span>${opt.text}</span>
+              <i class="fa-solid fa-chevron-right text-slate-600 group-hover:text-indigo-400"></i>
+            </button>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function answerQuiz(optionIdx) {
+      const q = QUIZ_QUESTIONS[currentQuizIndex];
+      const selected = q.options[optionIdx];
+      
+      const card = document.getElementById('quiz-card-container');
+      const isCorrect = selected.correct;
+      if (isCorrect) quizScore++;
+
+      card.innerHTML = `
+        <div class="space-y-4">
+          <div class="p-4 rounded-xl ${isCorrect ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400' : 'bg-rose-500/10 border border-rose-500/30 text-rose-400'} flex items-center gap-3">
+            <i class="fa-solid ${isCorrect ? 'fa-circle-check text-xl' : 'fa-circle-xmark text-xl'}"></i>
+            <div>
+              <div class="font-bold text-sm">${isCorrect ? 'Correct Answer!' : 'Incorrect'}</div>
+              <div class="text-xs text-slate-300 mt-0.5">${q.explanation}</div>
+            </div>
+          </div>
+
+          <button onclick="nextQuestion()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-indigo-600/30 transition">
+            Next Question
+          </button>
+        </div>
+      `;
+    }
+
+    function nextQuestion() {
+      currentQuizIndex++;
+      renderQuiz();
+    }
+
+    function resetQuiz() {
+      currentQuizIndex = 0;
+      quizScore = 0;
+      renderQuiz();
+    }
+
+    window.onload = function() {
+      renderMindmap();
+      populatePlaygroundSelector();
+      renderQuiz();
+    };
+  </script>
+</body>
+</html>

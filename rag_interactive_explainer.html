@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-900 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Understanding RAG (Retrieval-Augmented Generation)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        rag: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            cyan: '#06b6d4',
+                            emerald: '#10b981',
+                            amber: '#f59e0b',
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'bounce-short': 'bounce 1s infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .gradient-border {
+            border: 1px solid transparent;
+            background: linear-gradient(#0f172a, #0f172a) padding-box,
+                        linear-gradient(135deg, #38bdf8, #818cf8, #c084fc) border-box;
+        }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col min-h-screen bg-slate-950 text-slate-100 overflow-x-hidden selection:bg-indigo-500 selection:text-white">
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-50 glass-panel border-b border-slate-800/80 px-4 lg:px-8 py-3.5">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-cyan-500 to-emerald-400 p-0.5 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                    <div class="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
+                        <i class="fa-solid fa-brain text-indigo-400 text-lg"></i>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="text-xl font-extrabold tracking-tight flex items-center gap-2">
+                        <span>RAG</span> <span class="text-xs px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-medium border border-indigo-500/30">Interactive Guide</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Retrieval-Augmented Generation Visualizer</p>
+                </div>
+            </div>
+
+            <!-- Tab Navigation Buttons -->
+            <nav class="flex items-center gap-1 bg-slate-900/90 p-1.5 rounded-xl border border-slate-800 text-sm font-medium overflow-x-auto max-w-full">
+                <button onclick="switchTab('tab-sim')" id="btn-tab-sim" class="tab-btn active px-3.5 py-1.5 rounded-lg transition-all flex items-center gap-2 text-white bg-indigo-600 shadow-md">
+                    <i class="fa-solid fa-[#000]"></i>
+                    <i class="fa-solid fa-flask text-xs"></i>
+                    <span>Live Comparison</span>
+                </button>
+                <button onclick="switchTab('tab-arch')" id="btn-tab-arch" class="tab-btn px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-diagram-project text-xs"></i>
+                    <span>How It Works</span>
+                </button>
+                <button onclick="switchTab('tab-vs')" id="btn-tab-vs" class="tab-btn px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-scale-balanced text-xs"></i>
+                    <span>RAG vs Fine-Tuning</span>
+                </button>
+                <button onclick="switchTab('tab-tech')" id="btn-tab-tech" class="tab-btn px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-cubes text-xs"></i>
+                    <span>Tech & .NET</span>
+                </button>
+                <button onclick="switchTab('tab-quiz')" id="btn-tab-quiz" class="tab-btn px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-circle-question text-xs"></i>
+                    <span>Quiz</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
+
+        <!-- Executive Summary Banner -->
+        <div class="relative overflow-hidden rounded-2xl glass-panel p-6 sm:p-8 border border-slate-800">
+            <div class="absolute -top-24 -right-24 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div class="space-y-3 max-w-3xl">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-semibold uppercase tracking-wider">
+                        <i class="fa-solid fa-bolt text-amber-400"></i> Core Concept
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+                        What is <span class="gradient-text">Retrieval-Augmented Generation</span>?
+                    </h2>
+                    <p class="text-slate-300 leading-relaxed text-sm sm:text-base">
+                        RAG is an AI framework that allows a Large Language Model (LLM) to <strong class="text-cyan-400 font-semibold">search for relevant information first</strong> from external knowledge (PDFs, HR policies, databases), then <strong class="text-indigo-400 font-semibold">use that verified context</strong> to generate an accurate, hallucination-free answer.
+                    </p>
+                </div>
+
+                <!-- Quick Visual Pill -->
+                <div class="flex items-center gap-2 bg-slate-900/80 p-3 rounded-xl border border-slate-800 shrink-0 text-center text-xs font-mono">
+                    <div class="px-3 py-2 rounded-lg bg-slate-800 text-slate-300">
+                        <i class="fa-solid fa-magnifying-glass text-cyan-400 mb-1 block text-base"></i> Search First
+                    </div>
+                    <i class="fa-solid fa-arrow-right text-slate-600"></i>
+                    <div class="px-3 py-2 rounded-lg bg-indigo-950 text-indigo-300 border border-indigo-800/50">
+                        <i class="fa-solid fa-file-contract text-indigo-400 mb-1 block text-base"></i> Inject Context
+                    </div>
+                    <i class="fa-solid fa-arrow-right text-slate-600"></i>
+                    <div class="px-3 py-2 rounded-lg bg-emerald-950 text-emerald-300 border border-emerald-800/50">
+                        <i class="fa-solid fa-check-circle text-emerald-400 mb-1 block text-base"></i> Accurate Answer
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 1: LIVE SIMULATION -->
+        <section id="tab-sim" class="tab-content space-y-6">
+            
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900 p-5 rounded-2xl border border-slate-800">
+                <div>
+                    <h3 class="text-lg font-bold flex items-center gap-2 text-white">
+                        <i class="fa-solid fa-sliders text-indigo-400"></i> Choose a Scenario to Test
+                    </h3>
+                    <p class="text-xs text-slate-400">See how standard AI compares directly against AI powered by RAG.</p>
+                </div>
+
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="setScenario('leave')" id="scen-btn-leave" class="scen-btn active px-3.5 py-2 rounded-xl text-xs font-semibold bg-indigo-600 text-white border border-indigo-500 transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-calendar-check"></i> Annual Leave Policy
+                    </button>
+                    <button onclick="setScenario('medical')" id="scen-btn-medical" class="scen-btn px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-kit-medical"></i> Medical Claim SOP
+                    </button>
+                    <button onclick="setScenario('warranty')" id="scen-btn-warranty" class="scen-btn px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-shield-halved"></i> Product Warranty
+                    </button>
+                </div>
+            </div>
+
+            <!-- Context Source Document Card -->
+            <div class="bg-slate-900/90 rounded-2xl p-5 border border-slate-800 relative overflow-hidden">
+                <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-3">
+                    <div class="flex items-center gap-2 text-sm font-semibold text-emerald-400">
+                        <i class="fa-solid fa-file-pdf"></i>
+                        <span>Simulated External Document Store</span>
+                        <span id="doc-title-badge" class="text-xs px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 font-mono">Employee Handbook PDF</span>
+                    </div>
+                    <span class="text-xs text-slate-500 font-mono">Status: Indexed in Vector DB</span>
+                </div>
+                <div id="doc-content-box" class="bg-slate-950 p-4 rounded-xl border border-slate-800/80 font-mono text-xs text-slate-300 leading-relaxed transition-all">
+                    <!-- Dynamic doc content injected by JS -->
+                </div>
+            </div>
+
+            <!-- Action Prompt Bar -->
+            <div class="bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 p-4 rounded-2xl border border-indigo-500/30 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
+                <div class="flex items-center gap-3 w-full sm:w-auto">
+                    <div class="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                    <div class="w-full">
+                        <div class="text-xs text-slate-400 font-medium">User Prompt:</div>
+                        <div id="prompt-display-text" class="text-sm font-semibold text-white">"How many annual leave days do employees receive?"</div>
+                    </div>
+                </div>
+
+                <button onclick="runSimulation()" id="run-sim-btn" class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-500 hover:from-indigo-600 hover:to-cyan-600 text-white font-bold text-sm shadow-lg shadow-indigo-500/25 transition-all flex items-center justify-center gap-2 shrink-0">
+                    <i class="fa-solid fa-play text-xs"></i>
+                    <span>Run Query Comparison</span>
+                </button>
+            </div>
+
+            <!-- Comparison Split Panels -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                <!-- WITHOUT RAG CARD -->
+                <div class="bg-slate-900/80 rounded-2xl border border-rose-900/30 p-6 flex flex-col justify-between space-y-4 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 px-3 py-1 bg-rose-500/10 border-b border-l border-rose-500/30 rounded-bl-xl text-rose-400 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
+                        <i class="fa-solid fa-triangle-exclamation"></i> Without RAG
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-3 pt-2">
+                            <div class="w-9 h-9 rounded-xl bg-rose-500/20 border border-rose-500/30 flex items-center justify-center text-rose-400">
+                                <i class="fa-solid fa-robot"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-base font-bold text-slate-100">Standard LLM Model</h4>
+                                <p class="text-xs text-slate-400">Relies solely on pre-training data</p>
+                            </div>
+                        </div>
+
+                        <!-- Step visual -->
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs space-y-2">
+                            <div class="flex items-center justify-between text-slate-400 font-mono">
+                                <span>1. Prompt Sent</span>
+                                <i class="fa-solid fa-arrow-down"></i>
+                            </div>
+                            <div class="flex items-center justify-between text-slate-400 font-mono">
+                                <span>2. Search External Files?</span>
+                                <span class="text-rose-400 font-bold"><i class="fa-solid fa-xmark"></i> NO ACCESS</span>
+                            </div>
+                            <div class="flex items-center justify-between text-slate-400 font-mono">
+                                <span>3. Generation Strategy</span>
+                                <span class="text-amber-400">Best Guess / Generic HR Knowledge</span>
+                            </div>
+                        </div>
+
+                        <!-- Response Box -->
+                        <div class="space-y-2">
+                            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Generated Response:</div>
+                            <div id="sim-no-rag-output" class="bg-slate-950/80 p-4 rounded-xl border border-rose-900/30 text-sm text-slate-300 min-h-[110px] flex items-center justify-center italic text-center">
+                                Click "Run Query Comparison" to simulate answer...
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-rose-950/30 rounded-xl border border-rose-900/40 text-xs text-rose-300/90 space-y-1">
+                        <div class="font-bold flex items-center gap-1.5">
+                            <i class="fa-solid fa-bug"></i> Drawbacks:
+                        </div>
+                        <ul class="list-disc list-inside space-y-0.5 text-slate-400">
+                            <li>Does not know your specific company policy.</li>
+                            <li>High risk of hallucination or guessing.</li>
+                            <li>Cannot give updated or private document answers.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- WITH RAG CARD -->
+                <div class="bg-slate-900/80 rounded-2xl border border-emerald-900/40 p-6 flex flex-col justify-between space-y-4 relative overflow-hidden shadow-2xl shadow-emerald-950/20">
+                    <div class="absolute top-0 right-0 px-3 py-1 bg-emerald-500/20 border-b border-l border-emerald-500/40 rounded-bl-xl text-emerald-300 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
+                        <i class="fa-solid fa-circle-check"></i> With RAG
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-3 pt-2">
+                            <div class="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                                <i class="fa-solid fa-brain"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-base font-bold text-slate-100">RAG-Enabled AI Assistant</h4>
+                                <p class="text-xs text-slate-400">Searches docs first, then generates answer</p>
+                            </div>
+                        </div>
+
+                        <!-- Step visual -->
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs space-y-2">
+                            <div class="flex items-center justify-between text-slate-400 font-mono">
+                                <span>1. Similarity Search Vector DB</span>
+                                <span class="text-cyan-400 font-bold" id="rag-step-1-status">Ready</span>
+                            </div>
+                            <div class="flex items-center justify-between text-slate-400 font-mono">
+                                <span>2. Retrieved Chunk Match Score</span>
+                                <span class="text-emerald-400 font-bold font-mono" id="rag-step-2-status">--</span>
+                            </div>
+                            <div class="flex items-center justify-between text-slate-400 font-mono">
+                                <span>3. LLM Prompt Context</span>
+                                <span class="text-indigo-300 font-bold" id="rag-step-3-status">Injected Doc Paragraph</span>
+                            </div>
+                        </div>
+
+                        <!-- Response Box -->
+                        <div class="space-y-2">
+                            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+                                <span>Grounded Response:</span>
+                                <span class="text-[10px] text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800"><i class="fa-solid fa-shield"></i> Verified Fact</span>
+                            </div>
+                            <div id="sim-rag-output" class="bg-slate-950/80 p-4 rounded-xl border border-emerald-900/40 text-sm text-emerald-100 min-h-[110px] flex items-center justify-center italic text-center">
+                                Click "Run Query Comparison" to simulate answer...
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-emerald-950/30 rounded-xl border border-emerald-900/40 text-xs text-emerald-300/90 space-y-1">
+                        <div class="font-bold flex items-center gap-1.5">
+                            <i class="fa-solid fa-star"></i> Benefits:
+                        </div>
+                        <ul class="list-disc list-inside space-y-0.5 text-slate-400">
+                            <li>100% accurate based on actual company policy.</li>
+                            <li>Instant updates by replacing document files (no retraining).</li>
+                            <li>Drastically reduces AI hallucinations.</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- TAB 2: ARCHITECTURE & PIPELINE -->
+        <section id="tab-arch" class="tab-content hidden space-y-8">
+            
+            <div class="text-center space-y-2 max-w-2xl mx-auto">
+                <h3 class="text-2xl font-bold">How RAG Works Behind the Scenes</h3>
+                <p class="text-sm text-slate-400">RAG consists of two main workflows: **Document Ingestion** (preparing your files) and **Query & Retrieval** (answering user questions).</p>
+            </div>
+
+            <!-- Workflow Selector Switcher -->
+            <div class="flex justify-center">
+                <div class="bg-slate-900 p-1.5 rounded-xl border border-slate-800 inline-flex gap-2">
+                    <button onclick="setArchFlow('retrieval')" id="flow-btn-retrieval" class="px-5 py-2 rounded-lg text-xs font-bold bg-indigo-600 text-white transition-all shadow">
+                        <i class="fa-solid fa-comments text-xs mr-1.5"></i> Query & Retrieval Flow (Live Question)
+                    </button>
+                    <button onclick="setArchFlow('ingestion')" id="flow-btn-ingestion" class="px-5 py-2 rounded-lg text-xs font-bold text-slate-400 hover:text-slate-200 transition-all">
+                        <i class="fa-solid fa-database text-xs mr-1.5"></i> Document Ingestion Flow (Setup)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Interactive Architecture Step Pipeline -->
+            <div id="arch-pipeline-container" class="grid grid-cols-1 md:grid-cols-5 gap-3 relative">
+                <!-- Injected via JavaScript based on workflow mode -->
+            </div>
+
+            <!-- Detail Drawer for Architecture Step -->
+            <div id="arch-detail-card" class="bg-slate-900/90 p-6 rounded-2xl border border-indigo-500/30 glass-panel space-y-3">
+                <div class="flex items-center gap-3">
+                    <span id="arch-detail-num" class="w-7 h-7 rounded-lg bg-indigo-600 text-white text-xs font-extrabold flex items-center justify-center">1</span>
+                    <h4 id="arch-detail-title" class="text-lg font-bold text-white">Click any step above to explore details</h4>
+                </div>
+                <p id="arch-detail-desc" class="text-sm text-slate-300 leading-relaxed">
+                    Select a block in the pipeline above to see how data flows through text extraction, vector embeddings, similarity search, and prompt synthesis.
+                </p>
+                <div id="arch-detail-tech" class="flex flex-wrap gap-2 pt-2 border-t border-slate-800">
+                    <!-- Tech badges -->
+                </div>
+            </div>
+
+            <!-- Interactive Chunking & Vector Sandbox -->
+            <div class="bg-slate-900/90 rounded-2xl border border-slate-800 p-6 space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                    <div>
+                        <h4 class="text-base font-bold flex items-center gap-2 text-cyan-400">
+                            <i class="fa-solid fa-microchip"></i> Interactive Chunking & Vector Visualizer Sandbox
+                        </h4>
+                        <p class="text-xs text-slate-400">See how raw text is broken into chunks and converted into numerical vectors for semantic search.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs text-slate-400 font-mono">Chunk Size:</label>
+                        <select id="chunk-size-select" onchange="updateChunkingSandbox()" class="bg-slate-950 border border-slate-800 text-xs rounded-lg px-2.5 py-1.5 text-slate-200">
+                            <option value="50">Small (50 chars)</option>
+                            <option value="120" selected>Medium (120 chars)</option>
+                            <option value="200">Large (200 chars)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Left Input -->
+                    <div class="space-y-3">
+                        <label class="text-xs font-semibold text-slate-300">Raw Document Text Input:</label>
+                        <textarea id="sandbox-text-input" oninput="updateChunkingSandbox()" rows="5" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs font-mono text-slate-300 focus:outline-none focus:border-indigo-500 transition-all">
+Employees receive 18 days of paid annual leave each year. Unused leave can be carried forward for up to 6 months. Medical claims up to $500 per year require official receipts submitted via HR portal. Product warranty covers defects for 24 months.
+                        </textarea>
+                        <p class="text-[11px] text-slate-500">Edit the text above to see chunk splitting and vector generation in real time.</p>
+                    </div>
+
+                    <!-- Right Generated Chunks & Vectors -->
+                    <div class="space-y-3">
+                        <label class="text-xs font-semibold text-slate-300 flex items-center justify-between">
+                            <span>Extracted Chunks & Vector Representations:</span>
+                            <span id="chunk-count-badge" class="text-[10px] bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded border border-indigo-800">4 Chunks Generated</span>
+                        </label>
+                        <div id="sandbox-chunks-output" class="space-y-2.5 max-h-56 overflow-y-auto pr-1">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- TAB 3: RAG VS FINE-TUNING -->
+        <section id="tab-vs" class="tab-content hidden space-y-8">
+            
+            <div class="text-center space-y-2 max-w-2xl mx-auto">
+                <h3 class="text-2xl font-bold">RAG vs. Fine-Tuning</h3>
+                <p class="text-sm text-slate-400">Understanding when to use RAG (giving AI documents) vs Fine-Tuning (retraining the AI model itself).</p>
+            </div>
+
+            <!-- Comparison Table -->
+            <div class="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-900/90">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-slate-950 text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-800">
+                        <tr>
+                            <th class="p-4">Feature</th>
+                            <th class="p-4 text-indigo-400"><i class="fa-solid fa-brain mr-1.5"></i> RAG (Retrieval-Augmented)</th>
+                            <th class="p-4 text-cyan-400"><i class="fa-solid fa-sliders mr-1.5"></i> Fine-Tuning</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800/60 text-slate-300 text-xs sm:text-sm">
+                        <tr>
+                            <td class="p-4 font-semibold text-white">Primary Mechanism</td>
+                            <td class="p-4">Uses external documents directly in prompt context</td>
+                            <td class="p-4">Changes internal weights of the AI model itself</td>
+                        </tr>
+                        <tr>
+                            <td class="p-4 font-semibold text-white">Information Updates</td>
+                            <td class="p-4 text-emerald-400 font-medium"><i class="fa-solid fa-bolt mr-1"></i> Instant (Upload new document file)</td>
+                            <td class="p-4 text-rose-400 font-medium"><i class="fa-solid fa-clock mr-1"></i> Slow & costly (Requires retraining pipeline)</td>
+                        </tr>
+                        <tr>
+                            <td class="p-4 font-semibold text-white">Ideal For</td>
+                            <td class="p-4">Frequently changing knowledge (HR policies, SOPs, manuals)</td>
+                            <td class="p-4">Changing tone, specific writing style, standard format outputs</td>
+                        </tr>
+                        <tr>
+                            <td class="p-4 font-semibold text-white">Cost & Resources</td>
+                            <td class="p-4 text-emerald-400"><i class="fa-solid fa-dollar-sign"></i> Lower cost (Pay for embedding & inference)</td>
+                            <td class="p-4 text-amber-400"><i class="fa-solid fa-dollar-sign"></i><i class="fa-solid fa-dollar-sign"></i> Higher GPU computing cost</td>
+                        </tr>
+                        <tr>
+                            <td class="p-4 font-semibold text-white">Hallucination Risk</td>
+                            <td class="p-4 text-emerald-400 font-medium">Very Low (Grounded in source context)</td>
+                            <td class="p-4 text-amber-400 font-medium">Moderate (Can still hallucinate facts)</td>
+                        </tr>
+                        <tr>
+                            <td class="p-4 font-semibold text-white">Traceability & Citations</td>
+                            <td class="p-4 text-emerald-400"><i class="fa-solid fa-check text-xs"></i> High (Can cite exact PDF page/chunk)</td>
+                            <td class="p-4 text-rose-400"><i class="fa-solid fa-xmark text-xs"></i> None (Implicit neural weights)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Rule of Thumb Callout -->
+            <div class="bg-gradient-to-r from-indigo-950/60 via-purple-950/40 to-slate-900 p-6 rounded-2xl border border-indigo-500/30 flex flex-col md:flex-row items-center gap-5">
+                <div class="w-12 h-12 rounded-2xl bg-indigo-600/30 border border-indigo-400/40 flex items-center justify-center text-indigo-300 shrink-0 text-xl">
+                    <i class="fa-solid fa-lightbulb"></i>
+                </div>
+                <div class="space-y-1">
+                    <h4 class="text-base font-bold text-white">Golden Rule of Thumb</h4>
+                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                        Use <strong class="text-indigo-400">RAG</strong> when your knowledge changes frequently (documents, policies, technical manuals). Use <strong class="text-cyan-400">Fine-Tuning</strong> when you want the AI to behave differently (tone of voice, specialized JSON formatting, specialized domain phrasing).
+                    </p>
+                </div>
+            </div>
+
+            <!-- Interactive Recommendation Quiz Assistant -->
+            <div class="bg-slate-900/90 p-6 rounded-2xl border border-slate-800 space-y-4">
+                <h4 class="text-base font-bold flex items-center gap-2 text-white">
+                    <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i> Interactive Decision Assistant: Which should you choose?
+                </h4>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="space-y-2">
+                        <label class="text-xs font-semibold text-slate-300">1. How often does your information change?</label>
+                        <select id="dec-q1" onchange="calculateRecommendation()" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200">
+                            <option value="rag">Daily / Weekly / Frequently</option>
+                            <option value="ft">Rarely / Never</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="text-xs font-semibold text-slate-300">2. What is your primary objective?</label>
+                        <select id="dec-q2" onchange="calculateRecommendation()" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200">
+                            <option value="rag">Accurate fact lookup from documents</option>
+                            <option value="ft">Custom writing style or output formatting</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="text-xs font-semibold text-slate-300">3. Is source document citation required?</label>
+                        <select id="dec-q3" onchange="calculateRecommendation()" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200">
+                            <option value="rag">Yes (Must cite source file & page)</option>
+                            <option value="ft">No citations required</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Result Box -->
+                <div id="dec-result-box" class="p-4 rounded-xl bg-indigo-950/50 border border-indigo-500/30 flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-circle-check text-emerald-400 text-xl"></i>
+                        <div>
+                            <div class="text-xs font-semibold text-indigo-300">Recommended Approach:</div>
+                            <div id="dec-result-title" class="text-sm font-extrabold text-white">RAG (Retrieval-Augmented Generation)</div>
+                        </div>
+                    </div>
+                    <span id="dec-result-reason" class="text-xs text-slate-300 hidden sm:block">Ideal because your knowledge changes frequently and requires factual document precision.</span>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- TAB 4: TECH & .NET ARCHITECTURE -->
+        <section id="tab-tech" class="tab-content hidden space-y-8">
+            
+            <div class="text-center space-y-2 max-w-2xl mx-auto">
+                <h3 class="text-2xl font-bold">Tech Stack & .NET Integration</h3>
+                <p class="text-sm text-slate-400">Popular frameworks, vector databases, and how RAG fits into an ASP.NET Core application setup.</p>
+            </div>
+
+            <!-- Ecosystem Category Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                
+                <div class="bg-slate-900/90 p-5 rounded-2xl border border-slate-800 space-y-3">
+                    <div class="w-9 h-9 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-microchip"></i>
+                    </div>
+                    <h4 class="text-sm font-bold text-white">LLM Engines</h4>
+                    <ul class="text-xs text-slate-400 space-y-1.5 font-mono">
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-angle-right text-indigo-400"></i> OpenAI GPT-4o / Azure OpenAI</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-angle-right text-indigo-400"></i> Anthropic Claude 3.5</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-angle-right text-indigo-400"></i> Google Gemini</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-angle-right text-indigo-400"></i> Meta Llama 3</li>
+                    </ul>
+                </div>
+
+                <div class="bg-slate-900/90 p-5 rounded-2xl border border-slate-800 space-y-3">
+                    <div class="w-9 h-9 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-database"></i>
+                    </div>
+                    <h4 class="text-sm font-bold text-white">Vector Databases</h4>
+                    <ul class="text-xs text-slate-400 space-y-1.5 font-mono">
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-angle-right text-cyan-400"></i> Pinecone / Qdrant</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-angle-right text-cyan-400"></i> ChromaDB / Milvus</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-angle-right text-cyan-400"></i> Azure AI Search</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-angle-right text-cyan-400"></i> pgvector (PostgreSQL)</li>
+                    </ul>
+                </div>
+
+                <div class="bg-slate-900/90 p-5 rounded-2xl border border-slate-800 space-y-3">
+                    <div class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-cubes"></i>
+                    </div>
+                    <h4 class="text-sm font-bold text-white">Frameworks</h4>
+                    <ul class="text-xs text-slate-400 space-y-1.5 font-mono">
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-angle-right text-emerald-400"></i> Microsoft Semantic Kernel</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-angle-right text-emerald-400"></i> LangChain / LangGraph</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-angle-right text-emerald-400"></i> LlamaIndex</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-angle-right text-emerald-400"></i> Kernel Memory (.NET)</li>
+                    </ul>
+                </div>
+
+                <div class="bg-slate-900/90 p-5 rounded-2xl border border-slate-800 space-y-3">
+                    <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-vector-square"></i>
+                    </div>
+                    <h4 class="text-sm font-bold text-white">Embedding Models</h4>
+                    <ul class="text-xs text-slate-400 space-y-1.5 font-mono">
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-angle-right text-amber-400"></i> OpenAI text-embedding-3</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-angle-right text-amber-400"></i> BAAI BGE Embeddings</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-angle-right text-amber-400"></i> Cohere Embed</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-angle-right text-amber-400"></i> Jina Embeddings</li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- ASP.NET Core Specific Flow Diagram Card -->
+            <div class="bg-slate-900/90 p-6 rounded-2xl border border-indigo-500/30 space-y-5">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                    <div>
+                        <h4 class="text-base font-bold text-white flex items-center gap-2">
+                            <i class="fa-brands fa-microsoft text-cyan-400"></i> ASP.NET Core Web API RAG Pipeline
+                        </h4>
+                        <p class="text-xs text-slate-400">How backend C# developers integrate RAG into existing corporate web applications.</p>
+                    </div>
+                    <span class="text-xs font-mono px-2.5 py-1 rounded-lg bg-indigo-950 text-indigo-300 border border-indigo-800">C# / .NET 8 / Semantic Kernel</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-3 text-center">
+                    
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                        <div class="text-xs font-mono text-cyan-400 font-bold">STEP 1</div>
+                        <div class="text-sm font-bold text-white">ASP.NET Web API</div>
+                        <p class="text-[11px] text-slate-400">Receives `POST /api/chat` with user question payload.</p>
+                    </div>
+
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                        <div class="text-xs font-mono text-cyan-400 font-bold">STEP 2</div>
+                        <div class="text-sm font-bold text-white">Embedding Call</div>
+                        <p class="text-[11px] text-slate-400">Converts question string into float array vector.</p>
+                    </div>
+
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                        <div class="text-xs font-mono text-cyan-400 font-bold">STEP 3</div>
+                        <div class="text-sm font-bold text-white">Vector Search</div>
+                        <p class="text-[11px] text-slate-400">Queries Azure AI Search or Pinecone for top 3 matching chunks.</p>
+                    </div>
+
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                        <div class="text-xs font-mono text-cyan-400 font-bold">STEP 4</div>
+                        <div class="text-sm font-bold text-white">Azure OpenAI</div>
+                        <p class="text-[11px] text-slate-400">Calls GPT-4o with system prompt + retrieved chunks context.</p>
+                    </div>
+
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                        <div class="text-xs font-mono text-cyan-400 font-bold">STEP 5</div>
+                        <div class="text-sm font-bold text-white">Response Stream</div>
+                        <p class="text-[11px] text-slate-400">Streams verified JSON / Markdown back to Web or Mobile App.</p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Use Cases Grid -->
+            <div class="space-y-4">
+                <h4 class="text-base font-bold text-white"><i class="fa-solid fa-building text-indigo-400"></i> Real-World Enterprise Use Cases</h4>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                    
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-2">
+                        <div class="text-sm font-bold text-emerald-400 flex items-center gap-2">
+                            <i class="fa-solid fa-headset"></i> Customer Support Chatbot
+                        </div>
+                        <p class="text-slate-300">Answers queries regarding user manuals, return policies, and troubleshooting guides without human agent intervention.</p>
+                    </div>
+
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-2">
+                        <div class="text-sm font-bold text-indigo-400 flex items-center gap-2">
+                            <i class="fa-solid fa-users-gear"></i> Internal HR & Knowledge Base
+                        </div>
+                        <p class="text-slate-300">Employees ask "How do I claim medical expenses?" or "What is our WFH policy?" and receive answers directly sourced from PDF policy docs.</p>
+                    </div>
+
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-2">
+                        <div class="text-sm font-bold text-cyan-400 flex items-center gap-2">
+                            <i class="fa-solid fa-scale-balanced"></i> Legal & Compliance Search
+                        </div>
+                        <p class="text-slate-300">Lawyers and auditors search thousands of contracts, compliance frameworks, and case laws instantly with page-level citations.</p>
+                    </div>
+
+                </div>
+            </div>
+
+        </section>
+
+        <!-- TAB 5: AUDIENCE QUIZ -->
+        <section id="tab-quiz" class="tab-content hidden space-y-6">
+            
+            <div class="text-center space-y-2 max-w-2xl mx-auto">
+                <h3 class="text-2xl font-bold">Test Your Knowledge</h3>
+                <p class="text-sm text-slate-400">Quick 4-question check to reinforce your understanding of RAG.</p>
+            </div>
+
+            <div class="max-w-3xl mx-auto space-y-6">
+                
+                <!-- Q1 -->
+                <div class="bg-slate-900/90 p-5 rounded-2xl border border-slate-800 space-y-3">
+                    <h4 class="text-sm font-bold text-white">1. What does the "R" in RAG stand for?</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                        <button onclick="checkQuiz(1, 'a', false)" class="q1-btn p-3 rounded-xl bg-slate-950 border border-slate-800 text-left hover:border-indigo-500 transition-all">A) Rapid</button>
+                        <button onclick="checkQuiz(1, 'b', true)" class="q1-btn p-3 rounded-xl bg-slate-950 border border-slate-800 text-left hover:border-indigo-500 transition-all">B) Retrieval</button>
+                        <button onclick="checkQuiz(1, 'c', false)" class="q1-btn p-3 rounded-xl bg-slate-950 border border-slate-800 text-left hover:border-indigo-500 transition-all">C) Recurring</button>
+                        <button onclick="checkQuiz(1, 'd', false)" class="q1-btn p-3 rounded-xl bg-slate-950 border border-slate-800 text-left hover:border-indigo-500 transition-all">D) Reasoning</button>
+                    </div>
+                    <div id="q1-feedback" class="hidden text-xs p-2 rounded-lg font-medium"></div>
+                </div>
+
+                <!-- Q2 -->
+                <div class="bg-slate-900/90 p-5 rounded-2xl border border-slate-800 space-y-3">
+                    <h4 class="text-sm font-bold text-white">2. Why does RAG drastically reduce AI hallucinations?</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                        <button onclick="checkQuiz(2, 'a', false)" class="q2-btn p-3 rounded-xl bg-slate-950 border border-slate-800 text-left hover:border-indigo-500 transition-all">A) It makes the AI model run faster</button>
+                        <button onclick="checkQuiz(2, 'b', true)" class="q2-btn p-3 rounded-xl bg-slate-950 border border-slate-800 text-left hover:border-indigo-500 transition-all">B) It provides retrieved source context inside the prompt</button>
+                        <button onclick="checkQuiz(2, 'c', false)" class="q2-btn p-3 rounded-xl bg-slate-950 border border-slate-800 text-left hover:border-indigo-500 transition-all">C) It retrains the AI neural network continuously</button>
+                        <button onclick="checkQuiz(2, 'd', false)" class="q2-btn p-3 rounded-xl bg-slate-950 border border-slate-800 text-left hover:border-indigo-500 transition-all">D) It deletes old memories from the LLM</button>
+                    </div>
+                    <div id="q2-feedback" class="hidden text-xs p-2 rounded-lg font-medium"></div>
+                </div>
+
+                <!-- Q3 -->
+                <div class="bg-slate-900/90 p-5 rounded-2xl border border-slate-800 space-y-3">
+                    <h4 class="text-sm font-bold text-white">3. When should you prefer RAG over Fine-Tuning?</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                        <button onclick="checkQuiz(3, 'a', true)" class="q3-btn p-3 rounded-xl bg-slate-950 border border-slate-800 text-left hover:border-indigo-500 transition-all">A) When company knowledge changes frequently</button>
+                        <button onclick="checkQuiz(3, 'b', false)" class="q3-btn p-3 rounded-xl bg-slate-950 border border-slate-800 text-left hover:border-indigo-500 transition-all">B) When you want to change the AI's speaking voice or style</button>
+                        <button onclick="checkQuiz(3, 'c', false)" class="q3-btn p-3 rounded-xl bg-slate-950 border border-slate-800 text-left hover:border-indigo-500 transition-all">C) When you have no source document files available</button>
+                        <button onclick="checkQuiz(3, 'd', false)" class="q3-btn p-3 rounded-xl bg-slate-950 border border-slate-800 text-left hover:border-indigo-500 transition-all">D) When you want high GPU training costs</button>
+                    </div>
+                    <div id="q3-feedback" class="hidden text-xs p-2 rounded-lg font-medium"></div>
+                </div>
+
+                <!-- Q4 -->
+                <div class="bg-slate-900/90 p-5 rounded-2xl border border-slate-800 space-y-3">
+                    <h4 class="text-sm font-bold text-white">4. Which database type is specifically designed for similarity searching embeddings in RAG?</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                        <button onclick="checkQuiz(4, 'a', false)" class="q4-btn p-3 rounded-xl bg-slate-950 border border-slate-800 text-left hover:border-indigo-500 transition-all">A) Relational SQL DB</button>
+                        <button onclick="checkQuiz(4, 'b', false)" class="q4-btn p-3 rounded-xl bg-slate-950 border border-slate-800 text-left hover:border-indigo-500 transition-all">B) Key-Value Redis cache</button>
+                        <button onclick="checkQuiz(4, 'c', true)" class="q4-btn p-3 rounded-xl bg-slate-950 border border-slate-800 text-left hover:border-indigo-500 transition-all">C) Vector Database (e.g., Pinecone, Chroma)</button>
+                        <button onclick="checkQuiz(4, 'd', false)" class="q4-btn p-3 rounded-xl bg-slate-950 border border-slate-800 text-left hover:border-indigo-500 transition-all">D) Excel Spreadsheet</button>
+                    </div>
+                    <div id="q4-feedback" class="hidden text-xs p-2 rounded-lg font-medium"></div>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Scenario Datasets from PDF
+        const SCENARIOS = {
+            leave: {
+                title: 'Employee Handbook PDF (Page 2)',
+                docText: `Employee Handbook - Section 4: Annual Leave\n"Employees receive 18 days of paid annual leave each year. Unused leave can be carried forward for up to 6 months."`,
+                prompt: 'How many annual leave days do employees receive?',
+                noRagAnswer: '"Many companies typically provide between 14-20 days of annual leave depending on seniority."',
+                ragAnswer: '"According to your Employee Handbook, employees receive 18 days of paid annual leave per year, and unused leave can be carried forward for up to 6 months."',
+                matchScore: '0.94 (Cosine Similarity)'
+            },
+            medical: {
+                title: 'HR Benefits Policy PDF (Page 8)',
+                docText: `HR Benefits Policy - Section 9: Outpatient Claims\n"Employees can claim up to $500 annually for general outpatient medical expenses. Receipts must be submitted within 30 days via HR Portal."`,
+                prompt: 'What is our medical claim reimbursement limit?',
+                noRagAnswer: '"Standard medical benefits usually cover around $200-$1000 per year, depending on health insurance coverage."',
+                ragAnswer: '"Per Section 9 of your HR Benefits Policy, employees can claim up to $500 annually for outpatient medical expenses with receipts submitted within 30 days."',
+                matchScore: '0.91 (Cosine Similarity)'
+            },
+            warranty: {
+                title: 'Product Tech Specification Manual PDF',
+                docText: `Product Manual - Warranty Terms\n"The device includes a 24-month manufacturer warranty covering hardware defects. Accessories have a 6-month coverage."`,
+                prompt: 'How long is the product warranty?',
+                noRagAnswer: '"Most electronics come with a standard 1-year limited warranty."',
+                ragAnswer: '"According to the Product Tech Specification Manual, the device hardware is covered by a 24-month manufacturer warranty, while accessories carry 6 months coverage."',
+                matchScore: '0.96 (Cosine Similarity)'
+            }
+        };
+
+        let currentScenario = 'leave';
+
+        // Architecture Pipeline Data
+        const PIPELINE_DATA = {
+            retrieval: [
+                { step: 1, title: 'User Question', icon: 'fa-comment-dots', color: 'indigo', desc: 'The user submits a natural language question (e.g. "How many leave days do I have?").', tech: ['Web App UI', 'ASP.NET Core API'] },
+                { step: 2, title: 'Embed Question', icon: 'fa-vector-square', color: 'cyan', desc: 'The text prompt is passed to an embedding model (e.g., text-embedding-3) to create a numerical vector.', tech: ['OpenAI Embeddings', 'BAAI BGE'] },
+                { step: 3, title: 'Vector Search', icon: 'fa-magnifying-glass', color: 'emerald', desc: 'The query vector searches the Vector DB using Cosine Similarity to find top matching text chunks.', tech: ['Pinecone', 'Azure AI Search', 'Qdrant'] },
+                { step: 4, title: 'Prompt Context', icon: 'fa-file-circle-check', color: 'amber', desc: 'Retrieved matching chunks are injected directly into the LLM system prompt as verified background context.', tech: ['LangChain', 'Semantic Kernel'] },
+                { step: 5, title: 'LLM Generation', icon: 'fa-robot', color: 'purple', desc: 'The LLM synthesizes the background chunks with its reasoning capability to generate a accurate answer.', tech: ['GPT-4o', 'Claude 3.5', 'Gemini'] }
+            ],
+            ingestion: [
+                { step: 1, title: 'Source Documents', icon: 'fa-file-pdf', color: 'rose', desc: 'Upload raw unstructured documents (PDFs, Word documents, Excel sheets, HTML pages).', tech: ['PDFs', 'Word', 'Markdown', 'Websites'] },
+                { step: 2, title: 'Text Extraction', icon: 'fa-file-code', color: 'amber', desc: 'Extract clean raw plain text from complex document formatting and tables.', tech: ['PdfPig', 'Unstructured.io', 'Tesseract OCR'] },
+                { step: 3, title: 'Text Chunking', icon: 'fa-scissors', color: 'cyan', desc: 'Split continuous document text into smaller, manageable sections (e.g. 200-500 tokens).', tech: ['Recursive Character Splitter', 'Semantic Chunking'] },
+                { step: 4, title: 'Generate Embeddings', icon: 'fa-network-wired', color: 'indigo', desc: 'Convert each text chunk into a high-dimensional vector array representing semantic meaning.', tech: ['OpenAI text-embedding-3', 'HuggingFace'] },
+                { step: 5, title: 'Vector Store', icon: 'fa-database', color: 'emerald', desc: 'Store the chunks alongside their vector embeddings and metadata for fast sub-second search.', tech: ['Pinecone', 'ChromaDB', 'Milvus', 'pgvector'] }
+            ]
+        };
+
+        let currentArchFlow = 'retrieval';
+
+        window.onload = function() {
+            setScenario('leave');
+            renderArchitecturePipeline();
+            updateChunkingSandbox();
+        };
+
+        // Tab Switching
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-indigo-600', 'text-white', 'shadow-md');
+                btn.classList.add('text-slate-400');
+            });
+
+            document.getElementById(tabId).classList.remove('hidden');
+            const activeBtn = document.getElementById('btn-' + tabId);
+            activeBtn.classList.add('active', 'bg-indigo-600', 'text-white', 'shadow-md');
+            activeBtn.classList.remove('text-slate-400');
+        }
+
+        // Set Scenario
+        function setScenario(scenKey) {
+            currentScenario = scenKey;
+            const data = SCENARIOS[scenKey];
+
+            document.querySelectorAll('.scen-btn').forEach(btn => {
+                btn.classList.remove('bg-indigo-600', 'text-white', 'border-indigo-500');
+                btn.classList.add('bg-slate-800', 'text-slate-300', 'border-slate-700');
+            });
+            const activeScenBtn = document.getElementById('scen-btn-' + scenKey);
+            activeScenBtn.classList.remove('bg-slate-800', 'text-slate-300', 'border-slate-700');
+            activeScenBtn.classList.add('bg-indigo-600', 'text-white', 'border-indigo-500');
+
+            document.getElementById('doc-title-badge').innerText = data.title;
+            document.getElementById('doc-content-box').innerText = data.docText;
+            document.getElementById('prompt-display-text').innerText = `"${data.prompt}"`;
+
+            // Reset simulation outputs
+            document.getElementById('sim-no-rag-output').innerHTML = '<span class="text-slate-500 italic">Click "Run Query Comparison" to simulate answer...</span>';
+            document.getElementById('sim-rag-output').innerHTML = '<span class="text-slate-500 italic">Click "Run Query Comparison" to simulate answer...</span>';
+            document.getElementById('rag-step-2-status').innerText = '--';
+        }
+
+        // Run Simulation Animation
+        function runSimulation() {
+            const data = SCENARIOS[currentScenario];
+            
+            const btn = document.getElementById('run-sim-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-xs"></i> <span>Searching & Generating...</span>';
+
+            document.getElementById('sim-no-rag-output').innerHTML = '<span class="text-amber-400 text-xs flex items-center gap-1.5"><i class="fa-solid fa-spinner fa-spin"></i> Generating generic answer...</span>';
+            document.getElementById('sim-rag-output').innerHTML = '<span class="text-cyan-400 text-xs flex items-center gap-1.5"><i class="fa-solid fa-magnifying-glass fa-pulse"></i> Searching Vector DB...</span>';
+
+            setTimeout(() => {
+                document.getElementById('rag-step-2-status').innerText = data.matchScore;
+                
+                // Show Answers
+                document.getElementById('sim-no-rag-output').innerText = data.noRagAnswer;
+                document.getElementById('sim-rag-output').innerText = data.ragAnswer;
+
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-play text-xs"></i> <span>Run Query Comparison</span>';
+            }, 800);
+        }
+
+        // Architecture Pipeline Flow
+        function setArchFlow(flow) {
+            currentArchFlow = flow;
+            const retrievalBtn = document.getElementById('flow-btn-retrieval');
+            const ingestionBtn = document.getElementById('flow-btn-ingestion');
+
+            if (flow === 'retrieval') {
+                retrievalBtn.className = "px-5 py-2 rounded-lg text-xs font-bold bg-indigo-600 text-white transition-all shadow";
+                ingestionBtn.className = "px-5 py-2 rounded-lg text-xs font-bold text-slate-400 hover:text-slate-200 transition-all";
+            } else {
+                ingestionBtn.className = "px-5 py-2 rounded-lg text-xs font-bold bg-indigo-600 text-white transition-all shadow";
+                retrievalBtn.className = "px-5 py-2 rounded-lg text-xs font-bold text-slate-400 hover:text-slate-200 transition-all";
+            }
+
+            renderArchitecturePipeline();
+        }
+
+        function renderArchitecturePipeline() {
+            const steps = PIPELINE_DATA[currentArchFlow];
+            const container = document.getElementById('arch-pipeline-container');
+            container.innerHTML = '';
+
+            steps.forEach((s, idx) => {
+                const card = document.createElement('div');
+                card.className = `bg-slate-900 p-4 rounded-xl border border-slate-800 hover:border-indigo-500/50 cursor-pointer transition-all space-y-2 text-center group`;
+                card.onclick = () => selectArchStep(idx);
+
+                card.innerHTML = `
+                    <div class="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-400 mx-auto flex items-center justify-center font-bold text-xs group-hover:scale-110 transition-transform">
+                        <i class="fa-solid ${s.icon}"></i>
+                    </div>
+                    <div class="text-xs font-bold text-white">${s.step}. ${s.title}</div>
+                    <p class="text-[10px] text-slate-400 line-clamp-2">${s.desc}</p>
+                `;
+                container.appendChild(card);
+            });
+
+            // Select first step by default
+            selectArchStep(0);
+        }
+
+        function selectArchStep(index) {
+            const step = PIPELINE_DATA[currentArchFlow][index];
+            document.getElementById('arch-detail-num').innerText = step.step;
+            document.getElementById('arch-detail-title').innerText = step.title;
+            document.getElementById('arch-detail-desc').innerText = step.desc;
+
+            const techContainer = document.getElementById('arch-detail-tech');
+            techContainer.innerHTML = '<span class="text-xs text-slate-500 font-mono self-center mr-2">Common Technologies:</span>';
+            step.tech.forEach(t => {
+                const badge = document.createElement('span');
+                badge.className = "text-xs px-2.5 py-1 rounded-md bg-indigo-950 text-indigo-300 border border-indigo-800/60 font-mono";
+                badge.innerText = t;
+                techContainer.appendChild(badge);
+            });
+        }
+
+        function updateChunkingSandbox() {
+            const text = document.getElementById('sandbox-text-input').value;
+            const chunkSize = parseInt(document.getElementById('chunk-size-select').value);
+            const outputContainer = document.getElementById('sandbox-chunks-output');
+
+            if (!text.trim()) {
+                outputContainer.innerHTML = '<p class="text-xs text-slate-500">Enter text to visualize chunking...</p>';
+                return;
+            }
+
+            // Split into chunks
+            const chunks = [];
+            for (let i = 0; i < text.length; i += chunkSize) {
+                chunks.push(text.substring(i, i + chunkSize));
+            }
+
+            document.getElementById('chunk-count-badge').innerText = `${chunks.length} Chunk(s) Generated`;
+
+            outputContainer.innerHTML = '';
+            chunks.forEach((chunk, i) => {
+                // Generate pseudo vector representation
+                const pseudoVector = `[${(Math.sin(i + 1) * 0.5 + 0.1).toFixed(3)}, ${(Math.cos(i + 2) * 0.5 - 0.2).toFixed(3)}, ${(Math.sin(i * 3) * 0.4).toFixed(3)}, ...]`;
+                
+                const div = document.createElement('div');
+                div.className = "bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs space-y-1.5";
+                div.innerHTML = `
+                    <div class="flex items-center justify-between text-[11px] font-mono text-indigo-400">
+                        <span>Chunk #${i + 1} (${chunk.length} chars)</span>
+                        <span class="text-slate-500">Vector: <span class="text-cyan-400">${pseudoVector}</span></span>
+                    </div>
+                    <div class="text-slate-300 font-mono text-[11px] bg-slate-900/60 p-2 rounded border border-slate-800">${chunk}</div>
+                `;
+                outputContainer.appendChild(div);
+            });
+        }
+
+        function calculateRecommendation() {
+            const q1 = document.getElementById('dec-q1').value;
+            const q2 = document.getElementById('dec-q2').value;
+            const q3 = document.getElementById('dec-q3').value;
+
+            let ragScore = 0;
+            if (q1 === 'rag') ragScore++;
+            if (q2 === 'rag') ragScore++;
+            if (q3 === 'rag') ragScore++;
+
+            const titleEl = document.getElementById('dec-result-title');
+            const reasonEl = document.getElementById('dec-result-reason');
+
+            if (ragScore >= 2) {
+                titleEl.innerText = "RAG (Retrieval-Augmented Generation)";
+                reasonEl.innerText = "Ideal because your knowledge base changes frequently and requires verified document citations.";
+            } else {
+                titleEl.innerText = "Fine-Tuning (or Hybrid RAG + Fine-Tuning)";
+                reasonEl.innerText = "Ideal because your primary goal is customizing AI behavior/formatting, or your domain knowledge is static.";
+            }
+        }
+
+        function checkQuiz(qNum, choice, isCorrect) {
+            const feedbackEl = document.getElementById(`q${qNum}-feedback`);
+            feedbackEl.classList.remove('hidden', 'bg-emerald-950/80', 'text-emerald-300', 'border-emerald-800', 'bg-rose-950/80', 'text-rose-300', 'border-rose-800');
+
+            if (isCorrect) {
+                feedbackEl.classList.add('bg-emerald-950/80', 'text-emerald-300', 'border', 'border-emerald-800');
+                feedbackEl.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400 mr-1.5"></i> Correct! Excellent understanding.';
+            } else {
+                feedbackEl.classList.add('bg-rose-950/80', 'text-rose-300', 'border', 'border-rose-800');
+                feedbackEl.innerHTML = '<i class="fa-solid fa-circle-xmark text-rose-400 mr-1.5"></i> Incorrect. Review the section material and try again!';
+            }
+        }
+    </script>
+</body>
+</html>

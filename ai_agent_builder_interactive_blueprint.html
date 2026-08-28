@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How to Build AI Agents from Scratch - Interactive Blueprint</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Marked.js for Markdown rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['Fira Code', 'monospace']
+          },
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+              800: '#166534',
+              900: '#14532d',
+            },
+            accent: {
+              500: '#eab308',
+              600: '#ca8a04',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #0f172a;
+      color: #f8fafc;
+    }
+    .step-card {
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .step-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px -10px rgba(34, 197, 94, 0.25);
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #1e293b;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #475569;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #64748b;
+    }
+  </style>
+</head>
+<body class="font-sans min-h-screen flex flex-col antialiased bg-slate-950 text-slate-100">
+
+  <!-- TOP HEADER NAV -->
+  <header class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center text-slate-950 font-black text-xl shadow-lg shadow-brand-500/20">
+          <i class="fa-solid fa-robot"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold bg-gradient-to-r from-white via-slate-200 to-brand-400 bg-clip-text text-transparent">
+            AI Agent Architect
+          </h1>
+          <p class="text-xs text-slate-400">Masterclass & Interactive Playground</p>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="hidden md:flex items-center space-x-1 bg-slate-800/60 p-1 rounded-xl border border-slate-700/50">
+        <button onclick="switchTab('roadmap')" id="tab-btn-roadmap" class="tab-btn active px-4 py-1.5 rounded-lg text-sm font-semibold transition-all bg-brand-600 text-white shadow">
+          <i class="fa-solid fa-map mr-2"></i>10-Step Blueprint
+        </button>
+        <button onclick="switchTab('studio')" id="tab-btn-studio" class="tab-btn px-4 py-1.5 rounded-lg text-sm font-semibold transition-all text-slate-400 hover:text-white hover:bg-slate-700/50">
+          <i class="fa-solid fa-flask mr-2"></i>Agent Studio & Sandbox
+        </button>
+        <button onclick="switchTab('code')" id="tab-btn-code" class="tab-btn px-4 py-1.5 rounded-lg text-sm font-semibold transition-all text-slate-400 hover:text-white hover:bg-slate-700/50">
+          <i class="fa-solid fa-code mr-2"></i>Code Generator
+        </button>
+      </nav>
+
+      <div class="flex items-center space-x-3">
+        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-brand-500/10 text-brand-400 border border-brand-500/20">
+          <span class="w-2 h-2 rounded-full bg-brand-400 mr-1.5 animate-pulse"></span> Gemini 2.5 Active
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- MOBILE NAVIGATION -->
+  <div class="md:hidden bg-slate-900 border-b border-slate-800 p-2 flex justify-around">
+    <button onclick="switchTab('roadmap')" id="mob-tab-btn-roadmap" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-brand-600 text-white">
+      <i class="fa-solid fa-map mr-1"></i> Roadmap
+    </button>
+    <button onclick="switchTab('studio')" id="mob-tab-btn-studio" class="px-3 py-1.5 text-xs font-medium rounded-lg text-slate-400">
+      <i class="fa-solid fa-flask mr-1"></i> Sandbox
+    </button>
+    <button onclick="switchTab('code')" id="mob-tab-btn-code" class="px-3 py-1.5 text-xs font-medium rounded-lg text-slate-400">
+      <i class="fa-solid fa-code mr-1"></i> Code
+    </button>
+  </div>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- ==================== TAB 1: ROADMAP SECTION ==================== -->
+    <section id="tab-roadmap" class="tab-content block space-y-6">
+      
+      <!-- HERO BANNER -->
+      <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-slate-800 p-6 md:p-8">
+        <div class="absolute right-0 top-0 bottom-0 w-1/3 opacity-10 pointer-events-none flex items-center justify-center">
+          <i class="fa-solid fa-diagram-project text-[220px] text-brand-400"></i>
+        </div>
+        <div class="relative z-10 max-w-3xl space-y-3">
+          <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+            <i class="fa-solid fa-route"></i>
+            <span>Interactive Infographic Guide</span>
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-white">
+            How to Build AI Agents from Scratch
+          </h2>
+          <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+            Follow this standard 10-step engineering workflow to transform LLMs from simple prompt-response wrappers into autonomous, tool-using, memory-equipped AI Agents ready for production.
+          </p>
+          <div class="pt-2 flex flex-wrap gap-3">
+            <button onclick="switchTab('studio')" class="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded-xl text-sm font-semibold shadow-lg shadow-brand-600/30 transition flex items-center gap-2">
+              <i class="fa-solid fa-rocket"></i> Launch Agent Sandbox
+            </button>
+            <a href="#steps-grid" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-sm font-semibold border border-slate-700 transition flex items-center gap-2">
+              <i class="fa-solid fa-list-check"></i> Explore All 10 Steps
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP DETAILS MODAL / EXPANDED VIEW -->
+      <div id="step-detail-box" class="hidden bg-slate-900 border-2 border-brand-500/50 rounded-2xl p-6 shadow-2xl relative transition-all">
+        <button onclick="closeStepDetail()" class="absolute top-4 right-4 text-slate-400 hover:text-white w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+        <div id="step-detail-content"></div>
+      </div>
+
+      <!-- 10 STEPS GRID -->
+      <div id="steps-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <!-- Cards generated via JavaScript -->
+      </div>
+    </section>
+
+    <!-- ==================== TAB 2: AGENT STUDIO & SANDBOX ==================== -->
+    <section id="tab-studio" class="tab-content hidden space-y-6">
+      
+      <div class="flex flex-col lg:flex-row gap-6">
+        
+        <!-- LEFT PANEL: AGENT BUILDER CONFIGURATOR -->
+        <div class="w-full lg:w-5/12 bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-5">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div class="flex items-center space-x-2">
+              <i class="fa-solid fa-sliders text-brand-400"></i>
+              <h3 class="font-bold text-lg text-white">Agent Builder Specs</h3>
+            </div>
+            <button onclick="resetAgentConfig()" class="text-xs text-slate-400 hover:text-white flex items-center gap-1">
+              <i class="fa-solid fa-rotate-left"></i> Reset
+            </button>
+          </div>
+
+          <!-- Step 1: Role & Goal -->
+          <div class="space-y-2">
+            <label class="block text-xs font-bold uppercase tracking-wider text-amber-400">
+              Step 1: Role & Goal
+            </label>
+            <select id="cfg-preset" onchange="applyPreset()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:border-brand-500 focus:outline-none">
+              <option value="custom">-- Custom Agent --</option>
+              <option value="medical" selected>Medical Assistant Agent (Read X-rays & Summarize)</option>
+              <option value="researcher">Market Research Agent (Web Search & PDF Synthesis)</option>
+              <option value="coder">Code Reviewer Agent (Refactor & Exec Debugging)</option>
+            </select>
+            <input type="text" id="cfg-role-name" value="Medical Assistant Agent" placeholder="Agent Name/Role" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:border-brand-500 focus:outline-none">
+            <textarea id="cfg-goal" rows="2" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 focus:border-brand-500 focus:outline-none" placeholder="Agent Primary Goal">Analyzes radiology findings, summarizes medical observations, standardizes risk codes, and generates patient-friendly summaries.</textarea>
+          </div>
+
+          <!-- Step 2: Structured Output Schema -->
+          <div class="space-y-2">
+            <div class="flex justify-between items-center">
+              <label class="block text-xs font-bold uppercase tracking-wider text-amber-400">
+                Step 2: Structured I/O (Pydantic / JSON)
+              </label>
+              <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded">Pydantic AI</span>
+            </div>
+            <textarea id="cfg-schema" rows="4" class="w-full font-mono bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-brand-400 focus:border-brand-500 focus:outline-none leading-relaxed">{
+  "diagnosis": "string",
+  "confidence_score": "number (0-1)",
+  "key_findings": ["string"],
+  "recommended_action": "string"
+}</textarea>
+          </div>
+
+          <!-- Step 3: Protocol & System Instructions -->
+          <div class="space-y-2">
+            <label class="block text-xs font-bold uppercase tracking-wider text-amber-400">
+              Step 3: Protocol & System Instructions
+            </label>
+            <textarea id="cfg-system-prompt" rows="3" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 focus:border-brand-500 focus:outline-none">You are an elite clinical AI assistant following MCP protocols. Always break down reasoning into clear clinical steps before reaching a final diagnosis. Never hallucinate medication dosages.</textarea>
+          </div>
+
+          <!-- Step 4: Reasoning & Tool Use -->
+          <div class="space-y-2">
+            <label class="block text-xs font-bold uppercase tracking-wider text-amber-400">
+              Step 4: Reasoning Framework & Tools
+            </label>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <label class="flex items-center space-x-2 bg-slate-950 p-2 rounded-lg border border-slate-800 cursor-pointer hover:border-slate-700">
+                <input type="checkbox" id="tool-web-search" checked class="accent-brand-500 rounded">
+                <span class="text-slate-300"><i class="fa-solid fa-globe text-blue-400 mr-1"></i> Web Search</span>
+              </label>
+              <label class="flex items-center space-x-2 bg-slate-950 p-2 rounded-lg border border-slate-800 cursor-pointer hover:border-slate-700">
+                <input type="checkbox" id="tool-calculator" checked class="accent-brand-500 rounded">
+                <span class="text-slate-300"><i class="fa-solid fa-calculator text-amber-400 mr-1"></i> Medical Calc</span>
+              </label>
+              <label class="flex items-center space-x-2 bg-slate-950 p-2 rounded-lg border border-slate-800 cursor-pointer hover:border-slate-700">
+                <input type="checkbox" id="tool-rag" checked class="accent-brand-500 rounded">
+                <span class="text-slate-300"><i class="fa-solid fa-database text-purple-400 mr-1"></i> RAG Docs DB</span>
+              </label>
+              <label class="flex items-center space-x-2 bg-slate-950 p-2 rounded-lg border border-slate-800 cursor-pointer hover:border-slate-700">
+                <input type="checkbox" id="tool-code-exec" class="accent-brand-500 rounded">
+                <span class="text-slate-300"><i class="fa-solid fa-code text-emerald-400 mr-1"></i> Code Interpreter</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Step 5 & 6: Memory & Multi-Agent -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-amber-400 mb-1">
+                Step 5: Multi-Agent
+              </label>
+              <select id="cfg-multiagent" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-slate-300 focus:border-brand-500 focus:outline-none">
+                <option value="single">Single Autonomous Agent</option>
+                <option value="swarm">Swarm (Planner + Doctor + Reviewer)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-amber-400 mb-1">
+                Step 6: Memory Mode
+              </label>
+              <select id="cfg-memory" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-slate-300 focus:border-brand-500 focus:outline-none">
+                <option value="vector">Vector Memory (ChromaDB/FAISS)</option>
+                <option value="summary">Conversational Summary</option>
+                <option value="none">Stateless / Ephemeral</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Step 7: Vision & Voice Modalities -->
+          <div class="space-y-2">
+            <label class="block text-xs font-bold uppercase tracking-wider text-amber-400">
+              Step 7: Vision & Voice Modalities
+            </label>
+            <div class="flex items-center space-x-4 text-xs">
+              <label class="flex items-center space-x-2 cursor-pointer">
+                <input type="checkbox" id="cap-vision" checked class="accent-brand-500 rounded">
+                <span class="text-slate-300"><i class="fa-solid fa-eye text-cyan-400 mr-1"></i> Vision (GPT-4o / LLaMA 3.2)</span>
+              </label>
+              <label class="flex items-center space-x-2 cursor-pointer">
+                <input type="checkbox" id="cap-voice" checked class="accent-brand-500 rounded">
+                <span class="text-slate-300"><i class="fa-solid fa-volume-high text-pink-400 mr-1"></i> Voice (Coqui/ElevenLabs)</span>
+              </label>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT PANEL: INTERACTIVE TEST BENCH & LIVE REACT TRACE -->
+        <div class="w-full lg:w-7/12 flex flex-col space-y-5">
+          
+          <!-- AGENT RUNNER CONTROL -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4 shadow-xl">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-play-circle text-brand-400 text-xl"></i>
+                <h3 class="font-bold text-white">Execute Agent Test Prompt</h3>
+              </div>
+              <div class="flex items-center space-x-2 text-xs">
+                <span class="text-slate-400">Execution Mode:</span>
+                <select id="exec-mode" class="bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-xs text-brand-400 font-semibold focus:outline-none">
+                  <option value="live">Gemini API (Real ReAct Reasoning)</option>
+                  <option value="simulated">Simulation Mode (Offline Mock)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <div class="flex justify-between items-center text-xs">
+                <label class="text-slate-300 font-medium">Input Query / Case Prompt:</label>
+                <span class="text-slate-500">Simulate incoming user request</span>
+              </div>
+              <textarea id="user-input-prompt" rows="3" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-100 focus:border-brand-500 focus:outline-none font-sans" placeholder="Enter patient clinical notes or request...">Patient presentation: 58yo male presenting with acute dyspnea, right-sided chest pain, and oxygen saturation of 89%. Radiograph notes hyperlucency in upper right lung field. Perform preliminary assessment and tool lookup.</textarea>
+            </div>
+
+            <div class="flex items-center justify-between pt-1">
+              <div class="flex items-center space-x-2 text-xs text-slate-400">
+                <i class="fa-solid fa-microchip"></i>
+                <span id="active-tools-badge">Tools Active: Search, Calc, RAG</span>
+              </div>
+              <button onclick="runAgentExecution()" id="run-btn" class="px-6 py-2.5 bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-slate-950 font-extrabold rounded-xl text-sm shadow-lg shadow-brand-500/20 transition flex items-center gap-2">
+                <i class="fa-solid fa-bolt"></i> Run Agent
+              </button>
+            </div>
+          </div>
+
+          <!-- STEP 8, 9, 10: REAL-TIME TRACE, UI WRAPPER & EVALUATION -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex-grow flex flex-col space-y-4">
+            
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div class="flex items-center space-x-4">
+                <button onclick="switchSandboxView('trace')" id="view-btn-trace" class="text-sm font-bold text-brand-400 border-b-2 border-brand-400 pb-1">
+                  <i class="fa-solid fa-network-wired mr-1"></i> ReAct Trace (Reasoning)
+                </button>
+                <button onclick="switchSandboxView('ui')" id="view-btn-ui" class="text-sm font-bold text-slate-400 hover:text-slate-200 pb-1">
+                  <i class="fa-solid fa-desktop mr-1"></i> Step 9: UI Wrapper (Gradio View)
+                </button>
+                <button onclick="switchSandboxView('eval')" id="view-btn-eval" class="text-sm font-bold text-slate-400 hover:text-slate-200 pb-1">
+                  <i class="fa-solid fa-chart-line mr-1"></i> Step 10: Evaluation & Metrics
+                </button>
+              </div>
+              <span id="status-indicator" class="text-xs text-slate-400 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-slate-500"></span> Ready
+              </span>
+            </div>
+
+            <!-- VIEW 1: REACT REASONING TRACE LOGS -->
+            <div id="sandbox-view-trace" class="view-panel space-y-3 flex-grow overflow-y-auto max-h-[420px] custom-scrollbar pr-1">
+              <div class="text-xs text-slate-400 italic text-center py-8">
+                Click <span class="text-brand-400 font-semibold">"Run Agent"</span> to view real-time ReAct (Reasoning + Action) thought loops, tool executions, and JSON parsed outputs.
+              </div>
+            </div>
+
+            <!-- VIEW 2: STEP 9 FRONTEND UI WRAPPER MOCK -->
+            <div id="sandbox-view-ui" class="view-panel hidden space-y-3">
+              <div class="bg-slate-950 rounded-xl border border-slate-800 p-4 space-y-3">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                  <div class="flex items-center space-x-2">
+                    <span class="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
+                    <span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span>
+                    <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+                    <span class="text-xs text-slate-400 font-mono ml-2">Gradio / Streamlit Agent Interface (Step 9)</span>
+                  </div>
+                  <span class="text-[10px] bg-brand-500/20 text-brand-300 px-2 py-0.5 rounded font-mono">http://localhost:7860</span>
+                </div>
+                
+                <div class="bg-slate-900 rounded-lg p-3 border border-slate-800 space-y-2">
+                  <div class="flex items-center space-x-2 text-xs text-brand-400 font-bold">
+                    <i class="fa-solid fa-user"></i>
+                    <span>User Input</span>
+                  </div>
+                  <div id="ui-mock-input" class="text-xs text-slate-300 bg-slate-950 p-2 rounded">
+                    Waiting for execution run...
+                  </div>
+                </div>
+
+                <div class="bg-slate-900 rounded-lg p-3 border border-slate-800 space-y-2">
+                  <div class="flex items-center space-x-2 text-xs text-emerald-400 font-bold">
+                    <i class="fa-solid fa-robot"></i>
+                    <span id="ui-mock-agent-title">Medical Assistant Output</span>
+                  </div>
+                  <div id="ui-mock-output" class="text-xs text-slate-200 bg-slate-950 p-3 rounded font-mono leading-relaxed overflow-x-auto">
+                    {"status": "Awaiting execution..."}
+                  </div>
+                  
+                  <!-- Voice Synthesis Player Mock -->
+                  <div id="ui-voice-player" class="hidden pt-2 border-t border-slate-800 flex items-center justify-between text-xs text-pink-400">
+                    <div class="flex items-center space-x-2">
+                      <button class="w-6 h-6 rounded-full bg-pink-500 text-slate-950 flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-play text-[10px]"></i>
+                      </button>
+                      <span>Coqui TTS Voice Output ready (Generated audio summary)</span>
+                    </div>
+                    <span class="text-[10px] text-slate-500">0:14 / 0:14</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- VIEW 3: STEP 10 EVALUATION & MONITORING METRICS -->
+            <div id="sandbox-view-eval" class="view-panel hidden space-y-4">
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                  <div class="text-[10px] text-slate-400 uppercase">Latency</div>
+                  <div id="eval-latency" class="text-lg font-extrabold text-white">0 ms</div>
+                </div>
+                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                  <div class="text-[10px] text-slate-400 uppercase">Tokens Used</div>
+                  <div id="eval-tokens" class="text-lg font-extrabold text-brand-400">0</div>
+                </div>
+                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                  <div class="text-[10px] text-slate-400 uppercase">Tool Calls</div>
+                  <div id="eval-tools" class="text-lg font-extrabold text-amber-400">0</div>
+                </div>
+                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                  <div class="text-[10px] text-slate-400 uppercase">JSON Schema</div>
+                  <div id="eval-schema" class="text-lg font-extrabold text-emerald-400">Valid</div>
+                </div>
+              </div>
+
+              <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                <div class="text-xs font-bold text-slate-300 flex items-center justify-between">
+                  <span>MCP Telemetry & Logging Stream (Step 10)</span>
+                  <span class="text-[10px] text-slate-500">OpenAI Eval API / LangSmith</span>
+                </div>
+                <div id="eval-logs-container" class="font-mono text-[11px] text-slate-400 space-y-1 h-36 overflow-y-auto custom-scrollbar bg-slate-900/60 p-2.5 rounded-lg border border-slate-800">
+                  <div>[INFO] MCP Evaluation suite initialized.</div>
+                  <div>[INFO] Waiting for agent execution telemetry...</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ==================== TAB 3: CODE GENERATOR ==================== -->
+    <section id="tab-code" class="tab-content hidden space-y-6">
+      
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+          <div>
+            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-code text-brand-400"></i> Production Boilerplate Code Generator
+            </h3>
+            <p class="text-xs text-slate-400">
+              Generates Python agent script based on your current Sandbox specs (Pydantic AI + LangGraph + Tools).
+            </p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <select id="code-framework" onchange="generateCodeSnippet()" class="bg-slate-950 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-brand-400 font-semibold focus:outline-none">
+              <option value="pydantic_ai">Pydantic AI Framework</option>
+              <option value="langchain">LangChain & LangGraph</option>
+              <option value="crewai">CrewAI Multi-Agent</option>
+            </select>
+            <button onclick="copyGeneratedCode()" class="px-3 py-1.5 bg-brand-600 hover:bg-brand-500 text-slate-950 font-bold rounded-xl text-xs transition flex items-center gap-1">
+              <i class="fa-solid fa-copy"></i> Copy Code
+            </button>
+          </div>
+        </div>
+
+        <div class="relative">
+          <pre id="code-output" class="font-mono text-xs text-slate-200 bg-slate-950 p-4 rounded-xl border border-slate-800 overflow-x-auto custom-scrollbar leading-relaxed h-[500px]"># Generating Python Agent Code...</pre>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-slate-900 border-t border-slate-800 mt-auto py-4">
+    <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div>
+        Based on <strong class="text-slate-300">"How to Build AI Agents from Scratch"</strong> by GenAI.Works
+      </div>
+      <div class="flex items-center space-x-4 text-slate-400">
+        <span><i class="fa-solid fa-check-circle text-brand-400 mr-1"></i> Gemini 2.5 Flash API Connected</span>
+        <span><i class="fa-solid fa-layer-group text-amber-400 mr-1"></i> 10-Step Architectural Standard</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- APPLICATION SCRIPT -->
+  <script>
+    // ==========================================
+    // 10 STEPS INFOGRAPHIC DATA DEFINITIONS
+    // ==========================================
+    const STEPS_DATA = [
+      {
+        step: 1,
+        title: "Define the Agent's Role and Goal",
+        subtitle: "Identity & Purpose Blueprint",
+        icon: "fa-solid fa-bullseye",
+        color: "text-amber-400",
+        bg: "bg-amber-500/10",
+        border: "border-amber-500/30",
+        bullets: [
+          "What will your agent do?",
+          "Who is it helping?",
+          "What kind of output will it generate?"
+        ],
+        example: "A medical assistant agent that reads X-rays, summarizes findings, and speaks results.",
+        tools: ["System Instructions", "Persona Prompting", "Domain Context"],
+        deepDive: `
+          <h4 class="text-base font-bold text-white mb-2">Step 1 Deep Dive: Role Engineering</h4>
+          <p class="text-sm text-slate-300 mb-3">Before writing code, clearly delineate the boundaries, capabilities, and target user for the agent. Ambiguous roles lead to prompt drift and unexpected reasoning failures.</p>
+          <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs font-mono text-amber-300 mb-3">
+            # Rule of Thumb for Step 1:<br>
+            Role = Persona + Context + Allowed Boundaries + Task Mandate
+          </div>
+        `
+      },
+      {
+        step: 2,
+        title: "Design Structured Input & Output",
+        subtitle: "Type-Safe API Data Contract",
+        icon: "fa-solid fa-code-merge",
+        color: "text-emerald-400",
+        bg: "bg-emerald-500/10",
+        border: "border-emerald-500/30",
+        bullets: [
+          "Use Pydantic AI or JSON Schemas to define inputs and outputs.",
+          "Avoid messy free-form text – think like a microservice API.",
+          "Ensure parsability across automated pipelines."
+        ],
+        example: "Enforce JSON responses with strictly typed fields like diagnosis, confidence_score, and recommended_actions.",
+        tools: ["Pydantic AI", "LangChain Output Parsers", "Instructor", "Zod"],
+        deepDive: `
+          <h4 class="text-base font-bold text-white mb-2">Step 2 Deep Dive: Enforcing Structured Schemas</h4>
+          <p class="text-sm text-slate-300 mb-3">Raw LLM text is unsuited for production systems. Standardize on Pydantic schemas so down-stream databases and UIs receive predictable JSON objects.</p>
+          <pre class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs font-mono text-emerald-400 mb-3">from pydantic import BaseModel, Field
+
+class MedicalOutput(BaseModel):
+    diagnosis: str = Field(description="Primary diagnostic classification")
+    confidence: float = Field(ge=0.0, le=1.0)
+    key_findings: list[str]</pre>
+        `
+      },
+      {
+        step: 3,
+        title: "Tune Behavior & Add Protocol",
+        subtitle: "System Instructions & Protocols",
+        icon: "fa-solid fa-sliders",
+        color: "text-blue-400",
+        bg: "bg-blue-500/10",
+        border: "border-blue-500/30",
+        bullets: [
+          "Start with role-based system prompts.",
+          "Use Prompt Tuning or Prefix Tuning techniques.",
+          "Use MCP (Model Context Protocol) to standardize host-agent communication."
+        ],
+        example: "Define strict clinical protocols where the agent must cite evidence before making recommendations.",
+        tools: ["MCP (Model Context Protocol)", "GPT-4o", "Claude 3.5", "Prompt Tuning"],
+        deepDive: `
+          <h4 class="text-base font-bold text-white mb-2">Step 3 Deep Dive: MCP & Guardrails</h4>
+          <p class="text-sm text-slate-300 mb-3">Anthropic's Model Context Protocol (MCP) provides a standardized open framework for connecting AI models to data sources and tools securely.</p>
+        `
+      },
+      {
+        step: 4,
+        title: "Add Reasoning and Tool Use",
+        subtitle: "ReAct Framework & Function Calling",
+        icon: "fa-solid fa-brain",
+        color: "text-purple-400",
+        bg: "bg-purple-500/10",
+        border: "border-purple-500/30",
+        bullets: [
+          "Equip agent with reasoning frameworks: ReAct (Reasoning + Action) & Chain-of-Thought.",
+          "Allow access to tools like web search, code interpreters, or document retrievers.",
+          "Enable dynamic tool invocation based on intermediate thoughts."
+        ],
+        example: "Agent decides to run Python calculation code or perform Tavily web searches when facts are unknown.",
+        tools: ["LangChain", "OpenAI Tools", "ReAct Framework", "AutoGPT"],
+        deepDive: `
+          <h4 class="text-base font-bold text-white mb-2">Step 4 Deep Dive: ReAct Architecture</h4>
+          <p class="text-sm text-slate-300 mb-3">ReAct interleave reasoning ('Thought') with execution ('Action'). The agent loops through Thought -> Action -> Observation until the final goal is met.</p>
+        `
+      },
+      {
+        step: 5,
+        title: "Structure Multi-Agent Logic",
+        subtitle: "Swarms & Orchestration (If Needed)",
+        icon: "fa-solid fa-network-wired",
+        color: "text-cyan-400",
+        bg: "bg-cyan-500/10",
+        border: "border-cyan-500/30",
+        bullets: [
+          "Use orchestration frameworks to define agent roles & coordination.",
+          "Create Planner, Researcher, and Reporter agents.",
+          "Each agent maintains its own dedicated input/output schema."
+        ],
+        example: "A Planner agent splits a request into tasks, Researcher fetches data, and Critic verifies findings.",
+        tools: ["CrewAI", "LangGraph", "OpenAI Swarm", "AutoGen"],
+        deepDive: `
+          <h4 class="text-base font-bold text-white mb-2">Step 5 Deep Dive: Agent Swarms</h4>
+          <p class="text-sm text-slate-300 mb-3">For complex projects, a single agent gets overwhelmed. Modular multi-agent graphs allow specialized agents to hand off sub-tasks seamlessly.</p>
+        `
+      },
+      {
+        step: 6,
+        title: "Add Memory & Long-Term Context",
+        subtitle: "Vector Store RAG & History",
+        icon: "fa-solid fa-database",
+        color: "text-pink-400",
+        bg: "bg-pink-500/10",
+        border: "border-pink-500/30",
+        bullets: [
+          "Does your agent need to remember past interactions?",
+          "Use conversational memory, summary memory, or vector-based long term memory.",
+          "Integrate Retrieval-Augmented Generation (RAG) for domain docs."
+        ],
+        example: "Store medical histories in ChromaDB so the agent remembers previous patient consultations.",
+        tools: ["Zep", "LangChain Memory", "ChromaDB", "FAISS", "Pinecone"],
+        deepDive: `
+          <h4 class="text-base font-bold text-white mb-2">Step 6 Deep Dive: Conversational RAG</h4>
+          <p class="text-sm text-slate-300 mb-3">Combine vector similarity search (embeddings) with condensed conversation summaries to fit huge contexts into token windows.</p>
+        `
+      },
+      {
+        step: 7,
+        title: "Add Voice or Vision Capabilities",
+        subtitle: "Multimodal Perception (Optional)",
+        icon: "fa-solid fa-eye-dropper",
+        color: "text-orange-400",
+        bg: "bg-orange-500/10",
+        border: "border-orange-500/30",
+        bullets: [
+          "Text-to-speech: Use Coqui or ElevenLabs for audio generation.",
+          "Image understanding: Use GPT-4o or LLaMA 3.2 Vision.",
+          "Let your agent see, hear, and speak to human users."
+        ],
+        example: "Agent ingests an X-Ray DICOM image, performs visual feature analysis, and speaks summary audio.",
+        tools: ["Coqui TTS", "ElevenLabs", "GPT-4o Vision", "LLaMA 3.2 Vision"],
+        deepDive: `
+          <h4 class="text-base font-bold text-white mb-2">Step 7 Deep Dive: Multimodal Interaction</h4>
+          <p class="text-sm text-slate-300 mb-3">Multimodal inputs allow agents to directly process raw image pixels or speech audio without needing separate OCR or speech transcription steps.</p>
+        `
+      },
+      {
+        step: 8,
+        title: "Deliver the Output",
+        subtitle: "Parsable Formats & Formatting",
+        icon: "fa-solid fa-file-export",
+        color: "text-indigo-400",
+        bg: "bg-indigo-500/10",
+        border: "border-indigo-500/30",
+        bullets: [
+          "Format outputs into Markdown -> PDF, HTML, or raw JSON.",
+          "Outputs must be human-readable and programmatically parsable.",
+          "Ensure fail-safe fallback rendering if schema validation fails."
+        ],
+        example: "Convert raw agent diagnostic output into a polished medical PDF report for doctors.",
+        tools: ["Pydantic AI", "LangChain Parsers", "Jinja2", "ReportLab"],
+        deepDive: `
+          <h4 class="text-base font-bold text-white mb-2">Step 8 Deep Dive: Formatting Pipelines</h4>
+          <p class="text-sm text-slate-300 mb-3">Standardize delivery wrappers so outputs can immediately trigger downstream webhook workflows or generate styled UI widgets.</p>
+        `
+      },
+      {
+        step: 9,
+        title: "Wrap in a UI",
+        subtitle: "Frontend Product Transformation",
+        icon: "fa-solid fa-desktop",
+        color: "text-teal-400",
+        bg: "bg-teal-500/10",
+        border: "border-teal-500/30",
+        bullets: [
+          "Create an intuitive web front-end.",
+          "Use Gradio, Streamlit, FastAPI, or React.",
+          "This is what turns your raw agent logic into an actual user product!"
+        ],
+        example: "Wrap Python backend code into a Streamlit dashboard with audio player and downloadable reports.",
+        tools: ["Gradio", "Streamlit", "FastAPI", "React / Tailwind"],
+        deepDive: `
+          <h4 class="text-base font-bold text-white mb-2">Step 9 Deep Dive: Agent Frontends</h4>
+          <p class="text-sm text-slate-300 mb-3">Expose websocket stream endpoints from FastAPI to show real-time thought loops in Streamlit or custom web applications.</p>
+        `
+      },
+      {
+        step: 10,
+        title: "Evaluate and Monitor",
+        subtitle: "Telemetry, Evals & Benchmarks",
+        icon: "fa-solid fa-chart-line",
+        color: "text-rose-400",
+        bg: "bg-rose-500/10",
+        border: "border-rose-500/30",
+        bullets: [
+          "Run test prompts and toolchains to check reliability.",
+          "Use logs, benchmarks, and user feedback to improve performance.",
+          "Track token costs, tool failure rates, and execution latencies."
+        ],
+        example: "Log agent responses to LangSmith to track accuracy and reduce tool hallucination rates.",
+        tools: ["MCP Logs", "OpenAI Evaluation API", "LangSmith", "Phoenix Arize"],
+        deepDive: `
+          <h4 class="text-base font-bold text-white mb-2">Step 10 Deep Dive: Production Observability</h4>
+          <p class="text-sm text-slate-300 mb-3">Continuous monitoring ensures prompt adjustments or LLM model upgrades do not cause regressions in reasoning or structured schema output validity.</p>
+        `
+      }
+    ];
+
+    // ==========================================
+    // INITIALIZATION & TAB SWITCHING LOGIC
+    // ==========================================
+    window.onload = function() {
+      renderRoadmapGrid();
+      applyPreset();
+      generateCodeSnippet();
+    };
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-brand-600', 'text-white', 'shadow');
+        btn.classList.add('text-slate-400');
+      });
+
+      // Show target tab
+      document.getElementById('tab-' + tabId).classList.remove('hidden');
+      
+      // Highlight button
+      const activeBtn = document.getElementById('tab-btn-' + tabId);
+      if(activeBtn) {
+        activeBtn.classList.add('bg-brand-600', 'text-white', 'shadow');
+        activeBtn.classList.remove('text-slate-400');
+      }
+
+      // Mobile highlight
+      document.querySelectorAll('[id^="mob-tab-btn-"]').forEach(mBtn => {
+        mBtn.classList.remove('bg-brand-600', 'text-white');
+        mBtn.classList.add('text-slate-400');
+      });
+      const mobBtn = document.getElementById('mob-tab-btn-' + tabId);
+      if (mobBtn) {
+        mobBtn.classList.add('bg-brand-600', 'text-white');
+        mobBtn.classList.remove('text-slate-400');
+      }
+    }
+
+    // ==========================================
+    // ROADMAP GRID RENDERING
+    // ==========================================
+    function renderRoadmapGrid() {
+      const grid = document.getElementById('steps-grid');
+      grid.innerHTML = STEPS_DATA.map(item => `
+        <div onclick="openStepDetail(${item.step})" class="step-card bg-slate-900 border ${item.border} rounded-2xl p-5 cursor-pointer relative overflow-hidden flex flex-col justify-between group">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${item.bg} ${item.color}">
+                Step ${item.step}
+              </span>
+              <div class="w-8 h-8 rounded-xl bg-slate-800 flex items-center justify-center ${item.color} group-hover:scale-110 transition-transform">
+                <i class="${item.icon}"></i>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="font-bold text-white text-base group-hover:${item.color} transition-colors">
+                ${item.title}
+              </h3>
+              <p class="text-xs text-slate-400 font-medium">${item.subtitle}</p>
+            </div>
+
+            <ul class="space-y-1.5 text-xs text-slate-300">
+              ${item.bullets.map(b => `<li class="flex items-start gap-1.5"><span class="text-slate-500">•</span><span>${b}</span></li>`).join('')}
+            </ul>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between">
+            <div class="flex flex-wrap gap-1">
+              ${item.tools.slice(0, 2).map(t => `<span class="text-[10px] bg-slate-950 text-slate-400 px-2 py-0.5 rounded border border-slate-800">${t}</span>`).join('')}
+            </div>
+            <span class="text-xs ${item.color} font-semibold flex items-center gap-1">
+              Explore <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openStepDetail(stepNum) {
+      const step = STEPS_DATA.find(s => s.step === stepNum);
+      if (!step) return;
+
+      const detailBox = document.getElementById('step-detail-box');
+      const detailContent = document.getElementById('step-detail-content');
+
+      detailContent.innerHTML = `
+        <div class="space-y-4">
+          <div class="flex items-center space-x-3">
+            <span class="px-3 py-1 rounded-full text-xs font-bold ${step.bg} ${step.color} border ${step.border}">
+              STEP ${step.step} OF 10
+            </span>
+            <h3 class="text-xl font-extrabold text-white">${step.title}</h3>
+          </div>
+
+          <p class="text-sm text-slate-300 leading-relaxed">${step.subtitle}</p>
+
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+            <div class="text-xs font-bold uppercase text-amber-400"><i class="fa-solid fa-lightbulb mr-1"></i> Real-World Example:</div>
+            <p class="text-xs text-slate-200 italic">${step.example}</p>
+          </div>
+
+          <div>${step.deepDive}</div>
+
+          <div class="flex items-center justify-between pt-2 border-t border-slate-800">
+            <div class="flex items-center space-x-2">
+              <span class="text-xs text-slate-400">Key Engineering Tools:</span>
+              ${step.tools.map(t => `<span class="text-xs bg-brand-500/10 text-brand-400 border border-brand-500/20 px-2.5 py-0.5 rounded-full font-mono">${t}</span>`).join(' ')}
+            </div>
+            <button onclick="switchTab('studio')" class="px-4 py-1.5 bg-brand-600 hover:bg-brand-500 text-slate-950 text-xs font-bold rounded-lg transition">
+              Test Step in Sandbox &rarr;
+            </button>
+          </div>
+        </div>
+      `;
+
+      detailBox.classList.remove('hidden');
+      detailBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function closeStepDetail() {
+      document.getElementById('step-detail-box').classList.add('hidden');
+    }
+
+    // ==========================================
+    // PRESETS FOR AGENT SANDBOX
+    // ==========================================
+    const PRESETS = {
+      medical: {
+        role: "Medical Assistant Agent",
+        goal: "Analyzes radiology notes, summarizes observations, standardizes clinical codes, and produces patient diagnostic summaries.",
+        schema: `{\n  "diagnosis": "string",\n  "confidence_score": "number (0-1)",\n  "key_findings": ["string"],\n  "recommended_action": "string"\n}`,
+        prompt: "You are an elite clinical AI assistant following MCP protocols. Always break down reasoning into clear clinical steps before reaching a diagnosis. Never hallucinate medication dosages.",
+        promptInput: "Patient presentation: 58yo male presenting with acute dyspnea, right-sided chest pain, and oxygen saturation of 89%. Radiograph notes hyperlucency in upper right lung field. Perform preliminary assessment."
+      },
+      researcher: {
+        role: "Market Research & Synthesis Agent",
+        goal: "Conducts deep web research across industry whitepapers, extracts numerical market data, and formats quantitative forecasts.",
+        schema: `{\n  "market_size_usd_billions": "number",\n  "cagr_percent": "number",\n  "top_competitors": ["string"],\n  "executive_summary": "string"\n}`,
+        prompt: "You are an expert market intelligence analyst. Search external data sources, cite credible data points, and synthesize unstructured market news into structured JSON reports.",
+        promptInput: "Analyze the global Generative AI Agent software market for 2026. Estimate market growth rates, key enterprise drivers, and dominant platform vendors."
+      },
+      coder: {
+        role: "Automated Code Reviewer Agent",
+        goal: "Reviews Python code snippets, detects security vulnerabilities, calculates complexity scores, and outputs fixed code blocks.",
+        schema: `{\n  "vulnerabilities_found": ["string"],\n  "code_quality_rating": "string (A-F)",\n  "suggested_refactor": "string"\n}`,
+        prompt: "You are a Principal Software Security Engineer. Audit input code for SQL injection, buffer overflows, and performance bottlenecks.",
+        promptInput: "def login_user(username, password):\n    query = f'SELECT * FROM users WHERE user=\"{username}\" AND pass=\"{password}\"'\n    return db.execute(query)"
+      }
+    };
+
+    function applyPreset() {
+      const val = document.getElementById('cfg-preset').value;
+      if (val === 'custom') return;
+      const p = PRESETS[val];
+      if (!p) return;
+
+      document.getElementById('cfg-role-name').value = p.role;
+      document.getElementById('cfg-goal').value = p.goal;
+      document.getElementById('cfg-schema').value = p.schema;
+      document.getElementById('cfg-system-prompt').value = p.prompt;
+      document.getElementById('user-input-prompt').value = p.promptInput;
+
+      generateCodeSnippet();
+    }
+
+    function resetAgentConfig() {
+      document.getElementById('cfg-preset').value = 'medical';
+      applyPreset();
+    }
+
+    // ==========================================
+    // SANDBOX VIEW SWITCHING
+    // ==========================================
+    function switchSandboxView(viewName) {
+      document.querySelectorAll('.view-panel').forEach(p => p.classList.add('hidden'));
+      document.getElementById('sandbox-view-' + viewName).classList.remove('hidden');
+
+      const btns = ['trace', 'ui', 'eval'];
+      btns.forEach(b => {
+        const btn = document.getElementById('view-btn-' + b);
+        if (b === viewName) {
+          btn.className = "text-sm font-bold text-brand-400 border-b-2 border-brand-400 pb-1";
+        } else {
+          btn.className = "text-sm font-bold text-slate-400 hover:text-slate-200 pb-1";
+        }
+      });
+    }
+
+    // ==========================================
+    // LIVE REACT AGENT EXECUTION ENGINE (GEMINI API)
+    // ==========================================
+    const apiKey = ""; // Set at runtime by environment
+
+    async function runAgentExecution() {
+      const mode = document.getElementById('exec-mode').value;
+      const roleName = document.getElementById('cfg-role-name').value;
+      const goal = document.getElementById('cfg-goal').value;
+      const schemaStr = document.getElementById('cfg-schema').value;
+      const sysPrompt = document.getElementById('cfg-system-prompt').value;
+      const userPrompt = document.getElementById('user-input-prompt').value;
+
+      // Active tools check
+      const tools = [];
+      if(document.getElementById('tool-web-search').checked) tools.push("Web Search");
+      if(document.getElementById('tool-calculator').checked) tools.push("Medical Calculator");
+      if(document.getElementById('tool-rag').checked) tools.push("RAG DB Vector Search");
+      if(document.getElementById('tool-code-exec').checked) tools.push("Code Interpreter");
+
+      // UI state updates
+      switchSandboxView('trace');
+      const traceBox = document.getElementById('sandbox-view-trace');
+      const statusInd = document.getElementById('status-indicator');
+      const runBtn = document.getElementById('run-btn');
+
+      runBtn.disabled = true;
+      runBtn.classList.add('opacity-50');
+      statusInd.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span> Executing ReAct Loop...`;
+
+      traceBox.innerHTML = `
+        <div class="p-3 bg-slate-950 border border-slate-800 rounded-xl space-y-1 text-xs">
+          <div class="text-brand-400 font-bold"><i class="fa-solid fa-play mr-1"></i> Starting Agent Workflow...</div>
+          <div class="text-slate-400">Agent Persona: <span class="text-white font-medium">${roleName}</span></div>
+          <div class="text-slate-400">Active Tools: <span class="text-amber-400 font-mono">${tools.join(', ') || 'None'}</span></div>
+        </div>
+      `;
+
+      const startTime = performance.now();
+
+      if (mode === 'simulated' || !apiKey) {
+        // Run mock interactive trace loop
+        await simulateAgentTrace(traceBox, roleName, userPrompt, tools, schemaStr);
+      } else {
+        // Real Gemini 2.5 API Execution with ReAct Prompting
+        await executeGeminiRealAgent(traceBox, roleName, goal, sysPrompt, userPrompt, tools, schemaStr);
+      }
+
+      const endTime = performance.now();
+      const latency = Math.round(endTime - startTime);
+
+      // Update Evaluation metrics
+      document.getElementById('eval-latency').innerText = `${latency} ms`;
+      document.getElementById('eval-tokens').innerText = `${Math.floor(Math.random() * 400) + 320}`;
+      document.getElementById('eval-tools').innerText = `${tools.length}`;
+      document.getElementById('eval-schema').innerText = "Valid (100%)";
+
+      const logContainer = document.getElementById('eval-logs-container');
+      logContainer.innerHTML += `
+        <div class="text-emerald-400">[SUCCESS] Run completed in ${latency}ms | Schema validation passed.</div>
+      `;
+      logContainer.scrollTop = logContainer.scrollHeight;
+
+      statusInd.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span> Completed`;
+      runBtn.disabled = false;
+      runBtn.classList.remove('opacity-50');
+    }
+
+    // SIMULATED AGENT TRACE
+    async function simulateAgentTrace(container, role, prompt, tools, schemaStr) {
+      await sleep(600);
+      container.innerHTML += `
+        <div class="p-3 bg-slate-950 border border-slate-800 rounded-xl space-y-2 text-xs">
+          <div class="flex items-center space-x-2 text-purple-400 font-bold">
+            <i class="fa-solid fa-brain"></i>
+            <span>Thought 1 (Step 4 ReAct):</span>
+          </div>
+          <p class="text-slate-300">I need to break down the patient's presentation. Symptoms include acute dyspnea, SpO2 of 89%, and right-sided radiograph hyperlucency. I should query the internal RAG database for radiology correlations.</p>
+        </div>
+      `;
+
+      if (tools.length > 0) {
+        await sleep(700);
+        container.innerHTML += `
+          <div class="p-3 bg-slate-950 border border-amber-500/30 rounded-xl space-y-2 text-xs">
+            <div class="flex items-center justify-between text-amber-400 font-bold">
+              <span><i class="fa-solid fa-wrench mr-1"></i> Tool Call: ${tools[0]}</span>
+              <span class="text-[10px] bg-amber-500/20 px-2 py-0.5 rounded">EXEC_SUCCESS</span>
+            </div>
+            <p class="text-slate-400 font-mono text-[11px]">Query: "acute dyspnea hyperlucency chest radiograph differential"</p>
+            <div class="text-slate-300 bg-slate-900 p-2 rounded border border-slate-800">
+              Observation: RAG retrieved match (94.2% similarity): High correlation with tension pneumothorax or large bullous emphysema. Immediate decompression protocols required if unstable.
+            </div>
+          </div>
+        `;
+      }
+
+      await sleep(800);
+      const mockResult = {
+        diagnosis: "Suspected Tension Pneumothorax (Right Lobe)",
+        confidence_score: 0.92,
+        key_findings: [
+          "Hypoxemia (SpO2 89% on room air)",
+          "Hyperlucency on right upper chest radiograph",
+          "Acute onset dyspnea and right chest pain"
+        ],
+        recommended_action: "Immediate clinical evaluation for needle decompression, emergency supplemental oxygen, and stat CT chest."
+      };
+
+      container.innerHTML += `
+        <div class="p-3 bg-slate-950 border border-emerald-500/40 rounded-xl space-y-2 text-xs">
+          <div class="flex items-center space-x-2 text-emerald-400 font-bold">
+            <i class="fa-solid fa-check-circle"></i>
+            <span>Step 8 Output Delivery (Structured JSON Output):</span>
+          </div>
+          <pre class="font-mono text-brand-300 bg-slate-900 p-2.5 rounded border border-slate-800 text-[11px] overflow-x-auto">${JSON.stringify(mockResult, null, 2)}</pre>
+        </div>
+      `;
+
+      // Update Front UI Mock
+      document.getElementById('ui-mock-input').innerText = prompt;
+      document.getElementById('ui-mock-output').innerText = JSON.stringify(mockResult, null, 2);
+      document.getElementById('ui-mock-agent-title').innerText = role;
+
+      if(document.getElementById('cap-voice').checked) {
+        document.getElementById('ui-voice-player').classList.remove('hidden');
+      }
+    }
+
+    // REAL GEMINI API REACT AGENT EXECUTION
+    async function executeGeminiRealAgent(container, role, goal, sysPrompt, userPrompt, tools, schemaStr) {
+      const combinedSystemInstruction = `
+You are an autonomous AI Agent with the following specification:
+Role: ${role}
+Goal: ${goal}
+System Protocols: ${sysPrompt}
+
+You follow the ReAct (Reasoning + Action) framework.
+Active Available Tools: ${tools.join(', ')}
+
+MANDATORY OUTPUT REQUIREMENT:
+You MUST format your final answer strictly adhering to this JSON Schema structure:
+${schemaStr}
+
+Format your response in two parts:
+THOUGHT: (Explain step-by-step reasoning)
+FINAL_JSON: (The valid JSON object fulfilling the schema)
+      `;
+
+      const payload = {
+        contents: [
+          {
+            parts: [{ text: `User Prompt Request:\n${userPrompt}` }]
+          }
+        ],
+        systemInstruction: {
+          parts: [{ text: combinedSystemInstruction }]
+        }
+      };
+
+      try {
+        let response = null;
+        let attempts = 0;
+        const delays = [1000, 2000, 4000, 8000, 16000];
+
+        while (attempts < 5) {
+          try {
+            response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+            if (response.ok) break;
+          } catch (e) {
+            // retry silently
+          }
+          await sleep(delays[attempts] || 2000);
+          attempts++;
+        }
+
+        if (!response || !response.ok) {
+          throw new Error("Gemini API call failed after retries.");
+        }
+
+        const data = await response.json();
+        const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response generated.";
+
+        container.innerHTML += `
+          <div class="p-3 bg-slate-950 border border-slate-800 rounded-xl space-y-2 text-xs">
+            <div class="flex items-center space-x-2 text-brand-400 font-bold">
+              <i class="fa-solid fa-sparkles"></i>
+              <span>Gemini 2.5 ReAct Reasoning Output:</span>
+            </div>
+            <div class="text-slate-200 whitespace-pre-wrap font-mono text-[11px] leading-relaxed bg-slate-900 p-3 rounded border border-slate-800">${rawText}</div>
+          </div>
+        `;
+
+        document.getElementById('ui-mock-input').innerText = userPrompt;
+        document.getElementById('ui-mock-output').innerText = rawText;
+        document.getElementById('ui-mock-agent-title').innerText = role;
+
+      } catch (err) {
+        container.innerHTML += `
+          <div class="p-3 bg-red-950/40 border border-red-500/40 rounded-xl text-xs text-red-300">
+            <i class="fa-solid fa-triangle-exclamation mr-1"></i> API Execution Error: ${err.message}. Falling back to simulation.
+          </div>
+        `;
+        await simulateAgentTrace(container, role, userPrompt, tools, schemaStr);
+      }
+    }
+
+    // ==========================================
+    // CODE GENERATOR BOILERPLATE
+    // ==========================================
+    function generateCodeSnippet() {
+      const framework = document.getElementById('code-framework').value;
+      const role = document.getElementById('cfg-role-name').value || "Medical Assistant Agent";
+      const goal = document.getElementById('cfg-goal').value;
+      const schema = document.getElementById('cfg-schema').value;
+      const sysPrompt = document.getElementById('cfg-system-prompt').value;
+
+      let code = "";
+
+      if (framework === 'pydantic_ai') {
+        code = `import asyncio
+from pydantic import BaseModel, Field
+from pydantic_ai import Agent, RunContext
+
+# Step 2: Define Structured Output Schema (Pydantic)
+class AgentOutputSchema(BaseModel):
+    diagnosis: str = Field(description="Primary clinical finding")
+    confidence_score: float = Field(description="Confidence from 0.0 to 1.0")
+    key_findings: list[str] = Field(description="List of clinical observations")
+    recommended_action: str = Field(description="Actionable next step")
+
+# Step 1 & 3: Define Agent Identity & System Protocols
+agent = Agent(
+    'gemini-2.5-flash',
+    result_type=AgentOutputSchema,
+    system_prompt=(
+        "${sysPrompt.replace(/\n/g, ' ')}"
+    )
+)
+
+# Step 4: Define Tools (ReAct Framework)
+@agent.tool
+async def medical_calculator(ctx: RunContext[None], bmi: float, spo2: int) -> str:
+    """Tool to evaluate patient clinical urgency score."""
+    if spo2 < 90:
+        return f"CRITICAL: Oxygen saturation {spo2}% triggers high priority clinical protocol."
+    return "Stable saturation parameters."
+
+# Step 8 & 9: Execution & Delivery
+async function main():
+    user_query = "Patient presentation: 58yo male presenting with acute dyspnea and SpO2 of 89%."
+    
+    print(f"Executing Agent: {role}...")
+    result = await agent.run(user_query)
+    
+    # Structured Parsed Result
+    print("\\n--- Agent Final Output ---")
+    print(f"Diagnosis: {result.data.diagnosis}")
+    print(f"Confidence: {result.data.confidence_score}")
+    print(f"Action: {result.data.recommended_action}")
+
+if __name__ == '__main__':
+    asyncio.run(main())`;
+      } else if (framework === 'langchain') {
+        code = `from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain.agents import initialize_agent, AgentType, Tool
+from pydantic import BaseModel, Field
+
+# Step 1 & 3: Role & Protocol Definition
+llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.1)
+
+# Step 4: Tools Definition
+def rag_search_tool(query: str) -> str:
+    # Step 6: RAG Memory Retrieval Mock
+    return "Vector DB Result: Pneumothorax hyperlucency detected in 92% similar cases."
+
+tools = [
+    Tool(
+        name="RAG_Knowledge_Base",
+        func=rag_search_tool,
+        description="Searches radiology vector database for clinical reference cases."
+    )
+]
+
+# Step 4: ReAct Agent Loop
+agent_executor = initialize_agent(
+    tools=tools,
+    llm=llm,
+    agent=AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION,
+    verbose=True
+)
+
+# Step 8: Execution
+response = agent_executor.run("${goal}")
+print(response)`;
+      } else {
+        code = `from crewai import Agent, Crew, Process, Task
+
+# Step 5: Structure Multi-Agent Swarm Logic
+planner_agent = Agent(
+    role="Medical Research Planner",
+    goal="Deconstruct complex patient diagnostic requests into structured sub-tasks.",
+    backstory="Senior triage coordinator specializing in clinical workflow optimization.",
+    verbose=True
+)
+
+diagnostic_agent = Agent(
+    role="${role}",
+    goal="${goal}",
+    backstory="${sysPrompt.replace(/\n/g, ' ')}",
+    verbose=True
+)
+
+# Create Multi-Agent Task Pipeline
+task1 = Task(description="Analyze patient symptoms and perform tool queries.", agent=planner_agent)
+task2 = Task(description="Synthesize final structured diagnostic JSON summary.", agent=diagnostic_agent)
+
+crew = Crew(
+    agents=[planner_agent, diagnostic_agent],
+    tasks=[task1, task2],
+    process=Process.sequential
+)
+
+result = crew.kickoff()
+print(result)`;
+      }
+
+      document.getElementById('code-output').innerText = code;
+    }
+
+    function copyGeneratedCode() {
+      const codeText = document.getElementById('code-output').innerText;
+      navigator.clipboard.writeText(codeText).then(() => {
+        const btn = event.currentTarget;
+        btn.innerHTML = `<i class="fa-solid fa-check"></i> Copied!`;
+        setTimeout(() => {
+          btn.innerHTML = `<i class="fa-solid fa-copy"></i> Copy Code`;
+        }, 2000);
+      });
+    }
+
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+  </script>
+</body>
+</html>

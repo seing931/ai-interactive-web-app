@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Types of RAG - Interactive Enterprise Architecture Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkbg: '#0b0f19',
+                        cardbg: '#111827',
+                        ragClassic: '#3b82f6',
+                        ragGraph: '#10b981',
+                        ragAgentic: '#8b5cf6',
+                        ragHybrid: '#f97316',
+                        ragOther: '#ef4444'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glow-classic { box-shadow: 0 0 20px -5px rgba(59, 130, 246, 0.4); }
+        .glow-graph { box-shadow: 0 0 20px -5px rgba(16, 185, 129, 0.4); }
+        .glow-agentic { box-shadow: 0 0 20px -5px rgba(139, 92, 246, 0.4); }
+        .glow-hybrid { box-shadow: 0 0 20px -5px rgba(249, 115, 22, 0.4); }
+        .glow-other { box-shadow: 0 0 20px -5px rgba(239, 68, 68, 0.4); }
+        
+        @keyframes pulse-node {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.85; }
+        }
+        .node-active {
+            animation: pulse-node 1.5s infinite ease-in-out;
+            border-color: #60a5fa !important;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0f19;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4b5563;
+        }
+    </style>
+</head>
+<body class="bg-darkbg text-gray-100 font-sans min-h-screen flex flex-col antialiased">
+
+    <!-- Top Header Navigation -->
+    <header class="border-b border-gray-800 bg-gray-900/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-lg bg-gradient-to-tr from-blue-600 via-purple-600 to-emerald-500 flex items-center justify-center font-black text-white text-lg shadow-lg">
+                    ⚡
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                        TYPES OF RAG
+                        <span class="text-xs font-mono font-normal px-2 py-0.5 rounded bg-blue-900/50 text-blue-300 border border-blue-700/50">Enterprise Edition</span>
+                    </h1>
+                    <p class="text-xs text-gray-400 hidden sm:block">Choose the right RAG architecture for your enterprise use case</p>
+                </div>
+            </div>
+
+            <!-- Nav Tabs -->
+            <nav class="flex items-center space-x-1 sm:space-x-2 text-sm">
+                <button onclick="switchTab('explorer')" id="tab-explorer" class="px-3 py-1.5 rounded-md font-medium text-white bg-gray-800 border border-gray-700 transition">
+                    🗺️ Architecture Visualizer
+                </button>
+                <button onclick="switchTab('wizard')" id="tab-wizard" class="px-3 py-1.5 rounded-md font-medium text-gray-400 hover:text-white hover:bg-gray-800/60 transition">
+                    🎯 Decision Wizard
+                </button>
+                <button onclick="switchTab('matrix')" id="tab-matrix" class="px-3 py-1.5 rounded-md font-medium text-gray-400 hover:text-white hover:bg-gray-800/60 transition">
+                    📊 Comparison Matrix
+                </button>
+                <button onclick="switchTab('components')" id="tab-components" class="px-3 py-1.5 rounded-md font-medium text-gray-400 hover:text-white hover:bg-gray-800/60 transition">
+                    🧩 Core Components
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- TAB 1: ARCHITECTURE VISUALIZER & SIMULATOR -->
+        <section id="view-explorer" class="space-y-6">
+
+            <!-- Architecture Selector Pills -->
+            <div class="flex flex-wrap items-center justify-between gap-3 bg-gray-900/60 p-3 rounded-xl border border-gray-800">
+                <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider pl-1">Select Architecture:</span>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="selectRag('classic')" id="rag-btn-classic" class="rag-select-btn px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 bg-blue-600/20 text-blue-400 border border-blue-500/50 glow-classic">
+                        <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Classic RAG
+                    </button>
+                    <button onclick="selectRag('graph')" id="rag-btn-graph" class="rag-select-btn px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 bg-gray-800 text-gray-400 border border-gray-700 hover:bg-gray-700">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Graph RAG
+                    </button>
+                    <button onclick="selectRag('agentic')" id="rag-btn-agentic" class="rag-select-btn px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 bg-gray-800 text-gray-400 border border-gray-700 hover:bg-gray-700">
+                        <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span> Agentic RAG
+                    </button>
+                    <button onclick="selectRag('hybrid')" id="rag-btn-hybrid" class="rag-select-btn px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 bg-gray-800 text-gray-400 border border-gray-700 hover:bg-gray-700">
+                        <span class="w-2.5 h-2.5 rounded-full bg-orange-500"></span> Hybrid RAG
+                    </button>
+                    <button onclick="selectRag('other')" id="rag-btn-other" class="rag-select-btn px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 bg-gray-800 text-gray-400 border border-gray-700 hover:bg-gray-700">
+                        <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span> Other RAG Variants
+                    </button>
+                </div>
+            </div>
+
+            <!-- Details Header Card -->
+            <div id="rag-info-card" class="bg-gray-900 border border-blue-500/30 rounded-2xl p-6 transition-all duration-300">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="md:col-span-2 space-y-3">
+                        <div class="flex items-center gap-3">
+                            <span id="rag-badge" class="px-2.5 py-1 text-xs font-bold uppercase tracking-wider rounded-md bg-blue-500/20 text-blue-400 border border-blue-500/40">Baseline</span>
+                            <h2 id="rag-title" class="text-2xl font-bold text-white">Classic RAG</h2>
+                        </div>
+                        <p id="rag-desc" class="text-gray-300 text-sm leading-relaxed">
+                            Standard dense vector retrieval pipeline. Text is chunked, embedded into vector representations, and stored in a Vector DB. User query retrieves top-K nearest neighbors based on cosine similarity and sends them to the LLM context window.
+                        </p>
+                        <div class="flex flex-wrap gap-2 pt-2">
+                            <span class="text-xs px-2.5 py-1 rounded bg-gray-800 text-gray-300 border border-gray-700 flex items-center gap-1">
+                                🎯 <strong>Best For:</strong> <span id="rag-bestfor">General Q&A over private document databases.</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="bg-gray-950/60 p-4 rounded-xl border border-gray-800 space-y-2">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
+                            ⚡ Key Strengths
+                        </h4>
+                        <ul id="rag-strengths" class="text-xs text-gray-300 space-y-1.5">
+                            <li class="flex items-center gap-2">✓ Simple setup & low architecture footprint</li>
+                            <li class="flex items-center gap-2">✓ Fast implementations using standard embedding models</li>
+                            <li class="flex items-center gap-2">✓ Cost-effective baseline for unstructured text</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visual Flow & Interactive Query Simulator -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+                <!-- Dynamic Diagram Pipeline Display (7 cols) -->
+                <div class="lg:col-span-7 bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden">
+                    <div class="flex items-center justify-between border-b border-gray-800 pb-4 mb-6">
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-500/80"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-500/80"></div>
+                            <span class="text-xs font-mono text-gray-400 ml-2">Architecture Execution Flow Pipeline</span>
+                        </div>
+                        <span id="step-indicator" class="text-xs font-mono px-2 py-0.5 rounded bg-gray-800 text-gray-400">Step 0 of 5</span>
+                    </div>
+
+                    <!-- Flow Nodes Container -->
+                    <div id="pipeline-container" class="space-y-4 py-2 relative min-h-[380px] flex flex-col justify-center">
+                        <!-- Content rendered dynamically via JavaScript -->
+                    </div>
+
+                    <!-- Pipeline Controls -->
+                    <div class="mt-6 pt-4 border-t border-gray-800 flex items-center justify-between">
+                        <button onclick="resetPipeline()" class="px-3 py-1.5 text-xs rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 transition">
+                            ↺ Reset Flow
+                        </button>
+                        <div class="flex space-x-2">
+                            <button onclick="stepPipeline(-1)" class="px-3 py-1.5 text-xs rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 transition">
+                                ◀ Previous Step
+                            </button>
+                            <button onclick="stepPipeline(1)" class="px-3 py-1.5 text-xs rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold transition flex items-center gap-1">
+                                Next Step ▶
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Query Simulator Console (5 cols) -->
+                <div class="lg:col-span-5 bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between pb-3 border-b border-gray-800">
+                            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                                🧪 Interactive Query Test Bench
+                            </h3>
+                            <span class="text-xs text-gray-400 font-mono">Simulated LLM</span>
+                        </div>
+
+                        <!-- Sample Query Presets -->
+                        <div class="mt-4 space-y-2">
+                            <label class="text-xs text-gray-400 font-medium">Select a test scenario prompt:</label>
+                            <select id="query-select" onchange="onQuerySelectChange()" class="w-full text-xs bg-gray-950 border border-gray-800 text-gray-200 rounded-lg p-2.5 focus:border-blue-500 focus:outline-none">
+                                <option value="general">"Summarize our company's refund policy for software purchases."</option>
+                                <option value="relational">"Which products were developed by teams managed by John Doe, and what are their dependencies?"</option>
+                                <option value="agentic">"Look up Q3 revenue, compare it with 2024 forecast, and calculate percentage growth."</option>
+                                <option value="hybrid">"Search for error code ERR_8091_TIMEOUT in project documentation."</option>
+                                <option value="parentchild">"Find section 4.2 in legal agreement and provide surrounding contextual clause."</option>
+                            </select>
+                        </div>
+
+                        <!-- Query Execution Trace Log -->
+                        <div class="mt-4 bg-gray-950 rounded-xl p-4 border border-gray-800 space-y-3">
+                            <div class="flex items-center justify-between text-xs text-gray-400 border-b border-gray-800/80 pb-2">
+                                <span>Execution Diagnostics</span>
+                                <span id="sim-status" class="text-emerald-400 font-mono text-[11px]">● Ready</span>
+                            </div>
+                            <div id="sim-log" class="font-mono text-xs space-y-2 text-gray-300 max-h-[190px] overflow-y-auto pr-1">
+                                <p class="text-gray-500 italic">Press "Run Query Simulation" to see execution telemetry for the active RAG architecture.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="runQuerySimulation()" class="w-full mt-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 font-bold text-sm text-white shadow-lg transition flex items-center justify-center gap-2">
+                        🚀 Run Simulation Trace
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- Specialized Variants Sub-section (Visible when 'Other RAG' selected or for deep dive) -->
+            <div id="specialized-variants-section" class="bg-gray-900 border border-gray-800 rounded-2xl p-6 mt-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-red-500"></span> Specialized RAG Variants Explorer
+                        </h3>
+                        <p class="text-xs text-gray-400">Advanced indexing and retrieval techniques tailored for edge cases & specific data types.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <!-- Multi-Vector -->
+                    <div onclick="showVariantDetails('multivector')" class="cursor-pointer bg-gray-950 p-4 rounded-xl border border-gray-800 hover:border-red-500/50 hover:bg-gray-900 transition space-y-2 group">
+                        <div class="w-8 h-8 rounded-lg bg-red-500/10 text-red-400 flex items-center justify-center font-bold text-sm group-hover:bg-red-500 group-hover:text-white transition">
+                            📦
+                        </div>
+                        <h4 class="text-xs font-bold text-white">Multi-Vector</h4>
+                        <p class="text-[11px] text-gray-400 leading-snug">Decouples raw data chunks from vectors. Uses separate embeddings for summaries vs raw context.</p>
+                    </div>
+
+                    <!-- Parent-Child -->
+                    <div onclick="showVariantDetails('parentchild')" class="cursor-pointer bg-gray-950 p-4 rounded-xl border border-gray-800 hover:border-red-500/50 hover:bg-gray-900 transition space-y-2 group">
+                        <div class="w-8 h-8 rounded-lg bg-red-500/10 text-red-400 flex items-center justify-center font-bold text-sm group-hover:bg-red-500 group-hover:text-white transition">
+                            👨‍👦
+                        </div>
+                        <h4 class="text-xs font-bold text-white">Parent-Child</h4>
+                        <p class="text-[11px] text-gray-400 leading-snug">Parses granular small chunks for precise retrieval match, but returns larger parent context to LLM.</p>
+                    </div>
+
+                    <!-- Conversational -->
+                    <div onclick="showVariantDetails('conversational')" class="cursor-pointer bg-gray-950 p-4 rounded-xl border border-gray-800 hover:border-red-500/50 hover:bg-gray-900 transition space-y-2 group">
+                        <div class="w-8 h-8 rounded-lg bg-red-500/10 text-red-400 flex items-center justify-center font-bold text-sm group-hover:bg-red-500 group-hover:text-white transition">
+                            💬
+                        </div>
+                        <h4 class="text-xs font-bold text-white">Conversational</h4>
+                        <p class="text-[11px] text-gray-400 leading-snug">Condenses dialogue context history and rewrites follow-up queries before vector lookup.</p>
+                    </div>
+
+                    <!-- Time-Aware -->
+                    <div onclick="showVariantDetails('timeaware')" class="cursor-pointer bg-gray-950 p-4 rounded-xl border border-gray-800 hover:border-red-500/50 hover:bg-gray-900 transition space-y-2 group">
+                        <div class="w-8 h-8 rounded-lg bg-red-500/10 text-red-400 flex items-center justify-center font-bold text-sm group-hover:bg-red-500 group-hover:text-white transition">
+                            🕒
+                        </div>
+                        <h4 class="text-xs font-bold text-white">Time-Aware</h4>
+                        <p class="text-[11px] text-gray-400 leading-snug">Applies temporal decay scoring weights to favor recent documents over older context.</p>
+                    </div>
+
+                    <!-- Domain-Specific -->
+                    <div onclick="showVariantDetails('domain')" class="cursor-pointer bg-gray-950 p-4 rounded-xl border border-gray-800 hover:border-red-500/50 hover:bg-gray-900 transition space-y-2 group">
+                        <div class="w-8 h-8 rounded-lg bg-red-500/10 text-red-400 flex items-center justify-center font-bold text-sm group-hover:bg-red-500 group-hover:text-white transition">
+                            🏥
+                        </div>
+                        <h4 class="text-xs font-bold text-white">Domain-Specific</h4>
+                        <p class="text-[11px] text-gray-400 leading-snug">Tailored specifically for medical, legal, code, or financial ontology & data rules.</p>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- TAB 2: DECISION WIZARD -->
+        <section id="view-wizard" class="hidden space-y-6">
+            <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 md:p-8 max-w-4xl mx-auto">
+                <div class="text-center space-y-2 mb-8">
+                    <span class="text-xs font-bold px-3 py-1 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/30 uppercase tracking-widest">Architectural Recommendation Engine</span>
+                    <h2 class="text-2xl font-extrabold text-white">Find Your Optimal RAG Architecture</h2>
+                    <p class="text-sm text-gray-400">Answer 4 quick technical questions to determine the right retrieval pattern for your use case.</p>
+                </div>
+
+                <!-- Wizard Form -->
+                <div id="wizard-form" class="space-y-6">
+
+                    <!-- Q1 -->
+                    <div class="bg-gray-950 p-5 rounded-xl border border-gray-800">
+                        <label class="block text-sm font-bold text-white mb-2">1. What is the structure and complexity of your knowledge base?</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <label class="cursor-pointer border border-gray-800 hover:border-gray-700 bg-gray-900 p-3 rounded-lg flex flex-col justify-between">
+                                <input type="radio" name="w-complexity" value="simple" class="mb-2 text-purple-600 focus:ring-purple-500" checked>
+                                <span class="text-xs font-semibold text-white">Standard Documents</span>
+                                <span class="text-[11px] text-gray-400 mt-1">PDFs, FAQs, standard text docs</span>
+                            </label>
+                            <label class="cursor-pointer border border-gray-800 hover:border-gray-700 bg-gray-900 p-3 rounded-lg flex flex-col justify-between">
+                                <input type="radio" name="w-complexity" value="connected" class="mb-2 text-purple-600 focus:ring-purple-500">
+                                <span class="text-xs font-semibold text-white">Entity & Interconnected Data</span>
+                                <span class="text-[11px] text-gray-400 mt-1">High entity relations, graphs, dependencies</span>
+                            </label>
+                            <label class="cursor-pointer border border-gray-800 hover:border-gray-700 bg-gray-900 p-3 rounded-lg flex flex-col justify-between">
+                                <input type="radio" name="w-complexity" value="exact" class="mb-2 text-purple-600 focus:ring-purple-500">
+                                <span class="text-xs font-semibold text-white">Specific Codes & Keywords</span>
+                                <span class="text-[11px] text-gray-400 mt-1">Part numbers, logs, tech jargon, exact SKUs</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Q2 -->
+                    <div class="bg-gray-950 p-5 rounded-xl border border-gray-800">
+                        <label class="block text-sm font-bold text-white mb-2">2. Does your task require multi-step reasoning or external tool execution?</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <label class="cursor-pointer border border-gray-800 hover:border-gray-700 bg-gray-900 p-3 rounded-lg flex items-center space-x-3">
+                                <input type="radio" name="w-agentic" value="no" class="text-purple-600 focus:ring-purple-500" checked>
+                                <div>
+                                    <div class="text-xs font-semibold text-white">Single-turn Information Lookup</div>
+                                    <div class="text-[11px] text-gray-400">Direct query to answer mapping</div>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer border border-gray-800 hover:border-gray-700 bg-gray-900 p-3 rounded-lg flex items-center space-x-3">
+                                <input type="radio" name="w-agentic" value="yes" class="text-purple-600 focus:ring-purple-500">
+                                <div>
+                                    <div class="text-xs font-semibold text-white">Multi-step Orchestration & Tool Access</div>
+                                    <div class="text-[11px] text-gray-400">Requires SQL queries, APIs, web search, reflection loops</div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Q3 -->
+                    <div class="bg-gray-950 p-5 rounded-xl border border-gray-800">
+                        <label class="block text-sm font-bold text-white mb-2">3. What is your priority regarding search precision & recall?</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <label class="cursor-pointer border border-gray-800 hover:border-gray-700 bg-gray-900 p-3 rounded-lg flex items-center space-x-3">
+                                <input type="radio" name="w-recall" value="semantic" class="text-purple-600 focus:ring-purple-500" checked>
+                                <div>
+                                    <div class="text-xs font-semibold text-white">Conceptual & Semantic Understanding</div>
+                                    <div class="text-[11px] text-gray-400">Understanding intent over exact keyword matches</div>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer border border-gray-800 hover:border-gray-700 bg-gray-900 p-3 rounded-lg flex items-center space-x-3">
+                                <input type="radio" name="w-recall" value="hybrid" class="text-purple-600 focus:ring-purple-500">
+                                <div>
+                                    <div class="text-xs font-semibold text-white">Combined Keyword Recall + Semantic Precision</div>
+                                    <div class="text-[11px] text-gray-400">Dense vectors + BM25 Lexical + Cross-Encoder Reranking</div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="button" onclick="calculateRecommendation()" class="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-500 font-bold text-white shadow-lg transition text-sm">
+                        Analyze & Recommend RAG Architecture
+                    </button>
+                </div>
+
+                <!-- Result Modal / Card -->
+                <div id="wizard-result" class="hidden bg-gray-950 p-6 rounded-2xl border border-purple-500/50 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-purple-400 uppercase tracking-wider">Recommended Match</span>
+                        <button onclick="resetWizard()" class="text-xs text-gray-400 hover:text-white underline">Re-evaluate</button>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div id="wiz-res-icon" class="w-14 h-14 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-2xl font-bold border border-purple-500/30">
+                            🤖
+                        </div>
+                        <div>
+                            <h3 id="wiz-res-title" class="text-xl font-bold text-white">Agentic RAG</h3>
+                            <p id="wiz-res-fit" class="text-xs text-gray-400">Match score: 98% for multi-step reasoning requirement</p>
+                        </div>
+                    </div>
+                    <p id="wiz-res-rationale" class="text-xs text-gray-300 bg-gray-900 p-3 rounded-lg border border-gray-800 leading-relaxed">
+                        Your use case involves multi-step workflows with tool execution and adaptive self-correcting evaluation loops. Agentic RAG provides the necessary control loop and external API connectivity.
+                    </p>
+                    <div class="pt-2 flex justify-end">
+                        <button id="wiz-view-btn" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-xs font-semibold text-white">
+                            View Interactive Visualizer →
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- TAB 3: COMPARISON MATRIX -->
+        <section id="view-matrix" class="hidden space-y-6">
+            <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <h2 class="text-xl font-bold text-white">RAG Architecture Comparison Matrix</h2>
+                        <p class="text-xs text-gray-400">Evaluate complexity, relationship handling, and retrieval mechanics across patterns.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="text" id="matrix-search" oninput="filterMatrix()" placeholder="Filter RAG types..." class="text-xs bg-gray-950 border border-gray-800 text-gray-200 rounded-lg px-3 py-2 w-48 focus:border-blue-500 focus:outline-none">
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-gray-300">
+                        <thead class="bg-gray-950 text-gray-400 font-semibold uppercase tracking-wider border-b border-gray-800">
+                            <tr>
+                                <th class="p-3.5">RAG Type</th>
+                                <th class="p-3.5">Complexity</th>
+                                <th class="p-3.5">Relationships</th>
+                                <th class="p-3.5">Retrieval Method</th>
+                                <th class="p-3.5">Use Case Fit</th>
+                                <th class="p-3.5">Primary Strengths</th>
+                            </tr>
+                        </thead>
+                        <tbody id="matrix-tbody" class="divide-y divide-gray-800/60">
+                            <!-- Classic RAG -->
+                            <tr class="hover:bg-gray-800/40 transition">
+                                <td class="p-3.5 font-bold text-blue-400 flex items-center gap-2">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Classic RAG
+                                </td>
+                                <td class="p-3.5">
+                                    <span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 font-medium">Low</span>
+                                </td>
+                                <td class="p-3.5">Limited</td>
+                                <td class="p-3.5 font-mono text-[11px] text-gray-400">Dense (Vector Embedding)</td>
+                                <td class="p-3.5">General Q&A over static docs</td>
+                                <td class="p-3.5 text-gray-400">Simple setup, fast deployment, baseline cost</td>
+                            </tr>
+                            <!-- Graph RAG -->
+                            <tr class="hover:bg-gray-800/40 transition">
+                                <td class="p-3.5 font-bold text-emerald-400 flex items-center gap-2">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Graph RAG
+                                </td>
+                                <td class="p-3.5">
+                                    <span class="px-2 py-0.5 rounded bg-yellow-950 text-yellow-400 font-medium">Medium</span>
+                                </td>
+                                <td class="p-3.5 font-semibold text-emerald-300">Strong / Structured</td>
+                                <td class="p-3.5 font-mono text-[11px] text-gray-400">Graph Traversal + Vector</td>
+                                <td class="p-3.5">Relationship-heavy databases</td>
+                                <td class="p-3.5 text-gray-400">Prevents hallucinated leaps, explains entity linkages</td>
+                            </tr>
+                            <!-- Agentic RAG -->
+                            <tr class="hover:bg-gray-800/40 transition">
+                                <td class="p-3.5 font-bold text-purple-400 flex items-center gap-2">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span> Agentic RAG
+                                </td>
+                                <td class="p-3.5">
+                                    <span class="px-2 py-0.5 rounded bg-red-950 text-red-400 font-medium">High</span>
+                                </td>
+                                <td class="p-3.5">Dynamic</td>
+                                <td class="p-3.5 font-mono text-[11px] text-gray-400">Multi-agent Routing + Tools</td>
+                                <td class="p-3.5">Complex Multi-step Workflows</td>
+                                <td class="p-3.5 text-gray-400">Adaptive reasoning loops, self-correction, API tools</td>
+                            </tr>
+                            <!-- Hybrid RAG -->
+                            <tr class="hover:bg-gray-800/40 transition">
+                                <td class="p-3.5 font-bold text-orange-400 flex items-center gap-2">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-orange-500"></span> Hybrid RAG
+                                </td>
+                                <td class="p-3.5">
+                                    <span class="px-2 py-0.5 rounded bg-yellow-950 text-yellow-400 font-medium">Medium</span>
+                                </td>
+                                <td class="p-3.5">Optional</td>
+                                <td class="p-3.5 font-mono text-[11px] text-gray-400">Dense + Sparse (BM25) + Rerank</td>
+                                <td class="p-3.5">Mixed Search & Technical Docs</td>
+                                <td class="p-3.5 text-gray-400">High keyword recall, reranked semantic precision</td>
+                            </tr>
+                            <!-- Other Variants -->
+                            <tr class="hover:bg-gray-800/40 transition">
+                                <td class="p-3.5 font-bold text-red-400 flex items-center gap-2">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span> Other Variants
+                                </td>
+                                <td class="p-3.5">
+                                    <span class="px-2 py-0.5 rounded bg-gray-800 text-gray-300 font-medium">Varies</span>
+                                </td>
+                                <td class="p-3.5">Targeted</td>
+                                <td class="p-3.5 font-mono text-[11px] text-gray-400">Optimized Chunks / Time Weights</td>
+                                <td class="p-3.5">Specialized Architectural Needs</td>
+                                <td class="p-3.5 text-gray-400">Target optimization, parent context, temporal accuracy</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- TAB 4: CORE COMPONENTS BREAKDOWN -->
+        <section id="view-components" class="hidden space-y-6">
+            <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+                <div class="mb-6">
+                    <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Universal Architecture Building Blocks</span>
+                    <h2 class="text-xl font-bold text-white mt-1">4 Common Components of RAG Systems</h2>
+                    <p class="text-xs text-gray-400">Regardless of the specific architecture, modern RAG systems rely on these core functional units.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <!-- Component 1 -->
+                    <div class="bg-gray-950 p-5 rounded-xl border border-gray-800 flex gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-400 flex items-center justify-center font-bold text-xl flex-shrink-0">
+                            🔍
+                        </div>
+                        <div class="space-y-1">
+                            <h3 class="text-sm font-bold text-white">1. Query Processor</h3>
+                            <p class="text-xs text-gray-400 leading-relaxed">
+                                Normalizes user input, generates vector embeddings, or rewrites conversational queries (query expansion, sub-query decomposition, or hypothetical document embeddings HyDE).
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Component 2 -->
+                    <div class="bg-gray-950 p-5 rounded-xl border border-gray-800 flex gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center font-bold text-xl flex-shrink-0">
+                            📥
+                        </div>
+                        <div class="space-y-1">
+                            <h3 class="text-sm font-bold text-white">2. Retriever Engine</h3>
+                            <p class="text-xs text-gray-400 leading-relaxed">
+                                Interfaces with indexes (Vector Databases, Knowledge Graphs, BM25 Index). Executes top-K vector lookup, graph traversal, hybrid keyword fusion, and optional cross-encoder reranking.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Component 3 -->
+                    <div class="bg-gray-950 p-5 rounded-xl border border-gray-800 flex gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-400 flex items-center justify-center font-bold text-xl flex-shrink-0">
+                            ⚙️
+                        </div>
+                        <div class="space-y-1">
+                            <h3 class="text-sm font-bold text-white">3. Context Assembler</h3>
+                            <p class="text-xs text-gray-400 leading-relaxed">
+                                Formats retrieved chunks, parent documents, or graph node triples into a clean prompt context block, optimizing token budgets and reducing lost-in-the-middle context degradation.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Component 4 -->
+                    <div class="bg-gray-950 p-5 rounded-xl border border-gray-800 flex gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-500/30 text-orange-400 flex items-center justify-center font-bold text-xl flex-shrink-0">
+                            🤖
+                        </div>
+                        <div class="space-y-1">
+                            <h3 class="text-sm font-bold text-white">4. LLM / Generator</h3>
+                            <p class="text-xs text-gray-400 leading-relaxed">
+                                Receives the assembled prompt (System Instructions + Context + User Query) and synthesizes the final accurate, grounded answer with citations.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Key Takeaway Card -->
+                <div class="mt-8 bg-gradient-to-r from-blue-950/60 via-purple-950/40 to-gray-900 border border-blue-500/30 p-5 rounded-xl">
+                    <h4 class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-1 flex items-center gap-2">
+                        💡 Key Strategic Takeaway
+                    </h4>
+                    <p class="text-xs text-gray-300 leading-relaxed">
+                        Successful systems rely on selecting the right indexing format and retrieval logic based directly on the complexity of your data, enterprise security boundaries, context limits, and accuracy requirements.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal for Specialized Variant Details -->
+    <div id="variant-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-lg w-full p-6 space-y-4 relative shadow-2xl">
+            <button onclick="closeVariantModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-lg">✕</button>
+            <div class="flex items-center space-x-3">
+                <div id="modal-icon" class="w-10 h-10 rounded-lg bg-red-500/20 text-red-400 flex items-center justify-center text-xl font-bold">
+                    📦
+                </div>
+                <div>
+                    <h3 id="modal-title" class="text-lg font-bold text-white">Variant Detail</h3>
+                    <span class="text-xs text-red-400 font-mono">Specialized Strategy</span>
+                </div>
+            </div>
+            <div id="modal-body" class="text-xs text-gray-300 space-y-3 leading-relaxed border-t border-b border-gray-800 py-3">
+                <!-- Injected via JS -->
+            </div>
+            <div class="flex justify-end">
+                <button onclick="closeVariantModal()" class="px-4 py-1.5 text-xs rounded-lg bg-gray-800 hover:bg-gray-700 text-white font-medium">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application JavaScript Logic -->
+    <script>
+        // Data Store for RAG Architectures
+        const RAG_DATA = {
+            classic: {
+                title: "Classic RAG",
+                badge: "Baseline Architecture",
+                colorClass: "blue",
+                bestFor: "General Q&A over private document databases.",
+                desc: "Standard dense vector retrieval pipeline. Unstructured documents are chunked and stored in a vector database. Queries are embedded to retrieve top-K matching text blocks passed to the LLM.",
+                strengths: [
+                    "Simple setup & low maintenance footprint",
+                    "Fast execution for standard text QA",
+                    "Cost-effective baseline implementation"
+                ],
+                nodes: [
+                    { name: "Query", icon: "💬", desc: "User submits query prompt" },
+                    { name: "Embed", icon: "📐", desc: "Converts text to dense vector format" },
+                    { name: "Vector DB", icon: "🗄️", desc: "Similarity search (Cosine / L2 / HNSW)" },
+                    { name: "Top-K Chunks", icon: "📑", desc: "Extracts top matching document passages" },
+                    { name: "LLM", icon: "🤖", desc: "Synthesizes final answer with context" },
+                    { name: "Answer 💡", icon: "✨", desc: "Grounded output presented to user" }
+                ],
+                simLog: [
+                    "[0ms] Query received: 'Summarize our software refund policy.'",
+                    "[15ms] Generating 1536-dim embedding vector via text-embedding-ada-002...",
+                    "[42ms] Performing Top-K similarity lookup in Pinecone Vector DB...",
+                    "[68ms] Retrieved 3 top chunks (Similarity score: 0.89, 0.84, 0.78).",
+                    "[120ms] Assembled prompt payload (1,240 tokens) sent to LLM.",
+                    "[450ms] Answer generated with standard vector chunk grounding."
+                ]
+            },
+            graph: {
+                title: "Graph RAG",
+                badge: "Knowledge Graph Engine",
+                colorClass: "emerald",
+                bestFor: "Data with complex, interconnected relations (org structures, supply chains, dependencies).",
+                desc: "Combines Knowledge Graphs (KG) with vector representations. Nodes and relationships are extracted to preserve global domain semantics and multi-hop connections.",
+                strengths: [
+                    "Explains complex entity relationships effortlessly",
+                    "Strong structured multi-hop reasoning",
+                    "Prevents disconnected context leaps and hallucinations"
+                ],
+                nodes: [
+                    { name: "Query", icon: "💬", desc: "User query requiring relational reasoning" },
+                    { name: "Graph Retrieval", icon: "🕸️", desc: "Traverses entity relationships & triplets" },
+                    { name: "Knowledge Graph", icon: "🌐", desc: "Nodes: Entities | Edges: Relationships" },
+                    { name: "Connected Context", icon: "🔗", desc: "Extracts sub-graph topology context" },
+                    { name: "LLM", icon: "🤖", desc: "Processes relational subgraph payload" },
+                    { name: "Answer 💡", icon: "✨", desc: "Delivers reasoning-rich answer" }
+                ],
+                simLog: [
+                    "[0ms] Query received: 'Which projects depend on John Doe's microservice?'",
+                    "[20ms] Extracting entities: [John Doe (Person)], [Microservice (Software)].",
+                    "[55ms] Traversing Neo4j Knowledge Graph triples: (John Doe)-[MANAGES]->(Service X)-[DEPENDS_ON]->(Service Y).",
+                    "[90ms] Assembled connected graph context: 4 nodes, 5 edge relations.",
+                    "[180ms] Prompt constructed with topological graph summary.",
+                    "[510ms] LLM produces accurate entity-link response."
+                ]
+            },
+            agentic: {
+                title: "Agentic RAG",
+                badge: "Multi-Agent Orchestrator",
+                colorClass: "purple",
+                bestFor: "Complex, multi-step orchestration workflows & external tool integrations.",
+                desc: "Employs an autonomous RAG Agent with self-corrective reflection loops. The agent dynamically decides whether to query vector databases, search graph databases, execute code, or call external APIs.",
+                strengths: [
+                    "Adaptive multi-step reasoning & sub-query routing",
+                    "Self-corrective evaluation loops (hallucination grading)",
+                    "Native access to external web search, SQL, & custom APIs"
+                ],
+                nodes: [
+                    { name: "Query", icon: "💬", desc: "Multi-step complex user objective" },
+                    { name: "RAG Agent", icon: "🧠", desc: "Planner agent selects tools & sub-goals" },
+                    { name: "Vector DB / KG / APIs", icon: "🧰", desc: "Fetches information from multiple sources" },
+                    { name: "Evaluation Loop", icon: "🔄", desc: "Grades relevance & self-corrects if needed" },
+                    { name: "LLM", icon: "🤖", desc: "Generates step-by-step reasoning" },
+                    { name: "Final Answer 💡", icon: "🏆", desc: "Verified result with execution trail" }
+                ],
+                simLog: [
+                    "[0ms] Query received: 'Compare Q3 revenue with 2024 forecast.'",
+                    "[12ms] Agent planning: Plan divided into 2 tool calls.",
+                    "[40ms] Tool Call 1: Query internal SQL DB for Q3 revenue ($4.2M).",
+                    "[85ms] Tool Call 2: Vector DB retrieval for '2024 Revenue Target' ($4.0M).",
+                    "[110ms] Evaluation Loop: Grading context relevance = PASS (100%).",
+                    "[150ms] Agent computes difference: +$200k (+5%).",
+                    "[490ms] Final answer returned with verified audit trail."
+                ]
+            },
+            hybrid: {
+                title: "Hybrid RAG",
+                badge: "Dense + Sparse Fusion",
+                colorClass: "orange",
+                bestFor: "Combining keyword lookup (exact terms/code/SKUs) with conceptual semantic search.",
+                desc: "Combines dense vector similarity with sparse keyword matching (BM25/TF-IDF). Merges candidate results via Reciprocal Rank Fusion (RRF) and passes them through a Cross-Encoder Reranker.",
+                strengths: [
+                    "High keyword recall for precise technical terms",
+                    "Broad semantic coverage for general intent",
+                    "Reranker precision yields optimal context ordering"
+                ],
+                nodes: [
+                    { name: "Query", icon: "💬", desc: "Query containing mixed text & exact codes" },
+                    { name: "Dense + Sparse", icon: "🔀", desc: "Parallel retrieval strategy" },
+                    { name: "Vector DB + BM25", icon: "📚", desc: "Semantic vectors + Lexical keyword index" },
+                    { name: "Fuse Results & Rerank", icon: "📊", desc: "Reciprocal Rank Fusion + Cross-Encoder" },
+                    { name: "LLM", icon: "🤖", desc: "Receives re-ranked high-precision context" },
+                    { name: "Answer 💡", icon: "✨", desc: "High-precision factual answer" }
+                ],
+                simLog: [
+                    "[0ms] Query received: 'Troubleshoot ERR_8091_TIMEOUT in API gateway.'",
+                    "[15ms] Parallel Search Launched: Dense Embedding + BM25 Keyword Index.",
+                    "[35ms] BM25 retrieved 5 exact matches for 'ERR_8091_TIMEOUT'.",
+                    "[40ms] Vector DB retrieved 5 semantic matches for 'gateway timeout errors'.",
+                    "[65ms] Fusing candidate lists via Reciprocal Rank Fusion (RRF).",
+                    "[95ms] Cross-Encoder Reranker re-orders top 3 passages.",
+                    "[420ms] LLM outputs exact resolution steps."
+                ]
+            },
+            other: {
+                title: "Other RAG Variants",
+                badge: "Specialized Strategies",
+                colorClass: "red",
+                bestFor: "Specialized architectural requirements and custom domain edge cases.",
+                desc: "A suite of optimized retrieval techniques tailored for specialized data representations (summaries vs raw text, temporal decay, parent document context retrieval).",
+                strengths: [
+                    "Target optimization for specific document layouts",
+                    "Structural precision for granular vs broad context",
+                    "Resolves edge cases like temporal decay or dialog context"
+                ],
+                nodes: [
+                    { name: "Specialized Query", icon: "💬", desc: "Domain query or long conversation history" },
+                    { name: "Targeted Indexing", icon: "🎯", desc: "Parent-Child / Multi-Vector / Temporal" },
+                    { name: "Optimized Retrieval", icon: "⚙️", desc: "Fetches exact context granularity required" },
+                    { name: "Context Assembler", icon: "🧩", desc: "Formats context into prompt template" },
+                    { name: "LLM", icon: "🤖", desc: "Synthesizes final domain response" },
+                    { name: "Answer 💡", icon: "✨", desc: "Tailored domain answer" }
+                ],
+                simLog: [
+                    "[0ms] Query received in Parent-Child mode: 'Retrieve Section 4.2 clause.'",
+                    "[18ms] Vector index matched small child chunk (100 tokens).",
+                    "[30ms] Retrieval engine expanded child chunk to full Parent Document (1,500 tokens).",
+                    "[70ms] Sent full legal section context to LLM window.",
+                    "[390ms] LLM generated answer without lost-in-the-middle context loss."
+                ]
+            }
+        };
+
+        const VARIANT_DETAILS = {
+            multivector: {
+                title: "Multi-Vector RAG",
+                icon: "📦",
+                body: "Decouples the document representation used for retrieval from the context passed to the LLM. For instance, generating concise summaries or key questions for each document chunk, embedding those summaries into vectors, but linking them to the full raw text chunk. This drastically improves vector search accuracy on complex tables or long pages."
+            },
+            parentchild: {
+                title: "Parent-Child (Small-to-Big) RAG",
+                icon: "👨‍👦",
+                body: "Solves the context length dilemma. Documents are split into very small child chunks (e.g., 100 tokens) for high-precision semantic matching. When a child chunk matches a query, the system retrieves its larger Parent Document (e.g., 1,000 tokens) to provide full, coherent context to the LLM."
+            },
+            conversational: {
+                title: "Conversational RAG",
+                icon: "💬",
+                body: "Optimized for multi-turn chat applications. Employs a query condensation step where the user's latest message and previous conversation history are rewritten by an auxiliary model into a standalone search query before vector database lookup."
+            },
+            timeaware: {
+                title: "Time-Aware RAG",
+                icon: "🕒",
+                body: "Incorporates temporal metadata and recency weighting into the retrieval scoring formula. Useful for news, financial markets, or internal documentation where newer policies supersede older ones."
+            },
+            domain: {
+                title: "Domain-Specific RAG",
+                icon: "🏥",
+                body: "Custom-built for strict domain requirements like healthcare (HIPAA compliance, ICD-10 ontologies), legal (case precedent hierarchy), or software development (AST code trees)."
+            }
+        };
+
+        let activeRagKey = 'classic';
+        let currentStep = 0;
+
+        // Initialize Page
+        window.addEventListener('DOMContentLoaded', () => {
+            selectRag('classic');
+        });
+
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            const tabs = ['explorer', 'wizard', 'matrix', 'components'];
+            tabs.forEach(t => {
+                const view = document.getElementById(`view-${t}`);
+                const btn = document.getElementById(`tab-${t}`);
+                if (t === tabId) {
+                    view.classList.remove('hidden');
+                    btn.classList.add('bg-gray-800', 'text-white', 'border', 'border-gray-700');
+                    btn.classList.remove('text-gray-400');
+                } else {
+                    view.classList.add('hidden');
+                    btn.classList.remove('bg-gray-800', 'text-white', 'border', 'border-gray-700');
+                    btn.classList.add('text-gray-400');
+                }
+            });
+        }
+
+        // RAG Architecture Selection
+        function selectRag(key) {
+            activeRagKey = key;
+            currentStep = 0;
+            const data = RAG_DATA[key];
+
+            // Update buttons styling
+            document.querySelectorAll('.rag-select-btn').forEach(btn => {
+                btn.className = "rag-select-btn px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 bg-gray-800 text-gray-400 border border-gray-700 hover:bg-gray-700";
+            });
+
+            const activeBtn = document.getElementById(`rag-btn-${key}`);
+            if (activeBtn) {
+                const colorMap = {
+                    classic: 'bg-blue-600/20 text-blue-400 border-blue-500/50 glow-classic',
+                    graph: 'bg-emerald-600/20 text-emerald-400 border-emerald-500/50 glow-graph',
+                    agentic: 'bg-purple-600/20 text-purple-400 border-purple-500/50 glow-agentic',
+                    hybrid: 'bg-orange-600/20 text-orange-400 border-orange-500/50 glow-hybrid',
+                    other: 'bg-red-600/20 text-red-400 border-red-500/50 glow-other'
+                };
+                activeBtn.className = `rag-select-btn px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 ${colorMap[key]}`;
+            }
+
+            // Update Header Info Card
+            document.getElementById('rag-title').innerText = data.title;
+            document.getElementById('rag-badge').innerText = data.badge;
+            document.getElementById('rag-desc').innerText = data.desc;
+            document.getElementById('rag-bestfor').innerText = data.bestFor;
+
+            // Render Strengths
+            const strengthsUl = document.getElementById('rag-strengths');
+            strengthsUl.innerHTML = data.strengths.map(s => `<li class="flex items-center gap-2 text-gray-300">✓ ${s}</li>`).join('');
+
+            // Render Diagram Pipeline
+            renderPipelineNodes();
+
+            // Reset Simulation Log
+            const logContainer = document.getElementById('sim-log');
+            logContainer.innerHTML = `<p class="text-gray-500 italic">Press "Run Simulation Trace" to run telemetry for ${data.title}.</p>`;
+            document.getElementById('sim-status').innerText = '● Ready';
+            document.getElementById('sim-status').className = 'text-emerald-400 font-mono text-[11px]';
+        }
+
+        // Render Interactive Diagram Nodes
+        function renderPipelineNodes() {
+            const data = RAG_DATA[activeRagKey];
+            const container = document.getElementById('pipeline-container');
+            container.innerHTML = '';
+
+            document.getElementById('step-indicator').innerText = `Step ${currentStep} of ${data.nodes.length}`;
+
+            data.nodes.forEach((node, index) => {
+                const isStepActive = currentStep === index + 1;
+                const isPassed = currentStep > index + 1;
+
+                const nodeEl = document.createElement('div');
+                nodeEl.className = `p-3.5 rounded-xl border transition-all duration-300 flex items-center justify-between ${
+                    isStepActive
+                        ? 'node-active bg-gray-900 border-blue-500 shadow-lg text-white'
+                        : isPassed
+                        ? 'bg-gray-950/80 border-gray-800 text-gray-400'
+                        : 'bg-gray-950/40 border-gray-900 text-gray-600'
+                }`;
+
+                nodeEl.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 rounded-lg ${isStepActive ? 'bg-blue-500/20 text-blue-400' : 'bg-gray-800/50 text-gray-400'} flex items-center justify-center font-bold text-sm">
+                            ${node.icon}
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold ${isStepActive ? 'text-blue-300' : 'text-gray-200'}">${index + 1}. ${node.name}</div>
+                            <div class="text-[11px] text-gray-400">${node.desc}</div>
+                        </div>
+                    </div>
+                    ${isStepActive ? '<span class="text-[10px] bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded border border-blue-500/30 font-mono">ACTIVE</span>' : ''}
+                `;
+
+                container.appendChild(nodeEl);
+            });
+        }
+
+        // Pipeline Step Controls
+        function stepPipeline(dir) {
+            const max = RAG_DATA[activeRagKey].nodes.length;
+            currentStep += dir;
+            if (currentStep < 0) currentStep = 0;
+            if (currentStep > max) currentStep = max;
+            renderPipelineNodes();
+        }
+
+        function resetPipeline() {
+            currentStep = 0;
+            renderPipelineNodes();
+        }
+
+        // Query Simulation Execution
+        function runQuerySimulation() {
+            const data = RAG_DATA[activeRagKey];
+            const logContainer = document.getElementById('sim-log');
+            const statusEl = document.getElementById('sim-status');
+            
+            logContainer.innerHTML = '';
+            statusEl.innerText = '● Executing Trace...';
+            statusEl.className = 'text-yellow-400 font-mono text-[11px] animate-pulse';
+
+            currentStep = 0;
+            let stepIndex = 0;
+
+            const interval = setInterval(() => {
+                if (stepIndex < data.simLog.length) {
+                    const line = document.createElement('p');
+                    line.className = 'text-gray-300 font-mono text-xs animate-fadeIn';
+                    line.innerText = data.simLog[stepIndex];
+                    logContainer.appendChild(line);
+                    logContainer.scrollTop = logContainer.scrollHeight;
+
+                    // Advance visual pipeline node simultaneously
+                    if (stepIndex < data.nodes.length) {
+                        currentStep = stepIndex + 1;
+                        renderPipelineNodes();
+                    }
+
+                    stepIndex++;
+                } else {
+                    clearInterval(interval);
+                    statusEl.innerText = '● Completed';
+                    statusEl.className = 'text-emerald-400 font-mono text-[11px]';
+                }
+            }, 350);
+        }
+
+        function onQuerySelectChange() {
+            const val = document.getElementById('query-select').value;
+            // Map sample queries to best matching RAG architecture automatically
+            const map = {
+                general: 'classic',
+                relational: 'graph',
+                agentic: 'agentic',
+                hybrid: 'hybrid',
+                parentchild: 'other'
+            };
+            if (map[val]) {
+                selectRag(map[val]);
+            }
+        }
+
+        // Decision Wizard Logic
+        function calculateRecommendation() {
+            const comp = document.querySelector('input[name="w-complexity"]:checked').value;
+            const agentic = document.querySelector('input[name="w-agentic"]:checked').value;
+            const recall = document.querySelector('input[name="w-recall"]:checked').value;
+
+            let resultKey = 'classic';
+            let title = 'Classic RAG';
+            let fit = 'Match score: 95%';
+            let icon = '⚡';
+            let rationale = 'Your requirements favor a streamlined dense vector retrieval setup. Classic RAG delivers low latency, cost-effective performance for standard QA databases.';
+
+            if (agentic === 'yes') {
+                resultKey = 'agentic';
+                title = 'Agentic RAG';
+                icon = '🧠';
+                fit = 'Match score: 99% (Multi-step tool integration required)';
+                rationale = 'Because your workflow demands external tool access, API execution, and iterative reflection loops, Agentic RAG is essential for orchestration.';
+            } else if (comp === 'connected') {
+                resultKey = 'graph';
+                title = 'Graph RAG';
+                icon = '🕸️';
+                fit = 'Match score: 96% (High entity relationship density)';
+                rationale = 'Your knowledge base contains heavily interconnected entities. Graph RAG will preserve topological relationships and eliminate disconnected hallucinations.';
+            } else if (comp === 'exact' || recall === 'hybrid') {
+                resultKey = 'hybrid';
+                title = 'Hybrid RAG';
+                icon = '🔀';
+                fit = 'Match score: 97% (Exact keyword & code matching)';
+                rationale = 'Your queries rely on exact technical terms, SKUs, or error codes. Hybrid RAG merges BM25 keyword recall with dense semantic search and cross-encoder reranking.';
+            }
+
+            document.getElementById('wiz-res-icon').innerText = icon;
+            document.getElementById('wiz-res-title').innerText = title;
+            document.getElementById('wiz-res-fit').innerText = fit;
+            document.getElementById('wiz-res-rationale').innerText = rationale;
+
+            document.getElementById('wizard-form').classList.add('hidden');
+            document.getElementById('wizard-result').classList.remove('hidden');
+
+            document.getElementById('wiz-view-btn').onclick = () => {
+                switchTab('explorer');
+                selectRag(resultKey);
+            };
+        }
+
+        function resetWizard() {
+            document.getElementById('wizard-result').classList.add('hidden');
+            document.getElementById('wizard-form').classList.remove('hidden');
+        }
+
+        // Matrix Filtering
+        function filterMatrix() {
+            const q = document.getElementById('matrix-search').value.toLowerCase();
+            const rows = document.querySelectorAll('#matrix-tbody tr');
+            rows.forEach(r => {
+                const text = r.innerText.toLowerCase();
+                if (text.includes(q)) {
+                    r.style.display = '';
+                } else {
+                    r.style.display = 'none';
+                }
+            });
+        }
+
+        // Variant Modal Details
+        function showVariantDetails(key) {
+            const item = VARIANT_DETAILS[key];
+            if (!item) return;
+
+            document.getElementById('modal-icon').innerText = item.icon;
+            document.getElementById('modal-title').innerText = item.title;
+            document.getElementById('modal-body').innerText = item.body;
+            document.getElementById('variant-modal').classList.remove('hidden');
+        }
+
+        function closeVariantModal() {
+            document.getElementById('variant-modal').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>

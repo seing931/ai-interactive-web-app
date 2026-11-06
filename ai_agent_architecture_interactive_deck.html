@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Agent Architecture Presentation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    code, pre { font-family: 'JetBrains Mono', monospace; }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
+      50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.8); }
+    }
+    .glow-active { animation: pulse-glow 2s infinite; }
+  </style>
+</head>
+<body class="h-full flex flex-col overflow-hidden bg-slate-950 text-slate-100 selection:bg-cyan-500 selection:text-slate-950">
+
+  <!-- Header Navigation -->
+  <header class="h-16 border-b border-slate-800 bg-slate-900/80 backdrop-blur px-6 flex items-center justify-between z-20 shrink-0">
+    <div class="flex items-center space-x-3">
+      <div class="p-2 bg-cyan-500/10 border border-cyan-500/30 rounded-lg text-cyan-400">
+        <i data-lucide="cpu" class="w-6 h-6"></i>
+      </div>
+      <div>
+        <h1 class="font-bold text-lg leading-none bg-gradient-to-r from-white via-slate-200 to-cyan-400 bg-clip-text text-transparent">
+          AI Agent Architecture
+        </h1>
+        <p class="text-xs text-slate-400 mt-1">Based on Modern Autonomous Agent Blueprints</p>
+      </div>
+    </div>
+
+    <!-- Mode Tabs -->
+    <div class="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800">
+      <button id="tab-slides" onclick="switchView('slides')" class="px-4 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 transition-all bg-cyan-500 text-slate-950 shadow-lg shadow-cyan-500/20">
+        <i data-lucide="presentation" class="w-4 h-4"></i> Slide Deck
+      </button>
+      <button id="tab-sim" onclick="switchView('sim')" class="px-4 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 text-slate-400 hover:text-slate-200 transition-all">
+        <i data-lucide="play-circle" class="w-4 h-4"></i> Live Simulator
+      </button>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <button onclick="toggleFullscreen()" class="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition">
+        <i data-lucide="maximize-2" class="w-5 h-5"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="flex-1 relative overflow-hidden flex">
+
+    <!-- VIEW 1: SLIDE DECK VIEW -->
+    <div id="view-slides" class="w-full h-full flex flex-col md:flex-row overflow-hidden">
+      <!-- Slide Sidebar Index -->
+      <aside class="w-full md:w-80 border-r border-slate-800 bg-slate-900/50 flex flex-col shrink-0 h-48 md:h-full">
+        <div class="p-4 border-b border-slate-800 flex justify-between items-center">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Presentation Modules</span>
+          <span id="slide-counter" class="text-xs px-2 py-0.5 rounded bg-slate-800 text-cyan-400 font-mono">1 / 9</span>
+        </div>
+        <div id="slide-list" class="flex-1 overflow-y-auto p-3 space-y-1.5 custom-scrollbar">
+          <!-- Dynamically Generated Slide List -->
+        </div>
+      </aside>
+
+      <!-- Active Slide Content Area -->
+      <div class="flex-1 flex flex-col bg-slate-950 relative overflow-y-auto custom-scrollbar p-6 md:p-12">
+        <div class="max-w-4xl mx-auto w-full flex-1 flex flex-col justify-between">
+          <div id="slide-content" class="space-y-6">
+            <!-- Dynamic Slide Content Inserted Here -->
+          </div>
+
+          <!-- Presentation Nav Buttons -->
+          <div class="pt-8 mt-8 border-t border-slate-800/80 flex items-center justify-between shrink-0">
+            <button onclick="prevSlide()" class="px-5 py-2.5 rounded-xl border border-slate-700 bg-slate-900 text-slate-200 font-medium text-sm flex items-center gap-2 hover:bg-slate-800 transition disabled:opacity-40" id="btn-prev-slide">
+              <i data-lucide="chevron-left" class="w-4 h-4"></i> Previous
+            </button>
+
+            <div class="flex items-center gap-1.5" id="slide-dots">
+              <!-- Dots generated dynamically -->
+            </div>
+
+            <button onclick="nextSlide()" class="px-5 py-2.5 rounded-xl bg-cyan-500 text-slate-950 font-bold text-sm flex items-center gap-2 hover:bg-cyan-400 transition shadow-lg shadow-cyan-500/20 disabled:opacity-40" id="btn-next-slide">
+              Next <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 2: INTERACTIVE SIMULATOR -->
+    <div id="view-sim" class="w-full h-full hidden flex flex-col md:flex-row overflow-hidden p-6 gap-6 bg-slate-950">
+      <!-- Sim Controls & Prompt Selector -->
+      <div class="w-full md:w-96 flex flex-col gap-4 shrink-0">
+        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+          <h3 class="font-bold text-white text-base flex items-center gap-2 mb-2">
+            <i data-lucide="sliders" class="text-cyan-400 w-5 h-5"></i> Agent Simulation
+          </h3>
+          <p class="text-xs text-slate-400 mb-4">Select an agent scenario to trace its execution across architecture layers in real time.</p>
+          
+          <label class="text-xs font-semibold text-slate-300 block mb-1">Select Workflow Scenario:</label>
+          <select id="sim-scenario" onchange="resetSim()" class="w-full bg-slate-950 border border-slate-800 text-slate-200 text-sm rounded-xl p-3 focus:outline-none focus:border-cyan-500">
+            <option value="direct">1. Direct Response (Simple Greeting / General Q&A)</option>
+            <option value="tool">2. Tool Call Scenario (Fetch SQL Database & Summarize)</option>
+            <option value="complex">3. Multi-Step Agentic Loop (Research + Code Exec + File Write)</option>
+          </select>
+
+          <div class="mt-4 flex gap-2">
+            <button id="btn-run-sim" onclick="runSimulation()" class="flex-1 py-3 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl text-sm flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 transition">
+              <i data-lucide="play" class="w-4 h-4"></i> Run Execution
+            </button>
+            <button onclick="resetSim()" class="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-medium transition">
+              Reset
+            </button>
+          </div>
+        </div>
+
+        <!-- System Log Box -->
+        <div class="flex-1 bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col overflow-hidden min-h-[250px]">
+          <div class="flex justify-between items-center mb-3">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+              <i data-lucide="terminal" class="w-4 h-4 text-cyan-400"></i> Execution Telemetry Log
+            </span>
+            <span id="sim-status" class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400">Idle</span>
+          </div>
+          <div id="sim-log" class="flex-1 bg-slate-950 rounded-xl p-3 text-xs font-mono text-slate-300 overflow-y-auto space-y-2 border border-slate-800/80 custom-scrollbar">
+            <div class="text-slate-500">// Ready to trigger simulation workflow.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Execution Visualizer Panel -->
+      <div class="flex-1 bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col relative overflow-hidden">
+        <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-4 flex items-center justify-between">
+          <span>Active Execution Pipeline</span>
+          <span id="sim-step-indicator" class="text-xs font-normal text-cyan-400">Step 0 / 0</span>
+        </h3>
+
+        <!-- Dynamic Visual Flow Grid -->
+        <div class="flex-1 grid grid-cols-2 md:grid-cols-4 gap-4 overflow-y-auto p-2 custom-scrollbar" id="sim-pipeline-grid">
+          <!-- Dynamically Highlighted Components -->
+        </div>
+
+        <!-- Agent Internal Thought Drawer -->
+        <div class="mt-4 bg-slate-950 border border-slate-800 rounded-xl p-4">
+          <div class="text-xs font-bold text-purple-400 flex items-center gap-2 mb-1">
+            <i data-lucide="brain" class="w-4 h-4"></i> Reasoning Engine Internal State (Chain-of-Thought)
+          </div>
+          <p id="sim-thought" class="text-xs text-slate-400 italic">No active reasoning loop running.</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // SLIDE DECK DATA STRUCTURE
+    const slidesData = [
+      {
+        id: "intro",
+        title: "Overview of AI Agent Architecture",
+        subtitle: "The Anatomy of Modern Autonomous Intelligence Systems",
+        badge: "Architecture High-Level",
+        content: `
+          <div class="space-y-4">
+            <p class="text-slate-300 text-base leading-relaxed">
+              Unlike static Large Language Models (LLMs) that simply predict next words, an <strong>AI Agent</strong> is an autonomous operational framework capable of perceiving inputs, reasoning about goals, retrieving context, executing tool actions, and evaluating outcomes iteratively.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-6">
+              <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl">
+                <div class="text-cyan-400 font-bold text-sm mb-1">1. Perception & Intent</div>
+                <div class="text-xs text-slate-400">Captures multi-modal inputs, user queries, sensor events, and API payloads safely.</div>
+              </div>
+              <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl">
+                <div class="text-purple-400 font-bold text-sm mb-1">2. Cognitive Engine</div>
+                <div class="text-xs text-slate-400">Combines LLM reasoning patterns (ReAct, CoT) with short- and long-term memory.</div>
+              </div>
+              <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl">
+                <div class="text-emerald-400 font-bold text-sm mb-1">3. Action & Protocol</div>
+                <div class="text-xs text-slate-400">Executes tools, writes files, queries databases via standards like MCP (Model Context Protocol).</div>
+              </div>
+            </div>
+            <div class="p-4 bg-cyan-950/40 border border-cyan-800/60 rounded-xl text-xs text-cyan-200">
+              💡 <strong>Key takeaway:</strong> The agent acts as an orchestrator across decision loops, constantly checking <em>"Goal Completed?"</em> before emitting a final response.
+            </div>
+          </div>
+        `
+      },
+      {
+        id: "input-safety",
+        title: "Input Layer & Safety & Controls",
+        subtitle: "Frontline Defense and Ingestion Gateways",
+        badge: "Layer 1: Security & Trigger",
+        content: `
+          <div class="space-y-4">
+            <p class="text-slate-300 text-sm leading-relaxed">
+              Before raw prompts reach the core reasoning engine, they pass through rigorous validation, rate limiting, and permission boundaries.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+                <h4 class="font-bold text-white text-sm flex items-center gap-2 mb-2">
+                  <i data-lucide="log-in" class="w-4 h-4 text-cyan-400"></i> Input Sources
+                </h4>
+                <ul class="text-xs text-slate-400 space-y-2">
+                  <li>• <strong>User Queries:</strong> Natural language text, voice audio.</li>
+                  <li>• <strong>API Requests:</strong> Webhooks, web traffic, microservices.</li>
+                  <li>• <strong>Sensor Data & Events:</strong> IoT feeds, system telemetry.</li>
+                  <li>• <strong>Automated Triggers:</strong> Cron jobs, event queues.</li>
+                </ul>
+              </div>
+              <div class="bg-slate-900 p-4 rounded-xl border border-red-900/50">
+                <h4 class="font-bold text-red-400 text-sm flex items-center gap-2 mb-2">
+                  <i data-lucide="shield" class="w-4 h-4"></i> Safety & Controls
+                </h4>
+                <ul class="text-xs text-slate-400 space-y-2">
+                  <li>• <strong>Access Control:</strong> RBAC, JWT validation, API keys.</li>
+                  <li>• <strong>Rate Control:</strong> Preventing token exhaustion & DDoS.</li>
+                  <li>• <strong>Content Checks:</strong> Jailbreak detection & prompt injection filters.</li>
+                  <li>• <strong>Human-in-the-loop:</strong> Escalation checkpoints for high-risk actions.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        `
+      },
+      {
+        id: "understanding",
+        title: "Understanding & NLU Layer",
+        subtitle: "Parsing Raw Input into Actionable Intents",
+        badge: "Layer 2: NLU",
+        content: `
+          <div class="space-y-4">
+            <p class="text-slate-300 text-sm leading-relaxed">
+              The <strong>Understanding Layer</strong> converts structured/unstructured raw input into parsed intent schemas, entities, and context tokens ready for reasoning.
+            </p>
+            <div class="bg-slate-900 p-5 rounded-xl border border-slate-800 space-y-3">
+              <div class="flex justify-between text-xs font-mono text-slate-400 border-b border-slate-800 pb-2">
+                <span>Raw User Input</span>
+                <span class="text-cyan-400">Parsed Struct</span>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+                <div class="p-3 bg-slate-950 rounded border border-slate-800 text-slate-400">
+                  "Book a flight to NYC next Tuesday under $400 and email my manager."
+                </div>
+                <div class="p-3 bg-slate-950 rounded border border-slate-800 text-emerald-400">
+                  {<br>
+                  &nbsp;&nbsp;"intent": "book_flight_and_notify",<br>
+                  &nbsp;&nbsp;"destination": "NYC",<br>
+                  &nbsp;&nbsp;"budget": 400,<br>
+                  &nbsp;&nbsp;"requires_tools": true<br>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        `
+      },
+      {
+        id: "reasoning",
+        title: "Reasoning Engine / LLM Core",
+        subtitle: "The Cognitive Central Processing Unit",
+        badge: "Layer 3: Core Brain",
+        content: `
+          <div class="space-y-4">
+            <p class="text-slate-300 text-sm leading-relaxed">
+              The heart of the agent architecture is the <strong>Reasoning Engine</strong> powered by modern LLMs. It determines <em>how</em> to solve a problem using specialized cognitive frameworks:
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+                <div class="text-cyan-400 font-bold text-xs uppercase mb-1">Chain-of-Thought (CoT)</div>
+                <p class="text-xs text-slate-400">Breaks complex logic into sequential reasoning steps before generating responses.</p>
+              </div>
+              <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+                <div class="text-purple-400 font-bold text-xs uppercase mb-1">ReAct Paradigm</div>
+                <p class="text-xs text-slate-400">Interleaves <strong>Reasoning</strong> (Thought) and <strong>Acting</strong> (Tool execution) in a real-time loop.</p>
+              </div>
+              <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+                <div class="text-emerald-400 font-bold text-xs uppercase mb-1">Plan-and-Execute</div>
+                <p class="text-xs text-slate-400">Creates a full explicit DAG plan upfront, then dispatches sub-tasks to specialized tools.</p>
+              </div>
+            </div>
+          </div>
+        `
+      },
+      {
+        id: "memory",
+        title: "Memory System Architecture",
+        subtitle: "Short-Term Context & Long-Term Knowledge Storage",
+        badge: "Layer 4: State & Context",
+        content: `
+          <div class="space-y-4">
+            <p class="text-slate-300 text-sm leading-relaxed">
+              Without memory, an agent is stateless. The memory system provides both working context and historical recall.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="bg-slate-900 p-5 rounded-xl border border-purple-500/30">
+                <h4 class="font-bold text-purple-300 text-sm mb-2 flex items-center gap-2">
+                  <i data-lucide="zap" class="w-4 h-4"></i> Short-Term Memory
+                </h4>
+                <ul class="text-xs text-slate-300 space-y-2">
+                  <li>• Active conversation history & slide window.</li>
+                  <li>• Current task execution state & variables.</li>
+                  <li>• Intermediate tool call responses.</li>
+                </ul>
+              </div>
+              <div class="bg-slate-900 p-5 rounded-xl border border-purple-500/30">
+                <h4 class="font-bold text-purple-300 text-sm mb-2 flex items-center gap-2">
+                  <i data-lucide="database" class="w-4 h-4"></i> Long-Term Memory
+                </h4>
+                <ul class="text-xs text-slate-300 space-y-2">
+                  <li>• Vector databases (Pinecone, Qdrant, Chroma).</li>
+                  <li>• Episodic memory (past event logs).</li>
+                  <li>• Semantic memory (learned patterns & user preferences).</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        `
+      },
+      {
+        id: "planning-action",
+        title: "Planning Module & Task Queue",
+        subtitle: "Deconstructing Complex Goals into Sequential Execution Steps",
+        badge: "Layer 5: Planning & Execution",
+        content: `
+          <div class="space-y-4">
+            <p class="text-slate-300 text-sm leading-relaxed">
+              When an agent cannot respond directly, it routes to the <strong>Planning Module</strong>, breaking ambiguous objectives into discrete sub-tasks placed in a execution task queue.
+            </p>
+            <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 flex flex-col md:flex-row items-center gap-4">
+              <div class="flex-1 space-y-2 text-xs">
+                <div class="p-2 bg-slate-950 rounded border border-slate-800 text-amber-300 font-mono">
+                  Goal: "Generate Q3 Financial Audit Report"
+                </div>
+                <div class="pl-4 space-y-1 text-slate-400">
+                  <div class="flex items-center gap-2"><i data-lucide="corner-down-right" class="w-3 h-3 text-emerald-400"></i> Step 1: Query SQL DB for sales revenue</div>
+                  <div class="flex items-center gap-2"><i data-lucide="corner-down-right" class="w-3 h-3 text-emerald-400"></i> Step 2: Compute profit margins via Code Sandbox</div>
+                  <div class="flex items-center gap-2"><i data-lucide="corner-down-right" class="w-3 h-3 text-emerald-400"></i> Step 3: Write PDF summary file</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `
+      },
+      {
+        id: "mcp",
+        title: "MCP (Model Context Protocol) & Action Layer",
+        subtitle: "Standardized Tooling and Universal Interoperability",
+        badge: "Layer 6: Tool Ecosystem",
+        content: `
+          <div class="space-y-4">
+            <p class="text-slate-300 text-sm leading-relaxed">
+              <strong>MCP (Model Context Protocol)</strong> provides an open standard for securely connecting AI models to external data sources and execution environments.
+            </p>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-xs">
+              <div class="bg-slate-900 p-3 rounded-xl border border-cyan-800/40 text-center">
+                <i data-lucide="file-text" class="w-6 h-6 text-cyan-400 mx-auto mb-1"></i>
+                <div class="font-bold text-white">File Access</div>
+                <div class="text-[10px] text-slate-400">Read/Write Local & Cloud Files</div>
+              </div>
+              <div class="bg-slate-900 p-3 rounded-xl border border-cyan-800/40 text-center">
+                <i data-lucide="database" class="w-6 h-6 text-cyan-400 mx-auto mb-1"></i>
+                <div class="font-bold text-white">DB Searches</div>
+                <div class="text-[10px] text-slate-400">SQL Queries, Vector Retrievals</div>
+              </div>
+              <div class="bg-slate-900 p-3 rounded-xl border border-cyan-800/40 text-center">
+                <i data-lucide="cloud" class="w-6 h-6 text-cyan-400 mx-auto mb-1"></i>
+                <div class="font-bold text-white">API Requests</div>
+                <div class="text-[10px] text-slate-400">REST, GraphQL web services</div>
+              </div>
+              <div class="bg-slate-900 p-3 rounded-xl border border-cyan-800/40 text-center">
+                <i data-lucide="terminal" class="w-6 h-6 text-cyan-400 mx-auto mb-1"></i>
+                <div class="font-bold text-white">Code Running</div>
+                <div class="text-[10px] text-slate-400">Isolated Python/JS Execution</div>
+              </div>
+              <div class="bg-slate-900 p-3 rounded-xl border border-cyan-800/40 text-center">
+                <i data-lucide="github" class="w-6 h-6 text-cyan-400 mx-auto mb-1"></i>
+                <div class="font-bold text-white">External Tools</div>
+                <div class="text-[10px] text-slate-400">GitHub, Jira, Slack integrations</div>
+              </div>
+              <div class="bg-slate-900 p-3 rounded-xl border border-cyan-800/40 text-center flex flex-col justify-center items-center">
+                <i data-lucide="shield-check" class="w-6 h-6 text-emerald-400 mb-1"></i>
+                <div class="font-bold text-white">Secure Auth</div>
+                <div class="text-[10px] text-slate-400">OAuth & Secret Management</div>
+              </div>
+            </div>
+          </div>
+        `
+      },
+      {
+        id: "monitoring-loop",
+        title: "Monitoring Layer & Iterative Goal Evaluation",
+        subtitle: "Ensuring Output Quality, Accuracy, and Compliance",
+        badge: "Layer 7: Observability & Loop",
+        content: `
+          <div class="space-y-4">
+            <p class="text-slate-300 text-sm leading-relaxed">
+              After tool execution, the agent evaluates results through the <strong>Goal Completed?</strong> decision node. If incomplete, it re-enters the reasoning loop.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="bg-slate-900 p-4 rounded-xl border border-orange-500/30">
+                <h4 class="font-bold text-orange-300 text-sm mb-2 flex items-center gap-2">
+                  <i data-lucide="activity" class="w-4 h-4"></i> Monitoring & Telemetry
+                </h4>
+                <ul class="text-xs text-slate-300 space-y-1.5">
+                  <li>• Track latency & token cost per turn.</li>
+                  <li>• Hallucination detection & fact verification.</li>
+                  <li>• Output rate control & moderation checks.</li>
+                </ul>
+              </div>
+              <div class="bg-slate-900 p-4 rounded-xl border border-amber-500/30">
+                <h4 class="font-bold text-amber-300 text-sm mb-2 flex items-center gap-2">
+                  <i data-lucide="refresh-cw" class="w-4 h-4"></i> The Feedback Loop
+                </h4>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                  If the tool execution yielded error signals or partial results, the Reasoning Engine receives the feedback, updates Memory, and reformulates the next action step.
+                </p>
+              </div>
+            </div>
+          </div>
+        `
+      },
+      {
+        id: "summary",
+        title: "Summary & Architecture Blueprint Key Takeaways",
+        subtitle: "Building Reliable Autonomous Enterprise Agents",
+        badge: "Conclusion",
+        content: `
+          <div class="space-y-4">
+            <div class="bg-gradient-to-r from-slate-900 to-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4">
+              <h4 class="text-base font-bold text-cyan-400">Key Takeaways for System Engineers:</h4>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-slate-300">
+                <div class="p-3 bg-slate-950 rounded-lg border border-slate-800">
+                  <strong class="text-white block mb-1">1. Decoupled Components</strong>
+                  Reasoning, planning, and tool execution must remain modular for testability and security.
+                </div>
+                <div class="p-3 bg-slate-950 rounded-lg border border-slate-800">
+                  <strong class="text-white block mb-1">2. Standardized Integration</strong>
+                  Adopting protocols like MCP prevents tool fragmentation across different LLM backends.
+                </div>
+                <div class="p-3 bg-slate-950 rounded-lg border border-slate-800">
+                  <strong class="text-white block mb-1">3. Guardrails at Every Layer</strong>
+                  Safety checks occur twice: on raw input ingestion and prior to final output release.
+                </div>
+                <div class="p-3 bg-slate-950 rounded-lg border border-slate-800">
+                  <strong class="text-white block mb-1">4. Robust State Persistence</strong>
+                  Short-term state combined with vector long-term memory prevents endless loop degradation.
+                </div>
+              </div>
+            </div>
+          </div>
+        `
+      }
+    ];
+
+    // NODE DETAIL MODAL DATA
+    const nodeDetails = {
+      input: {
+        title: "Input Node",
+        tag: "Ingestion Layer",
+        desc: "Captures user requests, API triggers, streaming webhooks, sensor events, or schedule triggers.",
+        bullets: ["• User Text/Voice queries", "• REST/GraphQL webhooks", "• System event signals", "• Cron scheduled triggers"]
+      },
+      safety: {
+        title: "Safety & Controls",
+        tag: "Guardrail Layer",
+        desc: "Filters content, enforces RBAC permissions, limits execution rate, and routes high-risk actions to human approval.",
+        bullets: ["• Access Control & Permissions", "• Human-in-the-loop checkpoints", "• Prompt injection mitigation", "• Rate control & token quotas"]
+      },
+      memory: {
+        title: "Memory System",
+        tag: "Persistence Layer",
+        desc: "Manages state during active sessions and recalls relevant historical knowledge across long periods.",
+        bullets: ["• Short-term conversation context", "• Long-term vector databases", "• Episodic event logs", "• Learned user preferences"]
+      },
+      understanding: {
+        title: "Understanding Layer",
+        tag: "NLU Processing",
+        desc: "Translates natural language inputs into structured entity trees, intent specs, and actionable schemas.",
+        bullets: ["• Entity extraction", "• Intent parsing", "• Multi-modal preprocessing", "• Language translation"]
+      },
+      reasoning: {
+        title: "Reasoning Engine / LLM Core",
+        tag: "Cognitive Core",
+        desc: "The core decision-making LLM utilizing CoT, ReAct, and Plan-and-Execute strategies.",
+        bullets: ["• Chain-of-Thought reasoning", "• Dynamic ReAct loops", "• Self-correction capabilities", "• Context synthesis"]
+      },
+      decision1: {
+        title: "Can I respond directly?",
+        tag: "Branch Node",
+        desc: "Evaluates if the request requires external tool calls/data lookup or if it can be answered immediately from model knowledge.",
+        bullets: ["• Direct Q&A route", "• Action delegation route", "• Latency minimization check", "• Simple vs Complex classification"]
+      },
+      planning: {
+        title: "Planning Module",
+        tag: "Task Orchestration",
+        desc: "Decomposes multi-step complex goals into an ordered task sequence and places them into an execution queue.",
+        bullets: ["• Goal decomposition", "• Step 1 → Step 2 → Step N dependency graphs", "• Sub-task prioritization", "• Task Queue management"]
+      },
+      action: {
+        title: "Action / Tool Layer",
+        tag: "Execution Engine",
+        desc: "Executes programmatic function calls, tool operations, and API integrations determined by the Planning Module.",
+        bullets: ["• Function calling execution", "• API payload building", "• Tool result parsing", "• Exception & retry handling"]
+      },
+      mcp: {
+        title: "Model Context Protocol (MCP)",
+        tag: "Integration Standard",
+        desc: "Standardized interface for safe, bi-directional communication between LLMs, local tools, files, code sandboxes, and cloud tools.",
+        bullets: ["• File system read/write", "• SQL database execution", "• API requests", "• Code execution & GitHub integration"]
+      },
+      decision2: {
+        title: "Goal Completed?",
+        tag: "Evaluation Node",
+        desc: "Verifies if the action results satisfy the original objective. If not, loops back to the Reasoning Engine for another iteration.",
+        bullets: ["• Quality evaluation", "• Objective completion verification", "• Multi-turn feedback loop", "• Final response routing"]
+      }
+    };
+
+    // STATE MANAGEMENT
+    let currentSlideIndex = 0;
+    let simTimer = null;
+
+    // INITIALIZATION
+    window.onload = function() {
+      lucide.createIcons();
+      renderSlideList();
+      renderSlideContent();
+      buildSimPipeline();
+    };
+
+    // VIEW SWITCHING
+    function switchView(viewName) {
+      document.getElementById('view-slides').classList.add('hidden');
+      document.getElementById('view-sim').classList.add('hidden');
+
+      document.getElementById('tab-slides').className = "px-4 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 text-slate-400 hover:text-slate-200 transition-all";
+      document.getElementById('tab-sim').className = "px-4 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 text-slate-400 hover:text-slate-200 transition-all";
+
+      if (viewName === 'slides') {
+        document.getElementById('view-slides').classList.remove('hidden');
+        document.getElementById('tab-slides').className = "px-4 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 bg-cyan-500 text-slate-950 shadow-lg shadow-cyan-500/20 transition-all";
+      } else if (viewName === 'sim') {
+        document.getElementById('view-sim').classList.remove('hidden');
+        document.getElementById('tab-sim').className = "px-4 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 bg-cyan-500 text-slate-950 shadow-lg shadow-cyan-500/20 transition-all";
+      }
+    }
+
+    // SLIDE DECK FUNCTIONS
+    function renderSlideList() {
+      const container = document.getElementById('slide-list');
+      container.innerHTML = '';
+
+      slidesData.forEach((slide, idx) => {
+        const btn = document.createElement('button');
+        btn.onclick = () => goToSlide(idx);
+        btn.className = `w-full text-left p-3 rounded-xl text-xs transition flex flex-col gap-1 border ${
+          idx === currentSlideIndex
+            ? 'bg-slate-800 border-cyan-500/50 text-white font-semibold'
+            : 'border-transparent text-slate-400 hover:bg-slate-900 hover:text-slate-200'
+        }`;
+        btn.innerHTML = `
+          <div class="flex justify-between items-center">
+            <span class="text-[10px] font-mono text-cyan-400">0${idx + 1}</span>
+            <span class="text-[9px] px-1.5 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-400">${slide.badge}</span>
+          </div>
+          <div class="truncate text-slate-200">${slide.title}</div>
+        `;
+        container.appendChild(btn);
+      });
+
+      renderDots();
+    }
+
+    function renderDots() {
+      const dotsContainer = document.getElementById('slide-dots');
+      dotsContainer.innerHTML = '';
+      slidesData.forEach((_, idx) => {
+        const dot = document.createElement('span');
+        dot.onclick = () => goToSlide(idx);
+        dot.className = `w-2 h-2 rounded-full cursor-pointer transition-all ${
+          idx === currentSlideIndex ? 'bg-cyan-400 w-5' : 'bg-slate-700 hover:bg-slate-500'
+        }`;
+        dotsContainer.appendChild(dot);
+      });
+    }
+
+    function renderSlideContent() {
+      const slide = slidesData[currentSlideIndex];
+      const container = document.getElementById('slide-content');
+
+      document.getElementById('slide-counter').textContent = `${currentSlideIndex + 1} / ${slidesData.length}`;
+
+      container.innerHTML = `
+        <div class="space-y-2">
+          <div class="inline-block text-xs font-bold font-mono px-2.5 py-1 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800">
+            ${slide.badge}
+          </div>
+          <h2 class="text-2xl md:text-3xl font-extrabold text-white tracking-tight">${slide.title}</h2>
+          <p class="text-sm text-slate-400">${slide.subtitle}</p>
+        </div>
+        <div class="pt-4 border-t border-slate-800/80">
+          ${slide.content}
+        </div>
+      `;
+
+      document.getElementById('btn-prev-slide').disabled = currentSlideIndex === 0;
+      document.getElementById('btn-next-slide').disabled = currentSlideIndex === slidesData.length - 1;
+
+      renderSlideList();
+      lucide.createIcons();
+    }
+
+    function goToSlide(idx) {
+      currentSlideIndex = idx;
+      renderSlideContent();
+    }
+
+    function nextSlide() {
+      if (currentSlideIndex < slidesData.length - 1) {
+        currentSlideIndex++;
+        renderSlideContent();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlideIndex > 0) {
+        currentSlideIndex--;
+        renderSlideContent();
+      }
+    }
+
+    // DIAGRAM MODAL SELECTION
+    function selectNode(key) {
+      const info = nodeDetails[key];
+      if (!info) return;
+
+      document.getElementById('modal-tag').textContent = info.tag;
+      document.getElementById('modal-title').textContent = info.title;
+      document.getElementById('modal-desc').textContent = info.desc;
+
+      const bulletsContainer = document.getElementById('modal-bullets');
+      bulletsContainer.innerHTML = '';
+      info.bullets.forEach(b => {
+        const div = document.createElement('div');
+        div.textContent = b;
+        bulletsContainer.appendChild(div);
+      });
+
+      document.getElementById('node-modal').classList.remove('hidden');
+    }
+
+    function closeNodeModal() {
+      document.getElementById('node-modal').classList.add('hidden');
+    }
+
+    // SIMULATOR LOGIC
+    const componentsList = [
+      { id: "sim-input", name: "Input Layer", icon: "arrow-down-left" },
+      { id: "sim-safety", name: "Safety & Controls", icon: "shield" },
+      { id: "sim-understanding", name: "Understanding Layer", icon: "brain" },
+      { id: "sim-memory", name: "Memory System", icon: "database" },
+      { id: "sim-reasoning", name: "Reasoning Engine / LLM", icon: "cpu" },
+      { id: "sim-planning", name: "Planning & Queue", icon: "map" },
+      { id: "sim-action", name: "Action / Tool Layer", icon: "wrench" },
+      { id: "sim-mcp", name: "MCP Standard Tools", icon: "layers" },
+      { id: "sim-monitoring", name: "Monitoring Layer", icon: "activity" },
+      { id: "sim-output", name: "Output Layer", icon: "check-circle" }
+    ];
+
+    function buildSimPipeline() {
+      const grid = document.getElementById('sim-pipeline-grid');
+      grid.innerHTML = '';
+      componentsList.forEach(c => {
+        const div = document.createElement('div');
+        div.id = c.id;
+        div.className = "bg-slate-950 border border-slate-800/80 rounded-xl p-4 flex flex-col justify-between transition-all opacity-50";
+        div.innerHTML = `
+          <div class="flex items-center justify-between">
+            <i data-lucide="${c.icon}" class="w-5 h-5 text-slate-500 comp-icon"></i>
+            <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-slate-900 text-slate-500 comp-status">Inactive</span>
+          </div>
+          <div class="mt-3">
+            <div class="text-xs font-bold text-slate-300">${c.name}</div>
+          </div>
+        `;
+        grid.appendChild(div);
+      });
+      lucide.createIcons();
+    }
+
+    const scenarios = {
+      direct: [
+        { comp: "sim-input", thought: "Ingesting user prompt: 'What is the capital of France?'", log: "Input trigger received via Chat UI." },
+        { comp: "sim-safety", thought: "Scanning input against content moderation guardrails...", log: "Safety checks passed. No jailbreak pattern." },
+        { comp: "sim-understanding", thought: "Parsing intent: Direct general knowledge request.", log: "Intent parsed: direct_knowledge_qa." },
+        { comp: "sim-memory", thought: "Checking conversation context...", log: "Short-term context updated." },
+        { comp: "sim-reasoning", thought: "Reasoning: Direct answer available in LLM parameters. Decision: Can I respond directly? -> YES.", log: "Reasoning loop: Answer ready without tools." },
+        { comp: "sim-monitoring", thought: "Running output validation check...", log: "Monitoring layer verified answer quality." },
+        { comp: "sim-output", thought: "Delivering answer: 'The capital of France is Paris.'", log: "Output dispatched to client." }
+      ],
+      tool: [
+        { comp: "sim-input", thought: "Ingesting query: 'Fetch active user count from DB'", log: "Input received via API Webhook." },
+        { comp: "sim-safety", thought: "Checking database read permissions...", log: "RBAC verified for SQL read permission." },
+        { comp: "sim-understanding", thought: "Parsing intent: Database search query required.", log: "Intent parsed: execute_db_query." },
+        { comp: "sim-reasoning", thought: "Decision: Can I respond directly? -> NO. Planning tool invocation.", log: "Reasoning Engine initiated tool loop." },
+        { comp: "sim-planning", thought: "Splitting goal: Task 1 -> Execute SELECT COUNT(*) query.", log: "Task queue updated with SQL action." },
+        { comp: "sim-action", thought: "Dispatching SQL tool request...", log: "Action Layer invoked MCP connector." },
+        { comp: "sim-mcp", thought: "MCP executing query on PostgreSQL Database...", log: "MCP returned: { count: 1420 }." },
+        { comp: "sim-reasoning", thought: "Evaluating result: Goal Completed? -> YES. Formulating summary response.", log: "Reasoning finalized response from tool payload." },
+        { comp: "sim-monitoring", thought: "Auditing SQL execution security and telemetry.", log: "Telemetry logged 120ms total latency." },
+        { comp: "sim-output", thought: "Delivering output: 'There are currently 1,420 active users.'", log: "Output rendered to user UI." }
+      ],
+      complex: [
+        { comp: "sim-input", thought: "Ingesting complex goal: 'Gather top tech news, write python analysis script, save summary file.'", log: "Complex multi-task prompt received." },
+        { comp: "sim-safety", thought: "Evaluating code execution security & file writing permissions...", log: "Sandboxed execution permissions granted." },
+        { comp: "sim-understanding", thought: "Parsing intent: Multi-step research & code compilation.", log: "Intent parsed: autonomous_research_coding." },
+        { comp: "sim-memory", thought: "Retrieving user coding guidelines from Long-Term Vector Memory.", log: "Vector lookup completed." },
+        { comp: "sim-reasoning", thought: "Decision: Can respond directly? -> NO. Formulating DAG execution plan.", log: "Plan-and-Execute reasoning activated." },
+        { comp: "sim-planning", thought: "Plan created: Step 1 API fetch -> Step 2 Code run -> Step 3 File creation.", log: "Task Queue populated with 3 sub-tasks." },
+        { comp: "sim-action", thought: "Executing Step 1: External API fetch...", log: "Action layer triggering web search." },
+        { comp: "sim-mcp", thought: "MCP: Accessing web search API & Running Python code in sandbox...", log: "Python code executed successfully. File summary.md generated." },
+        { comp: "sim-reasoning", thought: "Evaluating loop: Goal Completed? -> YES.", log: "Goal verification confirmed completion." },
+        { comp: "sim-monitoring", thought: "Checking generated file against security rules...", log: "File payload clean." },
+        { comp: "sim-output", thought: "Output delivered: 'Summary file created successfully as summary.md'.", log: "Execution sequence complete." }
+      ]
+    };
+
+    function resetSim() {
+      if (simTimer) clearInterval(simTimer);
+      document.getElementById('sim-status').textContent = 'Idle';
+      document.getElementById('sim-status').className = 'text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400';
+      document.getElementById('sim-log').innerHTML = '<div class="text-slate-500">// Ready to trigger simulation workflow.</div>';
+      document.getElementById('sim-thought').textContent = 'No active reasoning loop running.';
+      document.getElementById('sim-step-indicator').textContent = 'Step 0 / 0';
+      buildSimPipeline();
+    }
+
+    function runSimulation() {
+      resetSim();
+      const type = document.getElementById('sim-scenario').value;
+      const steps = scenarios[type];
+      let stepIdx = 0;
+
+      document.getElementById('sim-status').textContent = 'Running';
+      document.getElementById('sim-status').className = 'text-[10px] px-2 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-800 animate-pulse';
+
+      simTimer = setInterval(() => {
+        if (stepIdx >= steps.length) {
+          clearInterval(simTimer);
+          document.getElementById('sim-status').textContent = 'Completed';
+          document.getElementById('sim-status').className = 'text-[10px] px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800';
+          return;
+        }
+
+        const current = steps[stepIdx];
+        document.getElementById('sim-step-indicator').textContent = `Step ${stepIdx + 1} / ${steps.length}`;
+        
+        // Highlight active component
+        componentsList.forEach(c => {
+          const el = document.getElementById(c.id);
+          if (c.id === current.comp) {
+            el.className = "bg-slate-900 border-2 border-cyan-400 rounded-xl p-4 flex flex-col justify-between shadow-lg shadow-cyan-500/20 glow-active opacity-100 scale-105 transition-all";
+            el.querySelector('.comp-icon').className = "w-5 h-5 text-cyan-400 comp-icon";
+            el.querySelector('.comp-status').textContent = "ACTIVE";
+            el.querySelector('.comp-status').className = "text-[9px] font-mono px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-800 comp-status";
+          } else {
+            el.className = "bg-slate-950 border border-slate-800/80 rounded-xl p-4 flex flex-col justify-between transition-all opacity-40";
+            el.querySelector('.comp-icon').className = "w-5 h-5 text-slate-500 comp-icon";
+            el.querySelector('.comp-status').textContent = "Waiting";
+            el.querySelector('.comp-status').className = "text-[9px] font-mono px-1.5 py-0.5 rounded bg-slate-900 text-slate-500 comp-status";
+          }
+        });
+
+        // Update Internal Thought
+        document.getElementById('sim-thought').textContent = `"${current.thought}"`;
+
+        // Update Log
+        const logBox = document.getElementById('sim-log');
+        const logEntry = document.createElement('div');
+        logEntry.className = "flex gap-2 text-[11px]";
+        logEntry.innerHTML = `
+          <span class="text-cyan-400 shrink-0 font-mono">[${new Date().toLocaleTimeString().split(' ')[0]}]</span>
+          <span class="text-slate-300">${current.log}</span>
+        `;
+        logBox.appendChild(logEntry);
+        logBox.scrollTop = logBox.scrollHeight;
+
+        stepIdx++;
+      }, 1400);
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {});
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+  </script>
+</body>
+</html>
